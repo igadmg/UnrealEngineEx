@@ -1,0 +1,14 @@
+.vs
+Binaries
+Build
+DerivedDataCache
+Intermediate
+Saved
+Release
+Debug
+x32
+x64
+*.sdf
+*.sln
+*.opendb
+*.db

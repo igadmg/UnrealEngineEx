@@ -1,0 +1,12 @@
+.vs
+*.dll
+*.user
+build/
+Binaries/
+Intermediate/
+mac/
+ARM
+ARM-Android-NVIDIA
+Win32
+x64
+xcuserdata
