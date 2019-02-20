@@ -1,6 +1,7 @@
 #include "CoordinateFrame.0.h"
 
 #include "CoordinateFrame.FTransform.h"
+#include "CoordinateFrame.FPlane.h"
 
 #ifdef ENGINE_Actor_generated_h
 #include "CoordinateFrame.AActor.h"

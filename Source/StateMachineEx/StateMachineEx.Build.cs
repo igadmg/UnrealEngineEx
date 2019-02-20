@@ -22,6 +22,7 @@ public class StateMachineEx : ModuleRules
 			});
 
 		PublicDependencyModuleNames.AddRange(new string[] {
+				"UnrealEngineEx",
 			});
 
 
@@ -31,7 +32,6 @@ public class StateMachineEx : ModuleRules
 			});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
-				"UnrealEngineEx",
 			});
 
 
