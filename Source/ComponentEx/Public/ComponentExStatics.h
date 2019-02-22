@@ -13,6 +13,10 @@ class COMPONENTEX_API UComponentExStatics : public UBlueprintFunctionLibrary
 
 
 public:
+	UFUNCTION(Category = "ComponentEx", BlueprintCallable)
+	static void SetActorEnabled(class AActor* Actor, bool bIsEnabled);
+
+
 	UFUNCTION(Category = "PostProcessing", BlueprintCallable)
 	static class UObject* GetBlendable(class APostProcessVolume* Volume, int Index);
 

@@ -9,12 +9,14 @@ public class InterpolationEx : ModuleRules
 	public InterpolationEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
-		PrivateIncludePaths.AddRange(new string[] {
-				"InterpolationEx/Private"
-			});
+		PrivatePCHHeaderFile = "Public/InterpolationEx.h";
 
 		PublicIncludePaths.AddRange(new string[] {
-				"InterpolationEx/Public"
+				Path.Combine(ModuleDirectory, "Public"),
+			});
+
+		PrivateIncludePaths.AddRange(new string[] {
+				Path.Combine(ModuleDirectory, "Private"),
 			});
 
 		PublicDependencyModuleNames.AddRange(new string[] {

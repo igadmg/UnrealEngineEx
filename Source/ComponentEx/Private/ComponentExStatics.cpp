@@ -1,10 +1,15 @@
 #include "ComponentExPrivatePCH.h"
-
 #include "ComponentExStatics.h"
 
+#include "ComponentEx.h"
 #include "Components/SplineComponent.h"
 
 
+
+void UComponentExStatics::SetActorEnabled(AActor* Actor, bool bIsEnabled)
+{
+	FComponentEx::SetActorEnabled(Actor, bIsEnabled);
+}
 
 UObject* UComponentExStatics::GetBlendable(APostProcessVolume* Volume, int Index)
 {

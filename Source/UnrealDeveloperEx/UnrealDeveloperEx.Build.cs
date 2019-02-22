@@ -1,3 +1,4 @@
+using System.IO;
 using UnrealBuildTool;
 
 
@@ -7,13 +8,15 @@ public class UnrealDeveloperEx : ModuleRules
 	public UnrealDeveloperEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
+		PrivatePCHHeaderFile = "Private/UnrealDeveloperExPrivatePCH.h";
+
 		PublicIncludePaths.AddRange(new string[] {
-				"UnrealDeveloperEx/Public"
+				Path.Combine(ModuleDirectory, "Public"),
 			});
 
 
 		PrivateIncludePaths.AddRange(new string[] {
-				"UnrealDeveloperEx/Private",
+				Path.Combine(ModuleDirectory, "Private"),
 			});
 
 
@@ -34,7 +37,6 @@ public class UnrealDeveloperEx : ModuleRules
 			});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
-				"StateMachineEx",
 			});
 
 

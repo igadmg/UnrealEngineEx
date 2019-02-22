@@ -76,26 +76,7 @@ TAssetPtr<UWorld> FUnrealEngineEx::GetLevelPtr(FString PackageName)
 FString FUnrealEngineEx::GetLevelName(const TAssetPtr<UWorld>& Level)
 {
 	//FPackageName::SearchForPackageOnDisk(LevelName.ToString() + FPackageName::GetMapPackageExtension(), &MapFullName)
-	return FPackageName::ObjectPathToObjectName(Level.ToStringReference().ToString());
-}
-
-void FUnrealEngineEx::SetActorEnabled(AActor* Actor, bool bIsEnabled)
-{
-	Actor->SetActorHiddenInGame(!bIsEnabled);
-	Actor->SetActorEnableCollision(bIsEnabled);
-	Actor->SetActorTickEnabled(bIsEnabled);
-	UStaticMeshComponent* MeshComponent = Cast<UStaticMeshComponent>(Actor->GetComponentByClass(UStaticMeshComponent::StaticClass()));
-	if (MeshComponent != NULL)
-	{
-		if (bIsEnabled)
-		{
-			UNavigationSystem::OnComponentRegistered(MeshComponent);
-		}
-		else
-		{
-			UNavigationSystem::OnComponentUnregistered(MeshComponent);
-		}
-	}
+	return FPackageName::ObjectPathToObjectName(Level.ToSoftObjectPath().ToString());
 }
 
 void FUnrealEngineEx::FinishLatentAction(FLatentActionManager& LatentManager, const FLatentActionInfo& LatentInfo)

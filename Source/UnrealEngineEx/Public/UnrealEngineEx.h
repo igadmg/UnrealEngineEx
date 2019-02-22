@@ -54,7 +54,5 @@ struct FUnrealEngineEx
 	UNREALENGINEEX_API static TAssetPtr<UWorld> GetLevelPtr(FString PackageName);
 	UNREALENGINEEX_API static FString GetLevelName(const TAssetPtr<UWorld>& Level);
 
-	UNREALENGINEEX_API static void SetActorEnabled(class AActor* Actor, bool bIsEnabled);
-
 	UNREALENGINEEX_API static void FinishLatentAction(FLatentActionManager& LatentManager, const FLatentActionInfo& LatentInfo);
 };

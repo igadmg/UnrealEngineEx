@@ -1,3 +1,4 @@
+using System.IO;
 using UnrealBuildTool;
 
 
@@ -7,13 +8,15 @@ public class UnrealEngineEx : ModuleRules
 	public UnrealEngineEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
+		PrivatePCHHeaderFile = "Private/UnrealEngineExPrivatePCH.h";
+
 		PublicIncludePaths.AddRange(new string[] {
-				"UnrealEngineEx/Public"
+				Path.Combine(ModuleDirectory, "Public"),
 			});
 
 
 		PrivateIncludePaths.AddRange(new string[] {
-				"UnrealEngineEx/Private",
+				Path.Combine(ModuleDirectory, "Private"),
 			});
 
 
@@ -37,7 +40,7 @@ public class UnrealEngineEx : ModuleRules
 
 		DynamicallyLoadedModuleNames.AddRange(new string[]{});
 
-		if (UEBuildConfiguration.bBuildEditor)
+		if (Target.Type == TargetRules.TargetType.Editor)
 		{
 			PrivateDependencyModuleNames.AddRange(new string[] {
 					"UnrealEd",

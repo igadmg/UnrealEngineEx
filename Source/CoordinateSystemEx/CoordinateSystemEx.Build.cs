@@ -1,3 +1,4 @@
+using System.IO;
 using UnrealBuildTool;
 
 
@@ -7,13 +8,15 @@ public class CoordinateSystemEx : ModuleRules
 	public CoordinateSystemEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
+		PrivatePCHHeaderFile = "Private/CoordinateSystemExPrivatePCH.h";
+
 		PublicIncludePaths.AddRange(new string[] {
-				"Public"
+				Path.Combine(ModuleDirectory, "Public"),
 			});
 
 
 		PrivateIncludePaths.AddRange(new string[] {
-				"Private",
+				Path.Combine(ModuleDirectory, "Private"),
 			});
 
 

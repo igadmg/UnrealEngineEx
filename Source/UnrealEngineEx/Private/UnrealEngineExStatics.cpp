@@ -236,11 +236,6 @@ bool UUnrealEngineExStatics::DoFrustumCheckSphere(ULocalPlayer* Player, FVector 
 	return false;
 }
 
-void UUnrealEngineExStatics::SetActorEnabled(AActor* Actor, bool bIsEnabled)
-{
-	FUnrealEngineEx::SetActorEnabled(Actor, bIsEnabled);
-}
-
 TAssetPtr<UWorld> UUnrealEngineExStatics::GetCurrentLevelAssetPtr(const UObject* WorldContextObject)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
@@ -297,7 +292,7 @@ UObject* UUnrealEngineExStatics::FindLevelScriptObject(const UObject* WorldConte
 	if (UKismetSystemLibrary::DoesImplementInterface(LevelScriptActor, ObjectClass))
 		return LevelScriptActor;
 
-	for (ULevelStreaming* Sublevel : World->StreamingLevels)
+	for (ULevelStreaming* Sublevel : World->GetStreamingLevels())
 	{
 		AActor* SublevelScriptActor = GetLevelScriptActorFromStreamingLevel(WorldContextObject, Sublevel);
 		if (UKismetSystemLibrary::DoesImplementInterface(SublevelScriptActor, ObjectClass))
@@ -317,7 +312,7 @@ bool UUnrealEngineExStatics::FindLevelScriptObjects(const UObject* WorldContextO
 	if (UKismetSystemLibrary::DoesImplementInterface(LevelScriptActor, ObjectClass))
 		Objects.Add(LevelScriptActor);
 
-	for (ULevelStreaming* Sublevel : World->StreamingLevels)
+	for (ULevelStreaming* Sublevel : World->GetStreamingLevels())
 	{
 		AActor* SublevelScriptActor = GetLevelScriptActorFromStreamingLevel(WorldContextObject, Sublevel);
 		if (UKismetSystemLibrary::DoesImplementInterface(SublevelScriptActor, ObjectClass))
@@ -333,14 +328,14 @@ ULevelStreaming* UUnrealEngineExStatics::AddStreamingLevel(UObject* WorldContext
 	if (!IsValid(World))
 		return nullptr;
 
-	ULevelStreaming** LevelStreamingPtr = World->StreamingLevels.FindByPredicate(FFindStreamingLevelBy(Level));
+	auto LevelStreamingPtr = World->GetStreamingLevels().FindByPredicate(FFindStreamingLevelBy(Level));
 	if (LevelStreamingPtr != nullptr)
 		return *LevelStreamingPtr;
 
 	ULevelStreaming* AsyncLevel = NewObject<ULevelStreaming>(World, ULevelStreamingKismet::StaticClass(), NAME_None, RF_Transient, NULL);
 	AsyncLevel->SetWorldAsset(Level);
-	AsyncLevel->bShouldBeLoaded = false;
-	AsyncLevel->bShouldBeVisible = false;
+	AsyncLevel->SetShouldBeLoaded(false);
+	AsyncLevel->SetShouldBeVisible(false);
 	AsyncLevel->LevelTransform = FTransform::Identity;
 
 #if WITH_EDITOR
@@ -351,7 +346,7 @@ ULevelStreaming* UUnrealEngineExStatics::AddStreamingLevel(UObject* WorldContext
 	}
 #endif
 
-	World->StreamingLevels.Add(AsyncLevel);
+	World->AddStreamingLevel(AsyncLevel);
 
 	return AsyncLevel;
 }
@@ -423,7 +418,7 @@ public:
 
 	ULevelStreaming* FindLevel(const TAssetPtr<UWorld>& LevelAssetPtr)
 	{
-		ULevelStreaming** LevelPtr = World->StreamingLevels.FindByPredicate(FFindStreamingLevelBy(LevelAssetPtr));
+		auto LevelPtr = World->GetStreamingLevels().FindByPredicate(FFindStreamingLevelBy(LevelAssetPtr));
 
 		return LevelPtr ? *LevelPtr : nullptr;
 	}
@@ -436,16 +431,16 @@ public:
 			if (bLoading)
 			{
 				UE_LOG(LogStreaming, Log, TEXT("Streaming in level %s (%s)..."), *LevelStreamingObject->GetName(), *LevelStreamingObject->GetWorldAssetPackageName());
-				LevelStreamingObject->bShouldBeLoaded = true;
-				LevelStreamingObject->bShouldBeVisible |= bMakeVisibleAfterLoad;
+				LevelStreamingObject->SetShouldBeLoaded(true);
+				LevelStreamingObject->SetShouldBeVisible(LevelStreamingObject->GetShouldBeVisibleFlag() | bMakeVisibleAfterLoad);
 				LevelStreamingObject->bShouldBlockOnLoad = bShouldBlockOnLoad;
 			}
 			// Unloading.
 			else
 			{
 				UE_LOG(LogStreaming, Log, TEXT("Streaming out level %s (%s)..."), *LevelStreamingObject->GetName(), *LevelStreamingObject->GetWorldAssetPackageName());
-				LevelStreamingObject->bShouldBeLoaded = false;
-				LevelStreamingObject->bShouldBeVisible = false;
+				LevelStreamingObject->SetShouldBeLoaded(false);
+				LevelStreamingObject->SetShouldBeVisible(false);
 			}
 
 			UWorld* LevelWorld = CastChecked<UWorld>(LevelStreamingObject->GetOuter());
@@ -459,16 +454,16 @@ public:
 
 					UE_LOG(LogLevel, Log, TEXT("ActivateLevel %s %i %i %i"),
 						*LevelStreamingObject->GetWorldAssetPackageName(),
-						LevelStreamingObject->bShouldBeLoaded,
-						LevelStreamingObject->bShouldBeVisible,
+						LevelStreamingObject->ShouldBeLoaded(),
+						LevelStreamingObject->ShouldBeVisible(),
 						LevelStreamingObject->bShouldBlockOnLoad);
 
 
 
 					PlayerController->LevelStreamingStatusChanged(
 						LevelStreamingObject,
-						LevelStreamingObject->bShouldBeLoaded,
-						LevelStreamingObject->bShouldBeVisible,
+						LevelStreamingObject->ShouldBeLoaded(),
+						LevelStreamingObject->ShouldBeVisible(),
 						LevelStreamingObject->bShouldBlockOnLoad,
 						INDEX_NONE);
 				}
@@ -484,17 +479,17 @@ public:
 			return true;
 		}
 		// Level is neither loaded nor should it be so we finished (in the sense that we have a pending GC request) unloading.
-		else if ((LevelStreamingObject->GetLoadedLevel() == NULL) && !LevelStreamingObject->bShouldBeLoaded)
+		else if ((LevelStreamingObject->GetLoadedLevel() == NULL) && !LevelStreamingObject->ShouldBeLoaded())
 		{
 			return true;
 		}
 		// Level shouldn't be loaded but is as background level streaming is enabled so we need to fire finished event regardless.
-		else if (LevelStreamingObject->GetLoadedLevel() && !LevelStreamingObject->bShouldBeLoaded && !GUseBackgroundLevelStreaming)
+		else if (LevelStreamingObject->GetLoadedLevel() && !LevelStreamingObject->ShouldBeLoaded() && !GUseBackgroundLevelStreaming)
 		{
 			return true;
 		}
 		// Level is both loaded and wanted so we finished loading.
-		else if (LevelStreamingObject->GetLoadedLevel() && LevelStreamingObject->bShouldBeLoaded
+		else if (LevelStreamingObject->GetLoadedLevel() && LevelStreamingObject->ShouldBeLoaded()
 			// Make sure we are visible if we are required to be so.
 			&& (!bMakeVisibleAfterLoad || LevelStreamingObject->GetLoadedLevel()->bIsVisible))
 		{
@@ -565,15 +560,15 @@ void UUnrealEngineExStatics::UnloadStreamLevelListBlocking(const UObject* WorldC
 
 	for (const TAssetPtr<UWorld>& Level : LevelList)
 	{
-		ULevelStreaming** LevelPtr = World->StreamingLevels.FindByPredicate(FFindStreamingLevelBy(Level));
+		auto LevelPtr = World->GetStreamingLevels().FindByPredicate(FFindStreamingLevelBy(Level));
 
 		if (LevelPtr != nullptr)
 		{
 			ULevelStreaming* LevelStreamingObject = *LevelPtr;
 
 			UE_LOG(LogStreaming, Log, TEXT("Streaming out level %s (%s)..."), *LevelStreamingObject->GetName(), *LevelStreamingObject->GetWorldAssetPackageName());
-			LevelStreamingObject->bShouldBeLoaded = false;
-			LevelStreamingObject->bShouldBeVisible = false;
+			LevelStreamingObject->SetShouldBeLoaded(false);
+			LevelStreamingObject->SetShouldBeVisible(false);
 
 			UWorld* LevelWorld = CastChecked<UWorld>(LevelStreamingObject->GetOuter());
 			// If we have a valid world
@@ -586,16 +581,16 @@ void UUnrealEngineExStatics::UnloadStreamLevelListBlocking(const UObject* WorldC
 
 					UE_LOG(LogLevel, Log, TEXT("ActivateLevel %s %i %i %i"),
 						*LevelStreamingObject->GetWorldAssetPackageName(),
-						LevelStreamingObject->bShouldBeLoaded,
-						LevelStreamingObject->bShouldBeVisible,
+						LevelStreamingObject->ShouldBeLoaded(),
+						LevelStreamingObject->ShouldBeVisible(),
 						LevelStreamingObject->bShouldBlockOnLoad);
 
 
 
 					PlayerController->LevelStreamingStatusChanged(
 						LevelStreamingObject,
-						LevelStreamingObject->bShouldBeLoaded,
-						LevelStreamingObject->bShouldBeVisible,
+						LevelStreamingObject->ShouldBeLoaded(),
+						LevelStreamingObject->ShouldBeVisible(),
 						LevelStreamingObject->bShouldBlockOnLoad,
 						INDEX_NONE);
 				}

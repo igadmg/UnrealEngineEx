@@ -1,3 +1,4 @@
+using System.IO;
 using UnrealBuildTool;
 
 
@@ -7,13 +8,15 @@ public class UnrealEditorEx : ModuleRules
 	public UnrealEditorEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
+		PrivatePCHHeaderFile = "Private/UnrealEditorExPrivatePCH.h";
+
 		PublicIncludePaths.AddRange(new string[] {
-				"UnrealEditorEx/Public"
+				Path.Combine(ModuleDirectory, "Public"),
 			});
 
 
 		PrivateIncludePaths.AddRange(new string[] {
-				"UnrealEditorEx/Private",
+				Path.Combine(ModuleDirectory, "Private"),
 			});
 
 

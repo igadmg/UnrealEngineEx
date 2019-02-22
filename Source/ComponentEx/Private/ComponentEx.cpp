@@ -32,15 +32,17 @@ void FComponentEx::SetActorEnabled(AActor* Actor, bool bIsEnabled)
 	Actor->SetActorTickEnabled(bIsEnabled);
 	UStaticMeshComponent* MeshComponent = Cast<UStaticMeshComponent>(Actor->GetComponentByClass(UStaticMeshComponent::StaticClass()));
 
-	if (MeshComponent != NULL)
+	if (MeshComponent != nullptr)
 	{
 		if (bIsEnabled)
 		{
-			UNavigationSystem::OnComponentRegistered(MeshComponent);
+
+			FNavigationSystem::OnComponentRegistered(*MeshComponent);
 		}
 		else
 		{
-			UNavigationSystem::OnComponentUnregistered(MeshComponent);
+
+			FNavigationSystem::OnComponentUnregistered(*MeshComponent);
 		}
 	}
 }

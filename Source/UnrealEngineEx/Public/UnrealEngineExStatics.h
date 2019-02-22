@@ -51,10 +51,6 @@ public:
 	static bool DoFrustumCheckSphere(class ULocalPlayer* Player, FVector Location, float Radius, bool& bIntersecting);
 
 
-	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable)
-	static void SetActorEnabled(class AActor* Actor, bool bIsEnabled);
-
-
 	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static TAssetPtr<UWorld> GetCurrentLevelAssetPtr(const UObject* WorldContextObject);
 

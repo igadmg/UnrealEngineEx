@@ -29,7 +29,7 @@ void USynchronizedNetworkClock::SynchronizeTimeServer_Implementation(int32 InTok
 	UNetDriver* NetDriver = GetWorld()->GetNetDriver();
 	if (IsValid(NetDriver))
 	{
-		FNetworkObjectInfo* NetworkObjectInfo = NetDriver->GetNetworkObjectInfo(GetOwner());
+		FNetworkObjectInfo* NetworkObjectInfo = NetDriver->FindNetworkObjectInfo(GetOwner());
 		UE_LOG(LogUnrealEngineEx, Log, TEXT("NetworkObjectInfo: %f"), NetworkObjectInfo->NextUpdateTime);
 	}
 

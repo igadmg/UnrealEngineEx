@@ -1,3 +1,4 @@
+using System.IO;
 using UnrealBuildTool;
 
 
@@ -7,13 +8,15 @@ public class ComponentEx : ModuleRules
 	public ComponentEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
+		PrivatePCHHeaderFile = "Private/ComponentExPrivatePCH.h";
+
 		PublicIncludePaths.AddRange(new string[] {
-				"ComponentEx/Public"
+				Path.Combine(ModuleDirectory, "Public"),
 			});
 
 
 		PrivateIncludePaths.AddRange(new string[] {
-				"ComponentEx/Private",
+				Path.Combine(ModuleDirectory, "Private"),
 			});
 
 
