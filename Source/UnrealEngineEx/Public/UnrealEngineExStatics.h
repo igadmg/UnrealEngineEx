@@ -104,7 +104,7 @@ public:
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable)
 	static void ShutdownGame();
 
-	
+
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable)
 	static FTransform GetTransfromInFrontOfPlayer(class AActor* PlayerPawnOrController, FVector Offset);
 
@@ -118,6 +118,13 @@ public:
 
 	UFUNCTION(Category = "UnrealEngineEx|Debug", BlueprintCallable, meta = (WorldContext = "WorldContextObject", DevelopmentOnly))
 	static void DrawDebugFloatHistoryTransformEx(UObject* WorldContextObject, const FDebugFloatHistory& FloatHistory, const FTransform& DrawTransform, FVector2D DrawSize, FLinearColor DrawColor = FLinearColor::White, float Duration = 0.f);
+
+
+	UFUNCTION(Category = "Utilities|String", BlueprintPure, meta = (DisplayName = "ToString (Timespan)", AdvancedDisplay = "1", BlueprintAutocast))
+	static FString Conv_TimespanToString(FTimespan Timespan, FString Format)
+	{
+		return Timespan.ToString(*Format);
+	}
 
 
 

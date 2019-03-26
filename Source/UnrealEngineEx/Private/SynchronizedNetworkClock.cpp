@@ -1,6 +1,8 @@
 #include "UnrealEngineExPrivatePCH.h"
 #include "SynchronizedNetworkClock.h"
 
+#include "LatentActions.h"
+#include "Kismet/GameplayStatics.h"
 #include "Engine/NetworkObjectList.h"
 #include "Net/UnrealNetwork.h"
 

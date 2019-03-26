@@ -3,6 +3,7 @@
 
 #include "ComponentEx.h"
 #include "Components/SplineComponent.h"
+#include "Engine/PostProcessVolume.h"
 #include "Engine/Texture.h"
 
 

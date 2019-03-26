@@ -6,6 +6,7 @@
 #include "SPeekEditor.h"
 
 #include "Toolkits/ToolkitManager.h"
+#include "EditorModeManager.h"
 
 /*
 #include "ScopedTransaction.h"

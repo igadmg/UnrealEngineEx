@@ -1,12 +1,19 @@
 #include "UnrealEngineExPrivatePCH.h"
 #include "UnrealEngineExStatics.h"
 
+#include "Camera/CameraComponent.h"
 #include "Engine/CoreSettings.h"
+#include "Engine/LevelScriptActor.h"
+#include "Engine/LevelStreaming.h"
+#include "Engine/LevelStreamingDynamic.h"
+#include "Engine/LocalPlayer.h"
+#include "GameFramework/GameStateBase.h"
+#include "GameFramework/GameModeBase.h"
+#include "GameFramework/PlayerState.h"
 #include "AsyncTask.h"
 #include "AsyncTaskManager.h"
 #include "DebugDrawHelpersEx.h"
-
-#include "Engine/LocalPlayer.h"
+#include "LatentActions.h"
 
 #include "CoordinateFrame.h"
 

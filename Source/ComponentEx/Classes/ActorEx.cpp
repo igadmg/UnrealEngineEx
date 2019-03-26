@@ -1,6 +1,7 @@
 #include "ComponentExPrivatePCH.h"
 #include "ActorEx.h"
 
+#include "Camera/CameraComponent.h"
 
 
 UCameraComponent* FActorEx::GetCameraComponent() const

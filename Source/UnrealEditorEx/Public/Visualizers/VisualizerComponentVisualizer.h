@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ComponentVisualizer.h"
 
 
 class FVisualizerComponentVisualizer : public FComponentVisualizer
