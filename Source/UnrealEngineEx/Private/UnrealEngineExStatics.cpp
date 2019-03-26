@@ -339,7 +339,11 @@ ULevelStreaming* UUnrealEngineExStatics::AddStreamingLevel(UObject* WorldContext
 	if (LevelStreamingPtr != nullptr)
 		return *LevelStreamingPtr;
 
+#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 21
+	ULevelStreaming* AsyncLevel = NewObject<ULevelStreaming>(World, ULevelStreamingDynamic::StaticClass(), NAME_None, RF_Transient, NULL);
+#else
 	ULevelStreaming* AsyncLevel = NewObject<ULevelStreaming>(World, ULevelStreamingKismet::StaticClass(), NAME_None, RF_Transient, NULL);
+#endif
 	AsyncLevel->SetWorldAsset(Level);
 	AsyncLevel->SetShouldBeLoaded(false);
 	AsyncLevel->SetShouldBeVisible(false);

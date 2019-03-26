@@ -1,3 +1,5 @@
+#include <type_traits>
+
 #include "CoordinateFrame.0.h"
 
 #include "CoordinateFrame.FTransform.h"

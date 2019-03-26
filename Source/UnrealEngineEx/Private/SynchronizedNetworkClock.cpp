@@ -21,7 +21,7 @@ void USynchronizedNetworkClock::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 	DOREPLIFETIME(USynchronizedNetworkClock, ServerTime);
 }
 */
-bool USynchronizedNetworkClock::SynchronizeTimeServer_Validate(int32 Token)
+bool USynchronizedNetworkClock::SynchronizeTimeServer_Validate(int32 InToken)
 {
 	return true;
 }
