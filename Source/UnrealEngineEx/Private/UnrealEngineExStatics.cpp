@@ -770,7 +770,7 @@ FDebugFloatHistory UUnrealEngineExStatics::RenormalizeFloatHistorySamples(FVecto
 		return FloatHistory;
 
 	FDebugFloatHistory* const MutableFloatHistory = const_cast<FDebugFloatHistory*>(&FloatHistory);
-	
+
 	float MinValue = TNumericLimits<float>::Max();
 	float MaxValue = TNumericLimits<float>::Min();
 
@@ -805,9 +805,9 @@ void UUnrealEngineExStatics::DrawDebugFloatHistoryTransformEx(UObject* WorldCont
 {
 #if ENABLE_DRAW_DEBUG
 	UWorld * World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
-	if (!IsValid(GEditor))
+	if (!IsValid(World))
 		return;
-	
+
 	::DrawDebugFloatHistoryEx(*World, FloatHistory, DrawTransform, DrawSize, DrawColor.ToFColor(true), false, LifeTime);
 #endif
 }
