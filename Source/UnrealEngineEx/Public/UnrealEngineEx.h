@@ -55,5 +55,14 @@ struct FUnrealEngineEx
 	UNREALENGINEEX_API static void FinishLatentAction(FLatentActionManager& LatentManager, const FLatentActionInfo& LatentInfo);
 };
 
-#define if_Implements(Type, Name, Variable) \
-if (auto Name = Variable) if (IsValid(Name) && FUnrealEngineEx::DoesImplementInterface<Type>(Name))
+template <typename UT, typename T>
+const T* ValidInterface(const T* v) { return IsValid(v) && FUnrealEngineEx::DoesImplementInterface<UT>(v) ? v : nullptr; }
+
+template <typename UT, typename T>
+T* ValidInterface(T* v) { return IsValid(v) && FUnrealEngineEx::DoesImplementInterface<UT>(v) ? v : nullptr; }
+
+#define if_Implements(Type, Name, Expression) \
+if (auto Name = ValidInterface<U ## Type>(Expression))
+
+#define if_ImplementsT(UType, Name, Expression) \
+if (auto Name = ValidInterface<UType>(Expression))

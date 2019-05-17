@@ -33,8 +33,24 @@ FORCEINLINE bool FMath::IsWithinInclusive<FVector4>(const FVector4& TestValue, c
 
 struct FMathEx
 {
+	static bool InRange(float Value, float Min, float Max) { return Value < Max && Value > Min; }
+
 	static MATHEX_API FVector FindCentroid(const TArray<FVector>& Values);
 	static MATHEX_API float RandomSameDigitsNumber(float Value);
+
+	template <typename T>
+	static const T& RandomArrayElement(const TArray<T>& Array)
+	{
+		verify(Array.Num() > 0);
+		return Array[FMath::RandRange(0, Array.Num() - 1)];
+	}
+
+	template <typename T>
+	static T& RandomArrayElement(TArray<T>& Array)
+	{
+		verify(Array.Num() > 0);
+		return Array[FMath::RandRange(0, Array.Num() - 1)];
+	}
 
 	static MATHEX_API float ProjectPointOnLineSegment(const FVector& LineStart, const FVector& LineEnd, const FVector& Point);
 	static MATHEX_API FVector ClosestPointOnLineSegment(const FVector& LineStart, const FVector& LineEnd, const FVector& Point);

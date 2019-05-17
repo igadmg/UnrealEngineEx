@@ -35,7 +35,7 @@ TAssetPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrToPIE(const TAssetPtr<UWorld>&
 	return NewWorld;
 }
 
-TAssetPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrFromPIE(const TAssetPtr<UWorld>& Level, class UWorld* World)
+TAssetPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrFromPIE(const TAssetPtr<UWorld>& Level, UWorld* World)
 {
 	FString PIELevelPackageName = UWorld::StripPIEPrefixFromPackageName(FPackageName::ObjectPathToPackageName(Level.ToString()), World->StreamingLevelsPrefix);
 	FString PIELevelObjectName = UWorld::RemovePIEPrefix(FPackageName::GetLongPackageAssetName(PIELevelPackageName));
