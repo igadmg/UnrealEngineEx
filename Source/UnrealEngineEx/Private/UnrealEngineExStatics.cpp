@@ -8,12 +8,14 @@
 #include "Engine/LevelStreaming.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "Engine/LocalPlayer.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/HUD.h"
 #include "GameFramework/InputSettings.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameFramework/PlayerState.h"
+#include "GameFramework/SpectatorPawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "AsyncTask.h"
@@ -123,54 +125,66 @@ void UUnrealEngineExStatics::RestartPlayerByState(APlayerState* PlayerState)
 }
 
 
+APlayerController* UUnrealEngineExStatics::GetLocalPlayerController(const UObject* WorldContextObject)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	if (!IsValid(World))
+		return nullptr;
+
+	return World->GetFirstPlayerController();
+}
+
 APlayerState* UUnrealEngineExStatics::GetPlayerState(const UObject* Object)
 {
 	if (!IsValid(Object))
 		return nullptr;
 
 
-	if (Object->IsA(AActor::StaticClass()))
+	const AActor* AsActor = Cast<AActor>(Object);
+	if (AsActor)
 	{
 		const APlayerState* AsPlayerState = Cast<APlayerState>(Object);
-		if (IsValid(AsPlayerState))
+		if (AsPlayerState)
 		{
 			return const_cast<APlayerState*>(AsPlayerState);
 		}
 
 		const APawn* AsPawn = Cast<APawn>(Object);
-		if (IsValid(AsPawn))
+		if (AsPawn)
 		{
 			return AsPawn->GetPlayerState();
 		}
 
 		const AController* AsController = Cast<AController>(Object);
-		if (IsValid(AsController))
+		if (AsController)
 		{
 			return AsController->PlayerState;
 		}
 
 		const AHUD* AsHUD = Cast<AHUD>(Object);
-		if (IsValid(AsHUD))
+		if (AsHUD)
 		{
 			return GetPlayerState(AsHUD->GetOwningPlayerController());
 		}
+
+		return GetPlayerState(AsActor->GetOwner());
 	}
 	else
 	{
 		const UActorComponent* AsActorComponent = Cast<UActorComponent>(Object);
-		if (IsValid(AsActorComponent))
+		if (AsActorComponent)
 		{
 			return GetPlayerState(AsActorComponent->GetOwner());
 		}
 
 		const UUserWidget* AsUserWidget = Cast<UUserWidget>(Object);
-		if (IsValid(AsUserWidget))
+		if (AsUserWidget)
 		{
 			return GetPlayerState(AsUserWidget->GetOwningPlayer());
 		}
 	}
 
-	return nullptr;
+	return GetPlayerState(Object->GetOuter());
 }
 
 APawn* UUnrealEngineExStatics::GetPawnOrSpectator(const UObject* Object)
@@ -209,48 +223,45 @@ AController* UUnrealEngineExStatics::GetController(const UObject* Object)
 		return nullptr;
 
 
-	if (Object->IsA(AActor::StaticClass()))
+	const AActor* AsActor = Cast<AActor>(Object);
+	if (AsActor)
 	{
 		const AController* AsController = Cast<AController>(Object);
-		if (IsValid(AsController))
+		if (AsController)
 		{
 			return const_cast<AController*>(AsController);
 		}
 
 		const APawn* AsPawn = Cast<APawn>(Object);
-		if (IsValid(AsPawn))
+		if (AsPawn)
 		{
 			return AsPawn->GetController();
 		}
 
-		const APlayerState* AsPlayerState = Cast<APlayerState>(Object);
-		if (IsValid(AsPlayerState))
-		{
-			return Cast<AController>(AsPlayerState->GetOwner());
-		}
-
 		const AHUD* AsHUD = Cast<AHUD>(Object);
-		if (IsValid(AsHUD))
+		if (AsHUD)
 		{
 			return AsHUD->GetOwningPlayerController();
 		}
+
+		return GetController(AsActor->GetOwner());
 	}
 	else
 	{
 		const UActorComponent* AsActorComponent = Cast<UActorComponent>(Object);
-		if (IsValid(AsActorComponent))
+		if (AsActorComponent)
 		{
 			return GetController(AsActorComponent->GetOwner());
 		}
 
 		const UUserWidget* AsUserWidget = Cast<UUserWidget>(Object);
-		if (IsValid(AsUserWidget))
+		if (AsUserWidget)
 		{
 			return AsUserWidget->GetOwningPlayer();
 		}
 	}
 
-	return nullptr;
+	return GetController(Object->GetOuter());
 }
 
 APlayerCameraManager* UUnrealEngineExStatics::GetCameraController(const UObject* Object)
@@ -270,6 +281,26 @@ UCameraComponent* UUnrealEngineExStatics::GetPlayerActiveCamera(const UObject* O
 
 	if (!IsValid(Controller->PlayerCameraManager))
 		return nullptr;
+
+	return nullptr;
+}
+
+UCharacterMovementComponent* UUnrealEngineExStatics::GetCharacterMovementComponent(const UObject* Object)
+{
+	if (!IsValid(Object))
+		return nullptr;
+
+	const ACharacter* AsCharacter = Cast<ACharacter>(Object);
+	if (AsCharacter)
+	{
+		return AsCharacter->GetCharacterMovement();
+	}
+
+	const UActorComponent* AsActorComponent = Cast<UActorComponent>(Object);
+	if (AsActorComponent)
+	{
+		return GetCharacterMovementComponent(AsActorComponent->GetOwner());
+	}
 
 	return nullptr;
 }
@@ -879,6 +910,48 @@ void UUnrealEngineExStatics::UnloadStreamLevelListBlocking(const UObject* WorldC
 						LevelStreamingObject->bShouldBlockOnLoad,
 						INDEX_NONE);
 				}
+			}
+		}
+	}
+}
+
+void UUnrealEngineExStatics::UnloadStreamLevelStreamingListBlocking(const UObject* WorldContextObject, TArray<ULevelStreaming*> LevelList)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	if (!IsValid(World))
+		return;
+
+	if (LevelList.Num() == 0)
+		return;
+
+	for (ULevelStreaming* Level : LevelList)
+	{
+		UE_LOG(LogStreaming, Log, TEXT("Streaming out level %s (%s)..."), *Level->GetName(), *Level->GetWorldAssetPackageName());
+		Level->SetShouldBeLoaded(false);
+		Level->SetShouldBeVisible(false);
+
+		UWorld* LevelWorld = CastChecked<UWorld>(Level->GetOuter());
+		// If we have a valid world
+		if (IsValid(LevelWorld))
+		{
+			// Notify players of the change
+			for (FConstPlayerControllerIterator Iterator = LevelWorld->GetPlayerControllerIterator(); Iterator; ++Iterator)
+			{
+				APlayerController* PlayerController = Iterator->Get();
+
+				UE_LOG(LogLevel, Log, TEXT("ActivateLevel %s %i %i %i"),
+					*Level->GetWorldAssetPackageName(),
+					Level->ShouldBeLoaded(),
+					Level->ShouldBeVisible(),
+					Level->bShouldBlockOnLoad);
+
+
+				PlayerController->LevelStreamingStatusChanged(
+					Level,
+					Level->ShouldBeLoaded(),
+					Level->ShouldBeVisible(),
+					Level->bShouldBlockOnLoad,
+					INDEX_NONE);
 			}
 		}
 	}

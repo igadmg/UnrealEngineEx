@@ -39,6 +39,9 @@ public:
 	static void RestartPlayerByState(class APlayerState* PlayerState);
 
 
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
+	static class APlayerController* GetLocalPlayerController(const UObject* WorldContextObject);
+
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
 	static class APlayerState* GetPlayerState(const UObject* Object);
 
@@ -59,6 +62,9 @@ public:
 
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
 	static class UCameraComponent* GetPlayerActiveCamera(const UObject* Object);
+
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
+	static class UCharacterMovementComponent* GetCharacterMovementComponent(const UObject* Object);
 
 
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
@@ -112,6 +118,9 @@ public:
 
 	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	static void UnloadStreamLevelListBlocking(const UObject* WorldContextObject, TArray<TAssetPtr<UWorld>> LevelList);
+
+	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	static void UnloadStreamLevelStreamingListBlocking(const UObject* WorldContextObject, TArray<ULevelStreaming*> LevelList);
 
 	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	static void ShowAllStreamingLevels(const UObject* WorldContextObject);

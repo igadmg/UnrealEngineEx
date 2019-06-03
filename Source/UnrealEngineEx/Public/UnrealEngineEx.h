@@ -4,6 +4,7 @@
 
 #include "UnrealEngineExTypes.h"
 
+#include <type_traits>
 
 
 class FUnrealEngineExModule : public IModuleInterface
@@ -66,3 +67,52 @@ if (auto Name = ValidInterface<U ## Type>(Expression))
 
 #define if_ImplementsT(UType, Name, Expression) \
 if (auto Name = ValidInterface<UType>(Expression))
+
+#define if_CanExecuteCosmeticEvents(WorldContextObject) \
+if (!UKismetSystemLibrary::IsDedicatedServer(WorldContextObject))
+
+
+static ENetRole GetNetRole(const AActor* Actor)
+{
+	return Actor->Role;
+}
+
+static ENetRole GetNetRole(const UActorComponent* ActorComponent)
+{
+	return ActorComponent->GetOwnerRole();
+}
+
+#define if_HasAuthority(WorldContextObject) \
+if (GetNetRole(WorldContextObject) == ROLE_Authority)
+
+#define if_HasNoAuthority(WorldContextObject) \
+if (GetNetRole(WorldContextObject) < ROLE_Authority)
+
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline E operator & (E lhs, E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<E>(static_cast<T>(lhs) & static_cast<T>(rhs));
+}
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline E operator | (E lhs, E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<E>(static_cast<T>(lhs) | static_cast<T>(rhs));
+}
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline E operator ^ (E lhs, E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<E>(static_cast<T>(lhs) ^ static_cast<T>(rhs));
+}
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline bool operator % (E lhs, E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<T>(lhs & rhs) == static_cast<T>(rhs);
+}

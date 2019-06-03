@@ -21,6 +21,18 @@ static bool IsValid(TScriptInterface<T> ScriptInterface)
 	return IsValid(ScriptInterface.GetObject());
 }
 
+static bool IsValid(FDelegateHandle DelegateHandle)
+{
+	return DelegateHandle.IsValid();
+}
+
+#ifdef UNREALENGINEEX_PropertyAccessor_generated_h
+static bool IsValid(const FPropertyAccessor& PropertyAccessor)
+{
+	return PropertyAccessor.IsValid();
+}
+#endif
+
 #ifdef ENGINE_BodyInstance_generated_h
 static bool IsValid(FBodyInstance* BodyInstance)
 {
