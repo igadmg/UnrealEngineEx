@@ -2,6 +2,14 @@
 #include "Core.h"
 #include "ModuleManager.h"
 
+#include "GameFramework/GameStateBase.h"
+#include "GameFramework/Pawn.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
+#include "LatentActions.h"
+
+#include "UnrealEngineExStatics.h"
 
 
 #define LOCTEXT_NAMESPACE "FUnrealEngineExModule"
@@ -16,6 +24,31 @@ void FUnrealEngineExModule::ShutdownModule()
 {
 }
 
+
+UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, AGameModeBase* Unused)
+{
+	return UGameplayStatics::GetGameMode(Object);
+}
+
+UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, AGameStateBase* Unused)
+{
+	return UGameplayStatics::GetGameState(Object);
+}
+
+UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, APlayerController* Unused)
+{
+	return UUnrealEngineExStatics::GetController(Object);
+}
+
+UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, APlayerState* Unused)
+{
+	return UUnrealEngineExStatics::GetPlayerState(Object);
+}
+
+UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, APawn* Unused)
+{
+	return UUnrealEngineExStatics::GetPlayerPawn(Object);
+}
 
 
 #if WITH_EDITOR

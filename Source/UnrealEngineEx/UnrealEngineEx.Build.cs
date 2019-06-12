@@ -34,6 +34,8 @@ public class UnrealEngineEx : ModuleRules
 				"Engine",
 				"EngineSettings",
 				"InputCore",
+				"SlateCore",
+				"Slate",
 				"UMG",
 			});
 
