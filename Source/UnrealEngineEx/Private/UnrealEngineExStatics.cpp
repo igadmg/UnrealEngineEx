@@ -134,6 +134,24 @@ APlayerController* UUnrealEngineExStatics::GetLocalPlayerController(const UObjec
 	return World->GetFirstPlayerController();
 }
 
+AHUD* UUnrealEngineExStatics::GetPlayerHUD(const UObject* Object)
+{
+	if (!IsValid(Object))
+		return nullptr;
+
+	const AHUD* AsHUD = Cast<AHUD>(Object);
+	if (AsHUD)
+	{
+		return const_cast<AHUD*>(AsHUD);
+	}
+	if (auto PlayerController = Cast<APlayerController>(GetController(Object)))
+	{
+		return PlayerController->GetHUD();
+	}
+
+	return nullptr;
+}
+
 APlayerState* UUnrealEngineExStatics::GetPlayerState(const UObject* Object)
 {
 	if (!IsValid(Object))

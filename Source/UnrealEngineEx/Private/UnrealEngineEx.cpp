@@ -35,9 +35,14 @@ UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, AGameStateB
 	return UGameplayStatics::GetGameState(Object);
 }
 
+UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, AHUD* Unused)
+{
+	return UUnrealEngineExStatics::GetPlayerHUD(Object);
+}
+
 UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, APlayerController* Unused)
 {
-	return UUnrealEngineExStatics::GetController(Object);
+	return Cast<APlayerController>(UUnrealEngineExStatics::GetController(Object));
 }
 
 UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, APlayerState* Unused)

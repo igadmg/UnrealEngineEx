@@ -43,6 +43,7 @@ struct FUnrealEngineEx
 	template <typename T> static T* GetAssociatedObject(const UObject* Object) { return Cast<T>(GetAssociatedObject(Object, (T*)nullptr)); }
 	UNREALENGINEEX_API static UObject* GetAssociatedObject(const UObject* Object, class AGameModeBase* Unused = nullptr);
 	UNREALENGINEEX_API static UObject* GetAssociatedObject(const UObject* Object, class AGameStateBase* Unused = nullptr);
+	UNREALENGINEEX_API static UObject* GetAssociatedObject(const UObject* Object, class AHUD* Unused = nullptr);
 	UNREALENGINEEX_API static UObject* GetAssociatedObject(const UObject* Object, class APawn* Unused = nullptr);
 	UNREALENGINEEX_API static UObject* GetAssociatedObject(const UObject* Object, class APlayerController* Unused = nullptr);
 	UNREALENGINEEX_API static UObject* GetAssociatedObject(const UObject* Object, class APlayerState* Unused = nullptr);

@@ -42,6 +42,9 @@ public:
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static class APlayerController* GetLocalPlayerController(const UObject* WorldContextObject);
 
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, BlueprintCosmetic)
+	static class AHUD* GetPlayerHUD(const UObject* Object);
+
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
 	static class APlayerState* GetPlayerState(const UObject* Object);
 
