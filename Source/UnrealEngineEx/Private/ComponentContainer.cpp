@@ -11,6 +11,8 @@
 UComponentContainer::UComponentContainer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	bAutoActivate = true;
+	bWantsInitializeComponent = true;
 }
 
 
@@ -36,6 +38,19 @@ bool UComponentContainer::ReplicateSubobjects(UActorChannel *Channel, FOutBunch 
 }
 
 
+void UComponentContainer::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	if_HasAuthority(this)
+	{
+		for (auto ComponentClass : InitialComponents)
+		{
+			AddComponent(ComponentClass);
+		}
+	}
+}
+
 UContainedComponent* UComponentContainer::GetComponent(TSubclassOf<UContainedComponent> Class) const
 {
 	for (auto Component : Components)
@@ -56,8 +71,11 @@ UContainedComponent* UComponentContainer::AddComponent(TSubclassOf<UContainedCom
 
 	UContainedComponent* Component = NewObject<UContainedComponent>(this, Class);
 	Components.Add(Component);
-	//Component
-	UComponentContainerManager::RegisterPendingComponent(this, Component);
+	if (auto ComponentContainerManager = Valid(UComponentContainerManager::Instance))
+	{
+		ComponentContainerManager->Components.Add(Component);
+		UComponentContainerManager::RegisterPendingComponent(this, Component);
+	}
 
 	return Component;
 }
@@ -76,12 +94,18 @@ bool UComponentContainer::RemoveComponent(TSubclassOf<UContainedComponent> Class
 }
 
 
+
 UComponentContainerManager* UComponentContainerManager::Instance = nullptr;
 
 UComponentContainerManager::UComponentContainerManager(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	Instance = this;
+}
+
+UComponentContainerManager::~UComponentContainerManager()
+{
+	Instance = nullptr;
 }
 
 void UComponentContainerManager::RegisterPendingComponent(const UObject* WorldContextObject, UContainedComponent* Component)
@@ -102,8 +126,6 @@ void UComponentContainerManager::RegisterPendingComponents(UWorld* World, ELevel
 	for (UContainedComponent* Component : PendingComponents)
 	{
 		Component->RegisterComponent();
-		Component->EnableComponentReplication();
-		Component->GetOwner()->ForceNetUpdate();
 	}
 
 	PendingComponents.Empty();
@@ -116,6 +138,7 @@ void UComponentContainerManager::RegisterPendingComponents(UWorld* World, ELevel
 UContainedComponent::UContainedComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	bAutoActivate = true;
 	bWantsInitializeComponent = true;
 }
 
@@ -131,8 +154,6 @@ UComponentContainer* UContainedComponent::GetComponentContainer() const
 
 void UContainedComponent::EnableComponentReplication()
 {
-	// Enable replication but do not register component as Actor's replicated component.
-	bReplicates = true;
 }
 
 bool UContainedComponent::ReplicateSubobjects(class UActorChannel* Channel, class FOutBunch* Bunch, struct FReplicationFlags* RepFlags)
@@ -146,10 +167,16 @@ void UContainedComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
+	SetIsReplicated(false);		// Unregister component as Actor's replicated component.
+
 	if (auto Container = GetComponentContainer())
 	{
-		Container->Components.Add(this);
-		UComponentContainerManager::Instance->OnComponentAdded.Broadcast(this);
+		Container->Components.AddUnique(this);
+		if (auto ComponentContainerManager = Valid(UComponentContainerManager::Instance))
+		{
+			ComponentContainerManager->Components.AddUnique(this);
+			ComponentContainerManager->OnComponentAdded.Broadcast(this);
+		}
 	}
 }
 
@@ -157,9 +184,21 @@ void UContainedComponent::UninitializeComponent()
 {
 	if (auto Container = GetComponentContainer())
 	{
-		UComponentContainerManager::Instance->OnComponentRemoved.Broadcast(this);
+		if (auto ComponentContainerManager = Valid(UComponentContainerManager::Instance))
+		{
+			ComponentContainerManager->OnComponentRemoved.Broadcast(this);
+			ComponentContainerManager->Components.Remove(this);
+		}
 		Container->Components.Remove(this);
 	}
 
 	Super::UninitializeComponent();
+}
+
+void UContainedComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	bReplicates = true;			// Enable replication but do not register component as Actor's replicated component.
+	GetOwner()->ForceNetUpdate();
 }

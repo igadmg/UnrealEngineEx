@@ -147,6 +147,13 @@ constexpr inline E operator ^ (E lhs, E rhs)
 }
 
 template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline E operator + (E lhs, E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<E>(static_cast<T>(lhs) | static_cast<T>(rhs));
+}
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
 constexpr inline bool operator % (typename std::underlying_type_t<E> lhs, E rhs)
 {
 	using T = std::underlying_type_t<E>;

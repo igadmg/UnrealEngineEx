@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SceneView.h"
 #include "UnrealEngineExTypes.generated.h"
 
 

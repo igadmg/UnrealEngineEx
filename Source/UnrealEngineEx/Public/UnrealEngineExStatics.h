@@ -6,6 +6,20 @@
 
 
 
+UENUM()
+enum class EBPWorldType : uint8
+{
+	None = EWorldType::None,
+	Game = EWorldType::Game,
+	Editor = EWorldType::Editor,
+	PIE = EWorldType::PIE,
+	EditorPreview = EWorldType::EditorPreview,
+	GamePreview = EWorldType::GamePreview,
+	GameRPC = EWorldType::GameRPC,
+	Inactive = EWorldType::Inactive
+};
+
+
 UCLASS()
 class UNREALENGINEEX_API UUnrealEngineExStatics : public UBlueprintFunctionLibrary
 {
@@ -14,6 +28,10 @@ class UNREALENGINEEX_API UUnrealEngineExStatics : public UBlueprintFunctionLibra
 
 
 public:
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable, meta = (ExpandEnumAsExecs = "OutWorldType", HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
+	static void WorldType(const UObject* WorldContextObject, EBPWorldType& OutWorldType);
+	
+
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static float GetServerWorldTimeSeconds(const UObject* WorldContextObject);
 
@@ -151,6 +169,9 @@ public:
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable)
 	static FTransform GetTransfromInFrontOfPlayer(class AActor* PlayerPawnOrController, FVector Offset);
 
+
+	UFUNCTION(Category = "UnrealEngineEx|User Interface", BlueprintCallable)
+	static bool ReplaceWidget(class UWidget* OldWidget, class UWidget* NewWidget);
 
 
 	UFUNCTION(Category = "UnrealEngineEx|Debug", BlueprintCallable, meta = (WorldContext = "WorldContextObject", DevelopmentOnly))

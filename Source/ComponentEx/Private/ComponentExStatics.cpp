@@ -2,6 +2,8 @@
 #include "ComponentExStatics.h"
 
 #include "ComponentEx.h"
+#include "Animation/AnimSequence.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Components/SplineComponent.h"
 #include "Engine/PostProcessVolume.h"
 #include "Engine/Texture.h"
@@ -48,4 +50,54 @@ FVector2D UComponentExStatics::GetSize(UTexture* Texture)
 		return FVector2D::ZeroVector;
 
 	return FVector2D(Texture->GetSurfaceWidth(), Texture->GetSurfaceHeight());
+}
+
+bool UComponentExStatics::GetWorldBoneTransformAtTime(USkeletalMeshComponent* SkeletalMeshComponent, UAnimSequence* AnimSequence, FName BoneName, float Time, FTransform& OutTransform)
+{
+	if (!IsValid(SkeletalMeshComponent))
+		return false;
+
+	if (!IsValid(AnimSequence))
+		return false;
+
+	if (SkeletalMeshComponent->GetBoneIndex(BoneName) == INDEX_NONE)
+		return false;
+
+	USkeleton* Skeleton = AnimSequence->GetSkeleton();
+	if (!IsValid(Skeleton))
+		return false;
+
+	TArray<FName> BoneStack;
+	BoneStack.Add(BoneName);
+	while (true)
+	{
+		FName ParentBoneName = SkeletalMeshComponent->GetParentBone(BoneStack.Last());
+		if (ParentBoneName == NAME_None)
+			break;
+		BoneStack.Add(ParentBoneName);
+	}
+
+	for (const FName& LocalBoneName : BoneStack)
+	{
+		int32 TrackIndex = Skeleton->GetAnimationTrackIndex(SkeletalMeshComponent->GetBoneIndex(LocalBoneName), AnimSequence, true);
+		if (TrackIndex == INDEX_NONE)
+			return false;
+
+		FTransform BoneTransform;
+		AnimSequence->GetBoneTransform(BoneTransform, TrackIndex, Time, true);
+		OutTransform = OutTransform * BoneTransform;
+	}
+
+	return true;
+}
+
+bool UComponentExStatics::GetWorldSocketTransformAtTime(USkeletalMeshComponent* SkeletalMeshComponent, UAnimSequence* AnimSequence, FName SocketName, float Time, FTransform& OutTransform)
+{
+	if (!IsValid(SkeletalMeshComponent))
+		return false;
+
+	if (!IsValid(AnimSequence))
+		return false;
+
+	return GetWorldBoneTransformAtTime(SkeletalMeshComponent, AnimSequence, SkeletalMeshComponent->GetSocketBoneName(SocketName), Time, OutTransform);
 }

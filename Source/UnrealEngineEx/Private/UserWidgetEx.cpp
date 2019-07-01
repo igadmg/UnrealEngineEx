@@ -14,7 +14,7 @@ void UUserWidgetEx::NativeOnFocusChanging(const FWeakWidgetPath& PreviousFocusPa
 {
 	if (PreventFocusChange % InFocusEvent.GetCause() && PreviousFocusPath.GetLastWidget() == TakeWidget())
 	{
-		int32 UserIndex;
+		int32 UserIndex = InFocusEvent.GetUser();
 		FSlateUser* SlateUser = nullptr;
 		FSlateApplication::Get().ForEachUser([UserIndex, &SlateUser](FSlateUser* User) { if (UserIndex == User->GetUserIndex()) SlateUser = User; });
 

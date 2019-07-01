@@ -3,6 +3,9 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
+#include "Components/PanelSlot.h"
+#include "Components/PanelWidget.h"
+#include "Components/Widget.h"
 #include "Engine/CoreSettings.h"
 #include "Engine/LevelScriptActor.h"
 #include "Engine/LevelStreaming.h"
@@ -34,6 +37,14 @@ struct FFindStreamingLevelBy {
 	FFindStreamingLevelBy(const TAssetPtr<UWorld>& LevelAssetPtr) : LevelAssetPtr(LevelAssetPtr) {}
 	bool operator ()(const ULevelStreaming* Level) const { return FUnrealEngineEx::ConvertLevelPtrFromPIE(Level->GetWorldAsset(), Level->GetWorld()) == LevelAssetPtr; }
 };
+
+
+void UUnrealEngineExStatics::WorldType(const UObject* WorldContextObject, EBPWorldType& OutWorldType)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	OutWorldType = (EBPWorldType)(IsValid(World) ? (EWorldType::Type)World->WorldType : EWorldType::None);
+}
+
 
 float UUnrealEngineExStatics::GetServerWorldTimeSeconds(const UObject* WorldContextObject)
 {
@@ -1120,6 +1131,29 @@ FTransform UUnrealEngineExStatics::GetTransfromInFrontOfPlayer(AActor* PlayerPaw
 	);
 
 	return Result;
+}
+
+bool UUnrealEngineExStatics::ReplaceWidget(UWidget* OldWidget, UWidget* NewWidget)
+{
+	if (!IsValid(OldWidget) || !IsValid(NewWidget))
+		return false;
+
+	UPanelWidget* Parent = OldWidget->GetParent();
+	if (!IsValid(Parent))
+		return false;
+
+	// HACK: Because UPanelWidget::ReplaceChildAt does no call OnSlotAdded and OnSlotRemoved.
+	int32 OldIndex = Parent->GetChildIndex(OldWidget);
+	TArray<UPanelSlot*>& ParenSlots = const_cast<TArray<UPanelSlot*>&>(Parent->GetSlots());
+
+	OldWidget->RemoveFromParent();
+	UPanelSlot* NewSlot = Parent->AddChild(NewWidget);
+	ParenSlots.Remove(NewSlot);
+	ParenSlots.Insert(NewSlot, OldIndex);
+
+	Parent->InvalidateLayoutAndVolatility();
+
+	return true;
 }
 
 FString UUnrealEngineExStatics::GetInstanceStringID(UObject* WorldContextObject)

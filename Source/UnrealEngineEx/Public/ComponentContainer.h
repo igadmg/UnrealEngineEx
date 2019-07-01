@@ -10,14 +10,17 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FComponentContainerOnActorComponent, class UContainedComponent*, Component);
 
 
-UCLASS()
+UCLASS(BlueprintType)
 class UNREALENGINEEX_API UComponentContainer : public UActorComponent
 {
 	GENERATED_BODY()
 
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<TSubclassOf<class UContainedComponent>> InitialComponents;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<class UContainedComponent*> Components;
 
 
@@ -51,7 +54,7 @@ public:
 	{
 		for (class UContainedComponent* Component : Components)
 		{
-			if (auto TC = Valid<TComponent>(Component))
+			if (auto TC = Cast<TComponent>(Component))
 			{
 				if_ImplementsT(T, IComponent, TC)
 				{
@@ -64,6 +67,7 @@ public:
 
 protected:
 	virtual bool ReplicateSubobjects(class UActorChannel *Channel, class FOutBunch *Bunch, struct FReplicationFlags *RepFlags) override;
+	virtual void InitializeComponent() override;
 };
 
 
@@ -121,11 +125,14 @@ public:
 			return AssociatedContainer->RemoveComponent(T::StaticClass());
 		}
 
-		return nullptr;
+		return false;
 	}
 
 
 public:
+	UPROPERTY()
+	TArray<class UContainedComponent*> Components;
+
 	/* client side cosmetic event */
 	UPROPERTY(BlueprintAssignable)
 	FComponentContainerOnActorComponent OnComponentAdded;
@@ -145,6 +152,7 @@ protected:
 
 public:
 	UComponentContainerManager(const FObjectInitializer& ObjectInitializer);
+	virtual ~UComponentContainerManager();
 };
 
 
@@ -172,6 +180,7 @@ protected:
 	virtual bool ReplicateSubobjects(class UActorChannel* Channel, class FOutBunch* Bunch, struct FReplicationFlags* RepFlags) override;
 	virtual void InitializeComponent() override;
 	virtual void UninitializeComponent() override;
+	virtual void BeginPlay() override;
 
 
 protected:

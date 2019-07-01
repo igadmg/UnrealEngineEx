@@ -1,27 +1,33 @@
-static bool IsValid(FName Name)
+static bool IsValid(const FName& Name)
 {
 	return Name != NAME_None && Name.IsValid();
 }
 
 template <typename T>
-static bool IsValid(TSharedPtr<T> SharedPtr)
+static bool IsValid(T* Ptr)
+{
+	return Ptr != nullptr;
+}
+
+template <typename T>
+static bool IsValid(const TSharedPtr<T>& SharedPtr)
 {
 	return SharedPtr.IsValid();
 }
 
 template <typename T>
-static bool IsValid(TWeakObjectPtr<T> WeakObjectPtr)
+static bool IsValid(const TWeakObjectPtr<T>& WeakObjectPtr)
 {
 	return WeakObjectPtr.IsValid();
 }
 
 template <typename T>
-static bool IsValid(TScriptInterface<T> ScriptInterface)
+static bool IsValid(const TScriptInterface<T>& ScriptInterface)
 {
 	return IsValid(ScriptInterface.GetObject());
 }
 
-static bool IsValid(FDelegateHandle DelegateHandle)
+static bool IsValid(const FDelegateHandle& DelegateHandle)
 {
 	return DelegateHandle.IsValid();
 }
