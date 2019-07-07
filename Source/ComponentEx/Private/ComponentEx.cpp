@@ -1,6 +1,9 @@
 #include "ComponentExPrivatePCH.h"
 #include "ComponentEx.h"
 
+#include "Components/ActorComponent.h"
+#include "GameFramework/Actor.h"
+
 
 
 #define LOCTEXT_NAMESPACE "FComponentExModule"
@@ -27,12 +30,20 @@ IMPLEMENT_MODULE(FComponentExModule, ComponentEx)
 
 void FComponentEx::SetActorEnabled(AActor* Actor, bool bIsEnabled)
 {
+	if (!IsValid(Actor))
+		return;
+
 	Actor->SetActorHiddenInGame(!bIsEnabled);
 	Actor->SetActorEnableCollision(bIsEnabled);
 	Actor->SetActorTickEnabled(bIsEnabled);
-	UStaticMeshComponent* MeshComponent = Cast<UStaticMeshComponent>(Actor->GetComponentByClass(UStaticMeshComponent::StaticClass()));
+	for (auto Component : Actor->GetComponents())
+	{
+		Component->SetComponentTickEnabled(bIsEnabled);
+	}
 
 #if 0
+	UStaticMeshComponent* MeshComponent = Cast<UStaticMeshComponent>(Actor->GetComponentByClass(UStaticMeshComponent::StaticClass()));
+
 	if (MeshComponent != nullptr)
 	{
 		if (bIsEnabled)

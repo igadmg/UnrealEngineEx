@@ -2,6 +2,14 @@
 #include "Core.h"
 #include "ModuleManager.h"
 
+#include "GameFramework/GameStateBase.h"
+#include "GameFramework/Pawn.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
+#include "LatentActions.h"
+
+#include "UnrealEngineExStatics.h"
 
 
 #define LOCTEXT_NAMESPACE "FUnrealEngineExModule"
@@ -16,6 +24,36 @@ void FUnrealEngineExModule::ShutdownModule()
 {
 }
 
+
+UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, AGameModeBase* Unused)
+{
+	return UGameplayStatics::GetGameMode(Object);
+}
+
+UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, AGameStateBase* Unused)
+{
+	return UGameplayStatics::GetGameState(Object);
+}
+
+UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, AHUD* Unused)
+{
+	return UUnrealEngineExStatics::GetPlayerHUD(Object);
+}
+
+UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, APlayerController* Unused)
+{
+	return Cast<APlayerController>(UUnrealEngineExStatics::GetController(Object));
+}
+
+UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, APlayerState* Unused)
+{
+	return UUnrealEngineExStatics::GetPlayerState(Object);
+}
+
+UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, APawn* Unused)
+{
+	return UUnrealEngineExStatics::GetPlayerPawn(Object);
+}
 
 
 #if WITH_EDITOR
@@ -35,7 +73,7 @@ TAssetPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrToPIE(const TAssetPtr<UWorld>&
 	return NewWorld;
 }
 
-TAssetPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrFromPIE(const TAssetPtr<UWorld>& Level, class UWorld* World)
+TAssetPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrFromPIE(const TAssetPtr<UWorld>& Level, UWorld* World)
 {
 	FString PIELevelPackageName = UWorld::StripPIEPrefixFromPackageName(FPackageName::ObjectPathToPackageName(Level.ToString()), World->StreamingLevelsPrefix);
 	FString PIELevelObjectName = UWorld::RemovePIEPrefix(FPackageName::GetLongPackageAssetName(PIELevelPackageName));

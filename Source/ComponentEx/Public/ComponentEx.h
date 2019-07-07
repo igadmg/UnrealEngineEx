@@ -27,5 +27,5 @@ public:
 
 struct FComponentEx
 {
-	COMPONENTEX_API static void SetActorEnabled(AActor* Actor, bool bIsEnabled);
+	COMPONENTEX_API static void SetActorEnabled(class AActor* Actor, bool bIsEnabled);
 };

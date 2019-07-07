@@ -47,11 +47,11 @@ public:
 	FORCEINLINE TCoordinateFrame<USceneComponent>& SetRelativeRotation(FQuat NewRotation) { Object.SetRelativeRotation(NewRotation); return *this; }
 	FORCEINLINE TCoordinateFrame<USceneComponent>& SetRelativeScale(FVector NewScale) { Object.SetRelativeScale3D(NewScale); return *this; }
 	FORCEINLINE TCoordinateFrame<USceneComponent>& SetRelativeTransform(FTransform NewTransform) { Object.SetRelativeTransform(NewTransform); return *this; }
-	FORCEINLINE TCoordinateFrame<USceneComponent>& SetWorldLocation(FVector NewLocation);
-	FORCEINLINE TCoordinateFrame<USceneComponent>& SetWorldRotation(FRotator NewRotation);
-	FORCEINLINE TCoordinateFrame<USceneComponent>& SetWorldRotation(FQuat NewRotation);
-	FORCEINLINE TCoordinateFrame<USceneComponent>& SetWorldScale(FVector NewScale);
-	FORCEINLINE TCoordinateFrame<USceneComponent>& SetWorldTransform(FTransform NewTransform);
+	FORCEINLINE TCoordinateFrame<USceneComponent>& SetWorldLocation(FVector NewLocation) { Object.SetWorldLocation(NewLocation); return *this; }
+	FORCEINLINE TCoordinateFrame<USceneComponent>& SetWorldRotation(FRotator NewRotation) { Object.SetWorldRotation(NewRotation); return *this; }
+	FORCEINLINE TCoordinateFrame<USceneComponent>& SetWorldRotation(FQuat NewRotation) { Object.SetWorldRotation(NewRotation); return *this; }
+	FORCEINLINE TCoordinateFrame<USceneComponent>& SetWorldScale(FVector NewScale) { Object.SetWorldScale3D(NewScale); return *this; }
+	FORCEINLINE TCoordinateFrame<USceneComponent>& SetWorldTransform(FTransform NewTransform) { Object.SetWorldTransform(NewTransform); return *this; }
 
 
 

@@ -4,6 +4,7 @@
 
 #include "UnrealEngineExTypes.h"
 
+#include <type_traits>
 
 
 class FUnrealEngineExModule : public IModuleInterface
@@ -39,6 +40,14 @@ struct FUnrealEngineEx
 		return Object->GetClass()->ImplementsInterface(I::StaticClass());
 	}
 
+	template <typename T> static T* GetAssociatedObject(const UObject* Object) { return Cast<T>(GetAssociatedObject(Object, (T*)nullptr)); }
+	UNREALENGINEEX_API static UObject* GetAssociatedObject(const UObject* Object, class AGameModeBase* Unused = nullptr);
+	UNREALENGINEEX_API static UObject* GetAssociatedObject(const UObject* Object, class AGameStateBase* Unused = nullptr);
+	UNREALENGINEEX_API static UObject* GetAssociatedObject(const UObject* Object, class AHUD* Unused = nullptr);
+	UNREALENGINEEX_API static UObject* GetAssociatedObject(const UObject* Object, class APawn* Unused = nullptr);
+	UNREALENGINEEX_API static UObject* GetAssociatedObject(const UObject* Object, class APlayerController* Unused = nullptr);
+	UNREALENGINEEX_API static UObject* GetAssociatedObject(const UObject* Object, class APlayerState* Unused = nullptr);
+
 #if WITH_EDITOR
 	UNREALENGINEEX_API static TAssetPtr<UWorld> ConvertLevelPtrToPIE(const TAssetPtr<UWorld>& Level, class UWorld* World);
 	UNREALENGINEEX_API static TAssetPtr<UWorld> ConvertLevelPtrFromPIE(const TAssetPtr<UWorld>& Level, class UWorld* World);
@@ -55,5 +64,105 @@ struct FUnrealEngineEx
 	UNREALENGINEEX_API static void FinishLatentAction(FLatentActionManager& LatentManager, const FLatentActionInfo& LatentInfo);
 };
 
-#define if_Implements(Type, Name, Variable) \
-if (auto Name = Variable) if (IsValid(Name) && FUnrealEngineEx::DoesImplementInterface<Type>(Name))
+template <typename UT, typename T>
+const T* ValidInterface(const T* v) { return IsValid(v) && FUnrealEngineEx::DoesImplementInterface<UT>(v) ? v : nullptr; }
+
+template <typename UT, typename T>
+T* ValidInterface(T* v) { return IsValid(v) && FUnrealEngineEx::DoesImplementInterface<UT>(v) ? v : nullptr; }
+
+#define if_Implements(Type, Name, Expression) \
+if (auto Name = ValidInterface<U ## Type>(Expression))
+
+#define if_ImplementsT(UType, Name, Expression) \
+if (auto Name = ValidInterface<UType>(Expression))
+
+#define if_CanExecuteCosmeticEvents(WorldContextObject) \
+if (!UKismetSystemLibrary::IsDedicatedServer(WorldContextObject))
+
+
+static ENetRole GetNetRole(const AActor* Actor)
+{
+	return Actor->Role;
+}
+
+static ENetRole GetNetRole(const UActorComponent* ActorComponent)
+{
+	return ActorComponent->GetOwnerRole();
+}
+
+#define if_HasAuthority(WorldContextObject) \
+if (GetNetRole(WorldContextObject) == ROLE_Authority)
+
+#define if_HasNoAuthority(WorldContextObject) \
+if (GetNetRole(WorldContextObject) < ROLE_Authority)
+
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline bool operator ! (E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<T>(rhs) == 0;
+}
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline E operator & (typename std::underlying_type_t<E> lhs, E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<E>(lhs & (1 << static_cast<T>(rhs)));
+}
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline E operator & (E lhs, E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<E>(static_cast<T>(lhs) & (1 << static_cast<T>(rhs)));
+}
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline E operator | (typename std::underlying_type_t<E> lhs, E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<E>(lhs | (1 << static_cast<T>(rhs)));
+}
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline E operator | (E lhs, E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<E>(static_cast<T>(lhs) | (1 << static_cast<T>(rhs)));
+}
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline E operator ^ (typename std::underlying_type_t<E> lhs, E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<E>(lhs ^ (1 << static_cast<T>(rhs)));
+}
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline E operator ^ (E lhs, E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<E>(static_cast<T>(lhs) ^ (1 << static_cast<T>(rhs)));
+}
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline E operator + (E lhs, E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<E>(static_cast<T>(lhs) | static_cast<T>(rhs));
+}
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline bool operator % (typename std::underlying_type_t<E> lhs, E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<T>(lhs & rhs) == (1 << static_cast<T>(rhs));
+}
+
+template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
+constexpr inline bool operator % (E lhs, E rhs)
+{
+	using T = std::underlying_type_t<E>;
+	return static_cast<T>(lhs & rhs) == (1 << static_cast<T>(rhs));
+}

@@ -10,7 +10,7 @@
 
 bool UInterpolationExStatics::IsFinished(UInterpolationTimer* Timer)
 {
-	if (Timer == nullptr)
+	if (!IsValid(Timer))
 		return true;
 
 	return Timer->IsFinished();

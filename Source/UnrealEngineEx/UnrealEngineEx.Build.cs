@@ -32,6 +32,11 @@ public class UnrealEngineEx : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[] {
 				"CoreUObject",
 				"Engine",
+				"EngineSettings",
+				"InputCore",
+				"SlateCore",
+				"Slate",
+				"UMG",
 			});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {

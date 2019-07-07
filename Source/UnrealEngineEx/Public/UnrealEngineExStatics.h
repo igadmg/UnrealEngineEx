@@ -6,6 +6,20 @@
 
 
 
+UENUM()
+enum class EBPWorldType : uint8
+{
+	None = EWorldType::None,
+	Game = EWorldType::Game,
+	Editor = EWorldType::Editor,
+	PIE = EWorldType::PIE,
+	EditorPreview = EWorldType::EditorPreview,
+	GamePreview = EWorldType::GamePreview,
+	GameRPC = EWorldType::GameRPC,
+	Inactive = EWorldType::Inactive
+};
+
+
 UCLASS()
 class UNREALENGINEEX_API UUnrealEngineExStatics : public UBlueprintFunctionLibrary
 {
@@ -14,6 +28,10 @@ class UNREALENGINEEX_API UUnrealEngineExStatics : public UBlueprintFunctionLibra
 
 
 public:
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable, meta = (ExpandEnumAsExecs = "OutWorldType", HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
+	static void WorldType(const UObject* WorldContextObject, EBPWorldType& OutWorldType);
+	
+
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static float GetServerWorldTimeSeconds(const UObject* WorldContextObject);
 
@@ -24,7 +42,13 @@ public:
 	static UObject* GetDefaultObject(TSubclassOf<UObject> ObjectClass);
 
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
+	static class UGameInstance* GetDefaultGameInstance();
+
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
 	static int32 GetPlayerControllerIndex(class APlayerController* PlayerController);
+
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
+	static class APlayerStart* FindPlayerStartByTag(const UObject* WorldContextObject, FName StartTag);
 
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable)
 	static void RestartPlayer(class AController* PlayerController);
@@ -32,17 +56,37 @@ public:
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable)
 	static void RestartPlayerByState(class APlayerState* PlayerState);
 
-	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
-	static class APawn* GetPawnOrSpectator(const class AController* PlayerController);
+
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
+	static class APlayerController* GetLocalPlayerController(const UObject* WorldContextObject);
+
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, BlueprintCosmetic)
+	static class AHUD* GetPlayerHUD(const UObject* Object);
 
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
-	static class APawn* GetObjectPlayerPawn(const UObject* PlayerPawnOrControllerOrAnyObject);
+	static class APlayerState* GetPlayerState(const UObject* Object);
 
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
-	static class AController* GetObjectController(const UObject* PlayerPawnOrControllerOrAnyObject);
+	static class APawn* GetPawnOrSpectator(const UObject* Object);
 
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
-	static class UCameraComponent* GetPlayerActiveCamera(class AActor* PlayerPawnOrController);
+	static class APawn* GetPlayerPawn(const UObject* Object);
+
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, BlueprintCosmetic)
+	static class ASpectatorPawn* GetSpectatorPawn(const UObject* Object);
+
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
+	static class AController* GetController(const UObject* Object);
+
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
+	static class APlayerCameraManager* GetCameraController(const UObject* Object);
+
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
+	static class UCameraComponent* GetPlayerActiveCamera(const UObject* Object);
+
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
+	static class UCharacterMovementComponent* GetCharacterMovementComponent(const UObject* Object);
+
 
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
 	static FViewSpaceDescriptor GetViewSpaceDescriptor(class ULocalPlayer* Player, FVector Locaton);
@@ -78,13 +122,30 @@ public:
 	static void LoadStreamLevelList(const UObject* WorldContextObject, TArray<TAssetPtr<UWorld>> LevelList
 		, const FUnrealEngineExOnLevelStreamedDelegate& OnLevelStreamedCallback, bool bMakeVisibleAfterLoad, bool bShouldBlockOnLoad, FLatentActionInfo LatentInfo);
 
+	/** Load a list of streamed in level. */
+	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject", Latent = "", LatentInfo = "LatentInfo"))
+	static void LoadStreamLevelStreamingList(const UObject* WorldContextObject, TArray<ULevelStreaming*> LevelStreamingList
+		, const FUnrealEngineExOnLevelStreamedDelegate& OnLevelStreamedCallback, bool bMakeVisibleAfterLoad, bool bShouldBlockOnLoad, FLatentActionInfo LatentInfo);
+
 	/** Unload a list of streamed in level. */
 	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject", Latent = "", LatentInfo = "LatentInfo"))
 	static void UnloadStreamLevelList(const UObject* WorldContextObject, TArray<TAssetPtr<UWorld>> LevelList
 		, const FUnrealEngineExOnLevelStreamedDelegate& OnLevelStreamedCallback, FLatentActionInfo LatentInfo);
 
+	/** Unload a list of streamed in level. */
+	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject", Latent = "", LatentInfo = "LatentInfo"))
+	static void UnloadStreamLevelStreamingList(const UObject* WorldContextObject, TArray<ULevelStreaming*> LevelList
+		, const FUnrealEngineExOnLevelStreamedDelegate& OnLevelStreamedCallback, FLatentActionInfo LatentInfo);
+
 	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	static void UnloadStreamLevelListBlocking(const UObject* WorldContextObject, TArray<TAssetPtr<UWorld>> LevelList);
+
+	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	static void UnloadStreamLevelStreamingListBlocking(const UObject* WorldContextObject, TArray<ULevelStreaming*> LevelList);
+
+	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	static void ShowAllStreamingLevels(const UObject* WorldContextObject);
+
 
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static UAsyncTask* CreateAsyncTask(const UObject* WorldContextObject, TSubclassOf<class UAsyncTask> AsyncTaskClass, const FUnrealEngineExOnAsyncTaskFinishedDelegate& OnFinished, bool bAutorun = true);
@@ -109,6 +170,9 @@ public:
 	static FTransform GetTransfromInFrontOfPlayer(class AActor* PlayerPawnOrController, FVector Offset);
 
 
+	UFUNCTION(Category = "UnrealEngineEx|User Interface", BlueprintCallable)
+	static bool ReplaceWidget(class UWidget* OldWidget, class UWidget* NewWidget);
+
 
 	UFUNCTION(Category = "UnrealEngineEx|Debug", BlueprintCallable, meta = (WorldContext = "WorldContextObject", DevelopmentOnly))
 	static FString GetInstanceStringID(UObject* WorldContextObject);
@@ -119,6 +183,9 @@ public:
 	UFUNCTION(Category = "UnrealEngineEx|Debug", BlueprintCallable, meta = (WorldContext = "WorldContextObject", DevelopmentOnly))
 	static void DrawDebugFloatHistoryTransformEx(UObject* WorldContextObject, const FDebugFloatHistory& FloatHistory, const FTransform& DrawTransform, FVector2D DrawSize, FLinearColor DrawColor = FLinearColor::White, float Duration = 0.f);
 
+
+	UFUNCTION(Category = "Settings", BlueprintPure)
+	static bool IsKeyMappedToAction(FKey Key, const FName ActionName);
 
 	UFUNCTION(Category = "Utilities|String", BlueprintPure, meta = (DisplayName = "ToString (Timespan)", AdvancedDisplay = "1", BlueprintAutocast))
 	static FString Conv_TimespanToString(FTimespan Timespan, FString Format)
