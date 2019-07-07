@@ -4,8 +4,9 @@
 #include "PeekEditorCommands.h"
 #include "PeekEditorObject.h"
 
+#include "EditorModeManager.h"
 #include "PropertyEditorModule.h"
-
+#include "SlateOptMacros.h"
 
 
 #define LOCTEXT_NAMESPACE "PeekEditor"

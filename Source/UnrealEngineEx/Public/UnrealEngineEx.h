@@ -1,7 +1,5 @@
 #pragma once
 
-
-#include "Engine.h"
 #include "ModuleManager.h"
 
 #include "UnrealEngineExTypes.h"
@@ -56,3 +54,6 @@ struct FUnrealEngineEx
 
 	UNREALENGINEEX_API static void FinishLatentAction(FLatentActionManager& LatentManager, const FLatentActionInfo& LatentInfo);
 };
+
+#define if_Implements(Type, Name, Variable) \
+if (auto Name = Variable) if (IsValid(Name) && FUnrealEngineEx::DoesImplementInterface<Type>(Name))

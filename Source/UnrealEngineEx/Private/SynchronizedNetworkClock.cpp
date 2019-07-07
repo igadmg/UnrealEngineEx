@@ -1,6 +1,8 @@
 #include "UnrealEngineExPrivatePCH.h"
 #include "SynchronizedNetworkClock.h"
 
+#include "LatentActions.h"
+#include "Kismet/GameplayStatics.h"
 #include "Engine/NetworkObjectList.h"
 #include "Net/UnrealNetwork.h"
 
@@ -19,7 +21,7 @@ void USynchronizedNetworkClock::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 	DOREPLIFETIME(USynchronizedNetworkClock, ServerTime);
 }
 */
-bool USynchronizedNetworkClock::SynchronizeTimeServer_Validate(int32 Token)
+bool USynchronizedNetworkClock::SynchronizeTimeServer_Validate(int32 InToken)
 {
 	return true;
 }

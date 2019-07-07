@@ -25,4 +25,7 @@ public:
 
 	UFUNCTION(Category = "Spline", BlueprintPure)
 	static float FindDistanceClosestToWorldLocation(class USplineComponent* Target, FVector WorldLocation);
+
+	UFUNCTION(Category = "Rendering|Texture", BlueprintPure)
+	static FVector2D GetSize(class UTexture* Texture);
 };

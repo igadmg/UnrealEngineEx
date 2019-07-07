@@ -60,14 +60,12 @@ protected:
 };
 
 
-// 
-//, std::negation<std::is_base_of<USceneComponent, T>::value>::value
 template <typename T>
 struct FCoordinateFrame<T, typename std::enable_if<
-		std::conjunction<
-			std::is_base_of<class UActorComponent, T>
-			, std::negation<std::is_base_of<class USceneComponent, T>>
-		>::value
+		//std::conjunction<
+			std::is_base_of<class UActorComponent, T>::value
+			&& !std::is_base_of<class USceneComponent, T>::value
+		//>::value
 	>::type>
 {
 	typedef TConstCoordinateFrame<UActorComponent> ConstReturnType;

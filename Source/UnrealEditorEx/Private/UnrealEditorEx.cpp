@@ -5,8 +5,10 @@
 
 #include "Editor/PeekEdMode.h"
 #include "Editor/PeekEditorCommands.h"
+#include "Editor/UnrealEdEngine.h"
 #include "Visualizers/VisualizerComponentVisualizer.h"
 #include "VisualizerComponent.h"
+#include "UnrealEdGlobals.h"
 
 
 

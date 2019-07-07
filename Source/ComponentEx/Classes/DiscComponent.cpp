@@ -1,6 +1,8 @@
 #include "ComponentExPrivatePCH.h"
 #include "DiscComponent.h"
 
+#include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 
 
 UDiscComponent::UDiscComponent()

@@ -1,12 +1,19 @@
 #include "UnrealEngineExPrivatePCH.h"
 #include "UnrealEngineExStatics.h"
 
+#include "Camera/CameraComponent.h"
 #include "Engine/CoreSettings.h"
+#include "Engine/LevelScriptActor.h"
+#include "Engine/LevelStreaming.h"
+#include "Engine/LevelStreamingDynamic.h"
+#include "Engine/LocalPlayer.h"
+#include "GameFramework/GameStateBase.h"
+#include "GameFramework/GameModeBase.h"
+#include "GameFramework/PlayerState.h"
 #include "AsyncTask.h"
 #include "AsyncTaskManager.h"
 #include "DebugDrawHelpersEx.h"
-
-#include "Engine/LocalPlayer.h"
+#include "LatentActions.h"
 
 #include "CoordinateFrame.h"
 
@@ -332,7 +339,11 @@ ULevelStreaming* UUnrealEngineExStatics::AddStreamingLevel(UObject* WorldContext
 	if (LevelStreamingPtr != nullptr)
 		return *LevelStreamingPtr;
 
+#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 21
+	ULevelStreaming* AsyncLevel = NewObject<ULevelStreaming>(World, ULevelStreamingDynamic::StaticClass(), NAME_None, RF_Transient, NULL);
+#else
 	ULevelStreaming* AsyncLevel = NewObject<ULevelStreaming>(World, ULevelStreamingKismet::StaticClass(), NAME_None, RF_Transient, NULL);
+#endif
 	AsyncLevel->SetWorldAsset(Level);
 	AsyncLevel->SetShouldBeLoaded(false);
 	AsyncLevel->SetShouldBeVisible(false);
@@ -759,7 +770,7 @@ FDebugFloatHistory UUnrealEngineExStatics::RenormalizeFloatHistorySamples(FVecto
 		return FloatHistory;
 
 	FDebugFloatHistory* const MutableFloatHistory = const_cast<FDebugFloatHistory*>(&FloatHistory);
-	
+
 	float MinValue = TNumericLimits<float>::Max();
 	float MaxValue = TNumericLimits<float>::Min();
 
@@ -794,9 +805,9 @@ void UUnrealEngineExStatics::DrawDebugFloatHistoryTransformEx(UObject* WorldCont
 {
 #if ENABLE_DRAW_DEBUG
 	UWorld * World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
-	if (!IsValid(GEditor))
+	if (!IsValid(World))
 		return;
-	
+
 	::DrawDebugFloatHistoryEx(*World, FloatHistory, DrawTransform, DrawSize, DrawColor.ToFColor(true), false, LifeTime);
 #endif
 }

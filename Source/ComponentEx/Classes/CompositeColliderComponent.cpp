@@ -1,6 +1,8 @@
 #include "ComponentExPrivatePCH.h"
 #include "CompositeColliderComponent.h"
 
+#include "Components/ShapeComponent.h"
+
 
 
 UCompositeColliderComponent::UCompositeColliderComponent()

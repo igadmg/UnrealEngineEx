@@ -3,6 +3,8 @@
 
 #include "ComponentEx.h"
 #include "Components/SplineComponent.h"
+#include "Engine/PostProcessVolume.h"
+#include "Engine/Texture.h"
 
 
 
@@ -38,4 +40,12 @@ bool UComponentExStatics::UpdateBlendableWeight(APostProcessVolume* Volume, int 
 float UComponentExStatics::FindDistanceClosestToWorldLocation(USplineComponent* Target, FVector WorldLocation)
 {
 	return 0;
+}
+
+FVector2D UComponentExStatics::GetSize(UTexture* Texture)
+{
+	if (!IsValid(Texture))
+		return FVector2D::ZeroVector;
+
+	return FVector2D(Texture->GetSurfaceWidth(), Texture->GetSurfaceHeight());
 }
