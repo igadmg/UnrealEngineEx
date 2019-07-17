@@ -20,7 +20,7 @@ public class ComponentEx : ModuleRules
 			});
 
 
-		PrivateDependencyModuleNames.AddRange(new string[] {
+		PublicDependencyModuleNames.AddRange(new string[] {
 				"Core",
 				"CoreUObject",
 				"Engine"

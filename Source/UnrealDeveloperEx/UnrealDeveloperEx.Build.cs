@@ -23,6 +23,8 @@ public class UnrealDeveloperEx : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] {
 				"BlueprintGraph",
 				"Core",
+				"CoreUObject",
+				"Engine",
 				"UnrealEd",
 			});
 
@@ -31,8 +33,6 @@ public class UnrealDeveloperEx : ModuleRules
 
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
-				"CoreUObject",
-				"Engine",
 				"KismetCompiler",
 			});
 

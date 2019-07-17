@@ -20,13 +20,16 @@ public class InterpolationEx : ModuleRules
 			});
 
 		PublicDependencyModuleNames.AddRange(new string[] {
+				"Core",
+				"CoreUObject",
+				"Engine",
+			});
+
+		PublicDependencyModuleNames.AddRange(new string[] {
 				"InterpolationLibraryImport"
 			});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
-				"Core",
-				"CoreUObject",
-				"Engine",
 				"InputCore",
 				"UnrealEngineEx",
 			});

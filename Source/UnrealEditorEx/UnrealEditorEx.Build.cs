@@ -22,6 +22,8 @@ public class UnrealEditorEx : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new string[] {
 				"Core",
+				"CoreUObject",
+				"Engine",
 				"InputCore",
 				"UnrealEd",
 			});
@@ -32,9 +34,7 @@ public class UnrealEditorEx : ModuleRules
 
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
-				"CoreUObject",
 				"EditorStyle",
-				"Engine",
 				"PropertyEditor",
 				"SlateCore",
 				"Slate",
