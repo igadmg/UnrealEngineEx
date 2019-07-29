@@ -41,7 +41,7 @@ public:
 	void Consume(std::function<void(T*)> OnObjectAdd, std::function<void(T*)> OnObjectRemove)
 	{
 		OnAddObjectFp = [OnObjectAdd](UObject* Object) { OnObjectAdd(Cast<T>(Object)); };
-		OnAddObjectFp = [OnObjectRemove](UObject* Object) { OnObjectRemove(Cast<T>(Object)); };
+		OnRemoveObjectFp = [OnObjectRemove](UObject* Object) { OnObjectRemove(Cast<T>(Object)); };
 
 		ConsumePendingObjects();
 	}
