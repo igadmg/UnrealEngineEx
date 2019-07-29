@@ -293,7 +293,7 @@ AController* UUnrealEngineExStatics::GetController(const UObject* Object)
 	return GetController(Object->GetOuter());
 }
 
-APlayerCameraManager* UUnrealEngineExStatics::GetCameraController(const UObject* Object)
+APlayerCameraManager* UUnrealEngineExStatics::GetPlayerCameraManager(const UObject* Object)
 {
 	const APlayerController* Controller = Cast<APlayerController>(GetController(Object));
 	if (!IsValid(Controller))

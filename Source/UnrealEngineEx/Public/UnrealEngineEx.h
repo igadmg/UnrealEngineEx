@@ -40,6 +40,9 @@ struct FUnrealEngineEx
 		return Object->GetClass()->ImplementsInterface(I::StaticClass());
 	}
 
+	template <typename T> static T* GetOwnerOfType(const UObject* Object) { return Cast<T>(GetOwnerOfType(Object, T::StaticClass(), (T*)nullptr)); }
+	static UObject* GetOwnerOfType(const UObject* Object, const UClass* Class, const UObject* Unused = nullptr);
+
 	template <typename T> static T* GetAssociatedObject(const UObject* Object) { return Cast<T>(GetAssociatedObject(Object, (T*)nullptr)); }
 	UNREALENGINEEX_API static UObject* GetAssociatedObject(const UObject* Object, class AGameModeBase* Unused = nullptr);
 	UNREALENGINEEX_API static UObject* GetAssociatedObject(const UObject* Object, class AGameStateBase* Unused = nullptr);
@@ -95,6 +98,9 @@ if (GetNetRole(WorldContextObject) == ROLE_Authority)
 
 #define if_HasNoAuthority(WorldContextObject) \
 if (GetNetRole(WorldContextObject) < ROLE_Authority)
+
+#define if_NotClassDefaultObject(WorldContextObject) \
+if ((WorldContextObject->GetFlags() & RF_ClassDefaultObject) == 0)
 
 
 template <typename E, typename std::enable_if<std::is_enum<E>::value && !std::is_convertible<E, int>::value, int>::type = 0>
@@ -165,4 +171,11 @@ constexpr inline bool operator % (E lhs, E rhs)
 {
 	using T = std::underlying_type_t<E>;
 	return static_cast<T>(lhs & rhs) == (1 << static_cast<T>(rhs));
+}
+
+template<typename T>
+static FString EnumToString(const TCHAR* enumName, const T value)
+{
+	UEnum* pEnum = FindObject<UEnum>(ANY_PACKAGE, enumName);
+	return *(pEnum ? pEnum->GetNameStringByIndex(static_cast<uint8>(value)) : "null");
 }

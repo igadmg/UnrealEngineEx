@@ -79,7 +79,7 @@ public:
 	static class AController* GetController(const UObject* Object);
 
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
-	static class APlayerCameraManager* GetCameraController(const UObject* Object);
+	static class APlayerCameraManager* GetPlayerCameraManager(const UObject* Object);
 
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
 	static class UCameraComponent* GetPlayerActiveCamera(const UObject* Object);

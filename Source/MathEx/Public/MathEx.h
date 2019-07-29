@@ -35,6 +35,14 @@ struct FMathEx
 {
 	static bool InRange(float Value, float Min, float Max) { return Value < Max && Value > Min; }
 
+	static FRotator ReverseRotator(const FRotator& Rotator)
+	{
+		return FRotationMatrix::MakeFromXZ(
+			-FRotationMatrix(Rotator).GetUnitAxis(EAxis::X)
+			, FRotationMatrix(Rotator).GetUnitAxis(EAxis::Z)
+		).Rotator();
+	}
+
 	static MATHEX_API FVector FindCentroid(const TArray<FVector>& Values);
 	static MATHEX_API float RandomSameDigitsNumber(float Value);
 

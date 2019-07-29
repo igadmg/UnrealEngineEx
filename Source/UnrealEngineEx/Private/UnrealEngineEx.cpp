@@ -25,6 +25,11 @@ void FUnrealEngineExModule::ShutdownModule()
 }
 
 
+UObject* FUnrealEngineEx::GetOwnerOfType(const UObject* Object, const UClass* Class, const UObject* Unused)
+{
+	return nullptr;
+}
+
 UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, AGameModeBase* Unused)
 {
 	return UGameplayStatics::GetGameMode(Object);
