@@ -8,7 +8,9 @@ public class ComponentEx : ModuleRules
 	public ComponentEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
+#if UE_4_21_OR_LATER
 		PrivatePCHHeaderFile = "Private/ComponentExPrivatePCH.h";
+#endif
 
 		PublicIncludePaths.AddRange(new string[] {
 				Path.Combine(ModuleDirectory, "Public"),
