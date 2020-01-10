@@ -8,7 +8,9 @@ public class UnrealEditorEx : ModuleRules
 	public UnrealEditorEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
+#if UE_4_21_OR_LATER
 		PrivatePCHHeaderFile = "Private/UnrealEditorExPrivatePCH.h";
+#endif
 
 		PublicIncludePaths.AddRange(new string[] {
 				Path.Combine(ModuleDirectory, "Public"),
