@@ -46,6 +46,21 @@ public:
 		ConsumePendingObjects();
 	}
 
+	template <typename T>
+	void Consume(TArray<T*>& Array)
+	{
+		OnAddObjectFp = [&Array](UObject* Object) { Array.Add(Cast<T>(Object)); };
+		OnRemoveObjectFp = [&Array](UObject* Object) { Array.Remove(Cast<T>(Object)); };
+
+		ConsumePendingObjects();
+	}
+
+	void Release()
+	{
+		OnAddObjectFp = nullptr;
+		OnRemoveObjectFp = nullptr;
+	}
+
 
 public:
 	UPendingContainer(const FObjectInitializer& ObjectInitializer);

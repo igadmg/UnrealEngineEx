@@ -158,6 +158,29 @@ private:
 };
 
 
+USTRUCT(BlueprintType)
+struct FViewFrustum
+{
+	GENERATED_BODY()
+
+
+
+	FConvexVolume FrustumVolume;
+	bool bIsValid;
+
+
+	FViewFrustum()
+		: bIsValid(false)
+	{
+	}
+
+	FViewFrustum(FConvexVolume FrustumVolume)
+		: FrustumVolume(FrustumVolume)
+		, bIsValid(true)
+	{
+	}
+};
+
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FUnrealEngineExOnAsyncTaskFinishedDelegate, EAsyncTaskResult, Result);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FUnrealEngineExOnLevelStreamedDelegate, class ULevelStreaming*, StreamedLevel);

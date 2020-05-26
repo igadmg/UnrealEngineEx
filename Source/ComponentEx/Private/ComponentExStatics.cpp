@@ -79,7 +79,12 @@ bool UComponentExStatics::GetWorldBoneTransformAtTime(USkeletalMeshComponent* Sk
 
 	for (const FName& LocalBoneName : BoneStack)
 	{
-		int32 TrackIndex = Skeleton->GetAnimationTrackIndex(SkeletalMeshComponent->GetBoneIndex(LocalBoneName), AnimSequence, true);
+		int32 TrackIndex =
+#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 23
+			Skeleton->GetRawAnimationTrackIndex(SkeletalMeshComponent->GetBoneIndex(LocalBoneName), AnimSequence);
+#elif ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 0
+			Skeleton->GetAnimationTrackIndex(SkeletalMeshComponent->GetBoneIndex(LocalBoneName), AnimSequence, true);
+#endif
 		if (TrackIndex == INDEX_NONE)
 			return false;
 

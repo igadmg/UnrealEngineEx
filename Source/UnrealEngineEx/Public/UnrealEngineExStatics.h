@@ -91,8 +91,8 @@ public:
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
 	static FViewSpaceDescriptor GetViewSpaceDescriptor(class ULocalPlayer* Player, FVector Locaton);
 
-	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable)
-	static bool DoFrustumCheckSphere(class ULocalPlayer* Player, FVector Location, float Radius, bool& bIntersecting);
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure)
+	static FViewFrustum GetViewFrustum(class ULocalPlayer* Player);
 
 
 	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))

@@ -356,14 +356,14 @@ FViewSpaceDescriptor UUnrealEngineExStatics::GetViewSpaceDescriptor(ULocalPlayer
 	return FViewSpaceDescriptor(SceneView, Locaton);
 }
 
-bool UUnrealEngineExStatics::DoFrustumCheckSphere(ULocalPlayer* Player, FVector Location, float Radius, bool& bIntersecting)
+FViewFrustum UUnrealEngineExStatics::GetViewFrustum(class ULocalPlayer* Player)
 {
 	if (!IsValid(Player) || !IsValid(Player->ViewportClient) || Player->ViewportClient->Viewport == nullptr)
-		return false;
+		return FViewFrustum();
 
 	UWorld* World = GEngine->GetWorldFromContextObject(Player, EGetWorldErrorMode::ReturnNull);
 	if (!IsValid(World))
-		return false;
+		return FViewFrustum();
 
 	FSceneViewFamilyContext ViewFamily(FSceneViewFamily::ConstructionValues(
 		Player->ViewportClient->Viewport
@@ -376,12 +376,10 @@ bool UUnrealEngineExStatics::DoFrustumCheckSphere(ULocalPlayer* Player, FVector 
 	FSceneView* SceneView = Player->CalcSceneView(&ViewFamily, ViewLocation, ViewRotation, Player->ViewportClient->Viewport);
 	if (SceneView != nullptr)
 	{
-		bool bIsFullyContained;
-		bIntersecting = SceneView->ViewFrustum.IntersectSphere(Location, Radius, bIsFullyContained);
-		return bIsFullyContained;
+		return FViewFrustum(SceneView->ViewFrustum);
 	}
 
-	return false;
+	return FViewFrustum();
 }
 
 TAssetPtr<UWorld> UUnrealEngineExStatics::GetCurrentLevelAssetPtr(const UObject* WorldContextObject)
