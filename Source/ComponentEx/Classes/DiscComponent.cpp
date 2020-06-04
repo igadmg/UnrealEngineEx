@@ -1,8 +1,8 @@
-#include "ComponentExPrivatePCH.h"
 #include "DiscComponent.h"
 
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
+#include "PrimitiveSceneProxy.h"
 
 
 UDiscComponent::UDiscComponent()

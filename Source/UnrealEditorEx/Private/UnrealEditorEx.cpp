@@ -1,13 +1,12 @@
-#include "UnrealEditorExPrivatePCH.h"
-
-#include "Core.h"
-#include "ModuleManager.h"
+#include "UnrealEditorEx.h"
 
 #include "Editor/PeekEdMode.h"
 #include "Editor/PeekEditorCommands.h"
-#include "Editor/UnrealEdEngine.h"
 #include "Visualizers/VisualizerComponentVisualizer.h"
 #include "VisualizerComponent.h"
+
+#include "Editor/UnrealEdEngine.h"
+#include "Core.h"
 #include "UnrealEdGlobals.h"
 
 

@@ -1,4 +1,3 @@
-#include "UnrealEngineExPrivatePCH.h"
 #include "BlueprintableVolume.h"
 
 
@@ -24,7 +23,11 @@ void ABlueprintableVolume::PostActorCreated()
 }
 
 #if WITH_EDITOR
+#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 25
+void ABlueprintableVolume::PreEditChange(FProperty* PropertyAboutToChange)
+#elif ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 0
 void ABlueprintableVolume::PreEditChange(UProperty* PropertyAboutToChange)
+#endif
 {
 	static FName NAME_BrushBuilder(TEXT("BrushBuilder"));
 

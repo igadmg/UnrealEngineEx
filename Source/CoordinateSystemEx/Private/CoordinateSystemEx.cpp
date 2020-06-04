@@ -1,5 +1,6 @@
-#include "CoordinateSystemExPrivatePCH.h"
 #include "CoordinateSystemEx.h"
+
+#include "Core.h"
 
 
 

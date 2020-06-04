@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Engine/EngineTypes.h"
 #include "PeekEditorObject.generated.h"
 
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ModuleManager.h"
+#include "Modules/ModuleInterface.h"
+#include "Modules/ModuleManager.h"
 
 #include "UnrealEngineExTypes.h"
 
@@ -73,7 +74,14 @@ const T* ValidInterface(const T* v) { return IsValid(v) && FUnrealEngineEx::Does
 template <typename UT, typename T>
 T* ValidInterface(T* v) { return IsValid(v) && FUnrealEngineEx::DoesImplementInterface<UT>(v) ? v : nullptr; }
 
-#define if_Implements(Type, Name, Expression) \
+#define EXPAND(x) x
+#define GET_MACRO_if_Implements(_1,_2,_3,NAME,...) NAME
+#define if_Implements(...) EXPAND(GET_MACRO_if_Implements(__VA_ARGS__, if_Implements3, if_Implements2)(__VA_ARGS__))
+
+#define if_Implements2(TypeAndName, Expression) \
+if (auto TypeAndName = ValidInterface<U ## TypeAndName>(Expression))
+
+#define if_Implements3(Type, Name, Expression) \
 if (auto Name = ValidInterface<U ## Type>(Expression))
 
 #define if_ImplementsT(UType, Name, Expression) \
@@ -85,7 +93,7 @@ if (!UKismetSystemLibrary::IsDedicatedServer(WorldContextObject))
 
 static ENetRole GetNetRole(const AActor* Actor)
 {
-	return Actor->Role;
+	return Actor->GetLocalRole();
 }
 
 static ENetRole GetNetRole(const UActorComponent* ActorComponent)

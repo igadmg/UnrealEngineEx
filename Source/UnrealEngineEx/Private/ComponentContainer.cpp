@@ -1,4 +1,3 @@
-#include "UnrealEngineExPrivatePCH.h"
 #include "ComponentContainer.h"
 
 #include "Engine/ActorChannel.h"
@@ -199,6 +198,7 @@ void UContainedComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	bReplicates = true;			// Enable replication but do not register component as Actor's replicated component.
+	// TODO: Not working
+	//bReplicates = true;			// Enable replication but do not register component as Actor's replicated component.
 	GetOwner()->ForceNetUpdate();
 }

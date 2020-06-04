@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Components/ActorComponent.h"
 #include "VisualizerComponent.generated.h"
 
 
@@ -10,18 +11,15 @@ class UNREALEDITOREX_API UVisualizerComponent : public UActorComponent
 	GENERATED_BODY()
 
 
-
 public:
 	UPROPERTY(Category = "Visualizer", EditAnywhere)
 	FString ComponentName;
-
 
 
 public:
 	UFUNCTION(Category = "Visualizer", BlueprintPure)
 	TArray<UActorComponent*> GetVisualizedComponents() const;
 
-	
 
 public:
 	UVisualizerComponent(const FObjectInitializer& ObjectInitializer);

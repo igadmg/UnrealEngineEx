@@ -1,4 +1,3 @@
-#include "UnrealEngineExPrivatePCH.h"
 #include "AsyncTaskManager.h"
 
 #include "AsyncTask.h"
@@ -25,7 +24,7 @@ void UAsyncTaskManager::BeginDestroy()
 	Super::BeginDestroy();
 }
 
-void UAsyncTaskManager::TickUpdate(ELevelTick TickType, float DeltaSeconds)
+void UAsyncTaskManager::TickUpdate(UWorld* World, ELevelTick TickType, float DeltaSeconds)
 {
 	if (TickType != LEVELTICK_All)
 		return;

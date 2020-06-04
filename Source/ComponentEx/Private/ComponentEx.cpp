@@ -1,4 +1,3 @@
-#include "ComponentExPrivatePCH.h"
 #include "ComponentEx.h"
 
 #include "Components/ActorComponent.h"

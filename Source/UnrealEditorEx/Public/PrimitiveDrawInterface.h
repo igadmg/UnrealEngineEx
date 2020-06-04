@@ -10,16 +10,13 @@ class UNREALEDITOREX_API UPrimitiveDrawInterface : public UObject
 	GENERATED_BODY()
 
 
-
 public:
-	FPrimitiveDrawInterface* PDI;
-
+	class FPrimitiveDrawInterface* PDI;
 
 
 public:
 	UFUNCTION(Category = "Draw", BlueprintCallable)
 	void DrawLine(const FVector& Start, const FVector& End, const FLinearColor& Color, uint8 DepthPriorityGroup, float Thickness = 0.0f, float DepthBias = 0.0f, bool bScreenSpace = false);
-
 
 
 public:

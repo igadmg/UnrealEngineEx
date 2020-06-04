@@ -31,5 +31,5 @@ public:
 
 protected:
 	FDelegateHandle TickUpdateHandle;
-	void TickUpdate(ELevelTick TickType, float DeltaSeconds);
+	void TickUpdate(class UWorld* World, ELevelTick TickType, float DeltaSeconds);
 };

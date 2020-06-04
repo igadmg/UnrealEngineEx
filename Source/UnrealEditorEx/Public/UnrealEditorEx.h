@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ModuleManager.h"
+#include "Modules/ModuleInterface.h"
+#include "Modules/ModuleManager.h"
 
 
 
@@ -21,3 +22,4 @@ struct FUnrealEditorEx
 {
 	// Declare module static functions here
 };
+

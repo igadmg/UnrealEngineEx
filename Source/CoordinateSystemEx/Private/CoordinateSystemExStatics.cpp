@@ -1,4 +1,3 @@
-#include "CoordinateSystemExPrivatePCH.h"
 #include "CoordinateSystemExStatics.h"
 
 #include "Components/ActorComponent.h"

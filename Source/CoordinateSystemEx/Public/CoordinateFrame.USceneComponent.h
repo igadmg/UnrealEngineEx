@@ -14,9 +14,9 @@ public:
 
 
 public:
-	FORCEINLINE FVector GetRelativeLocation() const { return Object.RelativeLocation; }
-	FORCEINLINE FRotator GetRelativeRotation() const { return Object.RelativeRotation; }
-	FORCEINLINE FVector GetRelativeScale() const { return Object.RelativeScale3D; }
+	FORCEINLINE FVector GetRelativeLocation() const { return Object.GetRelativeLocation(); }
+	FORCEINLINE FRotator GetRelativeRotation() const { return Object.GetRelativeRotation(); }
+	FORCEINLINE FVector GetRelativeScale() const { return Object.GetRelativeScale3D(); }
 	FORCEINLINE FTransform GetRelativeTransform() const { return Object.GetRelativeTransform(); }
 	FORCEINLINE FVector GetWorldLocation() const { return Object.GetComponentLocation(); }
 	FORCEINLINE FRotator GetWorldRotation() const { return Object.GetComponentRotation(); }

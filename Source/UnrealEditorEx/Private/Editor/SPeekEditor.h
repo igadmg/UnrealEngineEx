@@ -6,7 +6,7 @@
 #include "Widgets/SCompoundWidget.h"
 #include "Widgets/Notifications/SErrorText.h"
 #include "IDetailsView.h"
-#include "PeekEdMode.h"
+#include "Editor/PeekEdMode.h"
 //#include "Toolkits/IToolkitHost.h"
 //#include "AssetThumbnail.h"
 //#include "Toolkits/BaseToolkit.h"

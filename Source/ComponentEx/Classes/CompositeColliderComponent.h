@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
+#include "Components/ShapeComponent.h"
 #include "CompositeColliderComponent.generated.h"
 
 

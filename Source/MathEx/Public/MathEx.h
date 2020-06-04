@@ -1,13 +1,17 @@
 #pragma once
 
 #include "Core.h"
-#include "ModuleManager.h"
+#include "Modules/ModuleInterface.h"
+#include "Modules/ModuleManager.h"
 
 
 
 class FMathExModule : public IModuleInterface
 {
 public:
+	static inline FMathExModule& Get() { return FModuleManager::LoadModuleChecked<FMathExModule>("MathEx"); }
+	static inline bool IsAvailable() { return FModuleManager::Get().IsModuleLoaded("MathEx"); }
+	
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;

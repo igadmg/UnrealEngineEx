@@ -1,6 +1,6 @@
-#include "UnrealDeveloperExPrivatePCH.h"
+#include "UnrealDeveloperEx.h"
+
 #include "Core.h"
-#include "ModuleManager.h"
 
 
 

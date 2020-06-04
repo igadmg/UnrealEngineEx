@@ -1,4 +1,3 @@
-#include "UnrealEngineExPrivatePCH.h"
 #include "SynchronizedNetworkClock.h"
 
 #include "LatentActions.h"
@@ -11,7 +10,7 @@
 USynchronizedNetworkClock::USynchronizedNetworkClock(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	bReplicates = true;
+	SetIsReplicatedByDefault(true);
 }
 /*
 void USynchronizedNetworkClock::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const

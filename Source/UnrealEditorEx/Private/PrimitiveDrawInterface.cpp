@@ -1,5 +1,6 @@
-#include "UnrealEditorExPrivatePCH.h"
 #include "PrimitiveDrawInterface.h"
+
+#include "SceneManagement.h"
 
 
 

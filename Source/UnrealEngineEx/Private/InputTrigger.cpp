@@ -1,4 +1,3 @@
-#include "UnrealEngineExPrivatePCH.h"
 #include "InputTrigger.h"
 #include "Kismet/GameplayStatics.h"
 

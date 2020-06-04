@@ -1,4 +1,3 @@
-#include "ComponentExPrivatePCH.h"
 #include "SkeletalMeshEx.h"
 
 #include "Engine/SkeletalMeshSocket.h"

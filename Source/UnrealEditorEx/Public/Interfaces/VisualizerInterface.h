@@ -1,5 +1,6 @@
 #pragma once
 
+#include "UObject/Interface.h"
 #include "VisualizerInterface.generated.h"
 
 
@@ -13,7 +14,6 @@ class UNREALEDITOREX_API UVisualizerInterface : public UInterface
 class UNREALEDITOREX_API IVisualizerInterface
 {
 	GENERATED_IINTERFACE_BODY()
-
 
 
 public:

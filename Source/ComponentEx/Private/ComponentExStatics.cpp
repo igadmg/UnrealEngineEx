@@ -1,4 +1,3 @@
-#include "ComponentExPrivatePCH.h"
 #include "ComponentExStatics.h"
 
 #include "ComponentEx.h"
@@ -85,6 +84,7 @@ bool UComponentExStatics::GetWorldBoneTransformAtTime(USkeletalMeshComponent* Sk
 #elif ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 0
 			Skeleton->GetAnimationTrackIndex(SkeletalMeshComponent->GetBoneIndex(LocalBoneName), AnimSequence, true);
 #endif
+
 		if (TrackIndex == INDEX_NONE)
 			return false;
 

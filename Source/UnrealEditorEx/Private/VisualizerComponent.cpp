@@ -1,4 +1,3 @@
-#include "UnrealEditorExPrivatePCH.h"
 #include "VisualizerComponent.h"
 
 #include "Interfaces/VisualizerInterface.h"

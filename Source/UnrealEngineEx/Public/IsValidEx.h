@@ -1,10 +1,12 @@
+#include "UObject/Object.h"
+
 static bool IsValid(const FName& Name)
 {
 	return Name != NAME_None && Name.IsValid();
 }
 
 template <typename T>
-static bool IsValid(T* Ptr)
+static bool IsValid(const T* Ptr)
 {
 	return Ptr != nullptr;
 }

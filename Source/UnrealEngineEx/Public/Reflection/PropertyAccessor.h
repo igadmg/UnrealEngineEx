@@ -1,4 +1,6 @@
 #pragma once
+
+#include "UObject/UnrealType.h"
 #include "PropertyAccessor.generated.h"
 
 
@@ -12,8 +14,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	UObject* Object;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	UProperty* Property;
+	FProperty* Property;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FName PropertyName;
@@ -36,7 +37,7 @@ public:
 public:
 	bool IsValid() const
 	{
-		return ::IsValid(Object) && ::IsValid(Property);
+		return ::IsValid(Object) && Property != nullptr;
 	}
 
 	template <typename T>

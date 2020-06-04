@@ -1,4 +1,3 @@
-#include "UnrealEditorExPrivatePCH.h"
 #include "Visualizers/VisualizerComponentVisualizer.h"
 
 #include "Interfaces/VisualizerInterface.h"
@@ -24,7 +23,7 @@ void FVisualizerComponentVisualizer::DrawVisualization(const UActorComponent* Co
 {
 	uPDI->PDI = PDI;
 	UVisualizerComponent* VisualizerComponent = const_cast<UVisualizerComponent*>(Cast<UVisualizerComponent>(Component));
-	UProperty* VisualizedComponentProp = VisualizerComponent->GetClass()->FindPropertyByName("VisualizedComponent");
+	FProperty* VisualizedComponentProp = VisualizerComponent->GetClass()->FindPropertyByName("VisualizedComponent");
 	bool bDoesImplementInterface = FUnrealEngineEx::DoesImplementInterface<UVisualizerInterface>(VisualizerComponent);
 
 	VisualizerComponent->ForEachVisualizedComponent([this](UActorComponent* VisualizedComponent) {
@@ -32,7 +31,7 @@ void FVisualizerComponentVisualizer::DrawVisualization(const UActorComponent* Co
 	}, [=](UActorComponent* VisualizedComponent) {
 		if (bDoesImplementInterface)
 		{
-			if (IsValid(VisualizedComponentProp))
+			if (VisualizedComponentProp != nullptr)
 			{
 				UObject** ValuePtr = VisualizedComponentProp->ContainerPtrToValuePtr<UObject*>(VisualizerComponent);
 				if (ValuePtr != nullptr)
@@ -48,7 +47,7 @@ void FVisualizerComponentVisualizer::DrawVisualization(const UActorComponent* Co
 void FVisualizerComponentVisualizer::DrawVisualizationHUD(const UActorComponent* Component, const FViewport* Viewport, const FSceneView* View, FCanvas* Canvas)
 {
 	UVisualizerComponent* VisualizerComponent = const_cast<UVisualizerComponent*>(Cast<UVisualizerComponent>(Component));
-	UProperty* VisualizedComponentProp = VisualizerComponent->GetClass()->FindPropertyByName("VisualizedComponent");
+	FProperty* VisualizedComponentProp = VisualizerComponent->GetClass()->FindPropertyByName("VisualizedComponent");
 	bool bDoesImplementInterface = FUnrealEngineEx::DoesImplementInterface<UVisualizerInterface>(VisualizerComponent);
 
 	VisualizerComponent->ForEachVisualizedComponent([](UActorComponent* VisualizedComponent) {
@@ -56,7 +55,7 @@ void FVisualizerComponentVisualizer::DrawVisualizationHUD(const UActorComponent*
 	}, [=](UActorComponent* VisualizedComponent) {
 		if (bDoesImplementInterface)
 		{
-			if (IsValid(VisualizedComponentProp))
+			if (VisualizedComponentProp != nullptr)
 			{
 				UObject** ValuePtr = VisualizedComponentProp->ContainerPtrToValuePtr<UObject*>(VisualizerComponent);
 				if (ValuePtr != nullptr)

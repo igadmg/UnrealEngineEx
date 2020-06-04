@@ -1,4 +1,3 @@
-#include "UnrealEditorExPrivatePCH.h"
 #include "Editor/PeekEdMode.h"
 
 #include "Editor/PeekEditorCommands.h"
@@ -7,6 +6,7 @@
 
 #include "Toolkits/ToolkitManager.h"
 #include "EditorModeManager.h"
+#include "EditorViewportClient.h"
 
 /*
 #include "ScopedTransaction.h"

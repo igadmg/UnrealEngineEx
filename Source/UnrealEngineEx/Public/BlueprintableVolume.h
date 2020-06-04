@@ -19,7 +19,11 @@ protected:
 	virtual void PostActorCreated() override;
 
 #if WITH_EDITOR
+#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 25
+	virtual void PreEditChange(FProperty* PropertyAboutToChange) override;
+#elif ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 0
 	virtual void PreEditChange(UProperty* PropertyAboutToChange) override;
+#endif
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif // WITH_EDITOR
 

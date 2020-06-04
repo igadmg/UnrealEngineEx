@@ -1,4 +1,3 @@
-#include "ComponentExPrivatePCH.h"
 #include "ActorEx.h"
 
 #include "Camera/CameraComponent.h"
@@ -18,7 +17,7 @@ UCameraComponent* FActorEx::GetCameraComponent() const
 
 		for (UCameraComponent* CameraComponent : Cameras)
 		{
-			if (CameraComponent->bIsActive)
+			if (CameraComponent->IsActive())
 			{
 				return CameraComponent;
 			}

@@ -1,9 +1,10 @@
-#include "UnrealEditorExPrivatePCH.h"
-#include "SPeekEditor.h"
+#include "Editor/SPeekEditor.h"
 
-#include "PeekEditorCommands.h"
-#include "PeekEditorObject.h"
+#include "Editor/PeekEditorCommands.h"
+#include "Editor/PeekEditorObject.h"
 
+#include "Framework/MultiBox/MultiBoxBuilder.h"
+#include "Framework/MultiBox/MultiBoxDefs.h"
 #include "EditorModeManager.h"
 #include "PropertyEditorModule.h"
 #include "SlateOptMacros.h"
@@ -376,7 +377,7 @@ bool SPeekEditor::GetPeekEditorIsEnabled() const
 
 bool SPeekEditor::GetIsPropertyVisible(const FPropertyAndParent& PropertyAndParent) const
 {
-	const UProperty& Property = PropertyAndParent.Property;
+	const FProperty& Property = PropertyAndParent.Property;
 
 	FPeekEdMode* PeekEdMode = GetEditorMode();
 #if 0
