@@ -1,5 +1,9 @@
 #include "BlueprintableVolume.h"
 
+#include "Components/BrushComponent.h"
+#include "Engine/BrushBuilder.h"
+#include "Engine/Polys.h"
+
 
 
 ABlueprintableVolume::ABlueprintableVolume(const FObjectInitializer& ObjectInitializer)

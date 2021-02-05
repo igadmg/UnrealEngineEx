@@ -56,6 +56,6 @@ void FUnrealEditorExModule::ShutdownModule()
 
 IMPLEMENT_MODULE(FUnrealEditorExModule, UnrealEditorEx)
 
-DEFINE_LOG_CATEGORY(LogUnrealEditorEx);
-//DEFINE_LOG_CATEGORY(LogUnrealEditorExInit);
-//DEFINE_LOG_CATEGORY(LogUnrealEditorExCriticalErrors);
+DEFINE_LOG_CATEGORY(LogUnrealEditorEx)
+//DEFINE_LOG_CATEGORY(LogUnrealEditorExInit)
+//DEFINE_LOG_CATEGORY(LogUnrealEditorExCriticalErrors)

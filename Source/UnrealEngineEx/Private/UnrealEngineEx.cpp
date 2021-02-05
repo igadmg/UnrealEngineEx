@@ -1,6 +1,7 @@
 #include "UnrealEngineEx.h"
 
 #include "GameFramework/GameStateBase.h"
+#include "GameFramework/HUD.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
