@@ -63,7 +63,7 @@ UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, APawn* Unus
 
 
 #if WITH_EDITOR
-TAssetPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrToPIE(const TAssetPtr<UWorld>& Level, UWorld* World)
+TSoftObjectPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrToPIE(const TSoftObjectPtr<UWorld>& Level, UWorld* World)
 {
 	int32 PIEInstanceID = World->GetOutermost()->PIEInstanceID;
 	FString PIELevelPackageName;
@@ -74,12 +74,12 @@ TAssetPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrToPIE(const TAssetPtr<UWorld>&
 
 	PIELevelPackageName = UWorld::ConvertToPIEPackageName(FPackageName::ObjectPathToPackageName(Level.ToString()), PIEInstanceID);
 	PIELevelObjectName = FPackageName::GetLongPackageAssetName(PIELevelPackageName);
-	TAssetPtr<UWorld> NewWorld;
+	TSoftObjectPtr<UWorld> NewWorld;
 	NewWorld = PIELevelPackageName + TEXT(".") + PIELevelObjectName;
 	return NewWorld;
 }
 
-TAssetPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrFromPIE(const TAssetPtr<UWorld>& Level, UWorld* World)
+TSoftObjectPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrFromPIE(const TSoftObjectPtr<UWorld>& Level, UWorld* World)
 {
 	FString PIELevelPackageName = UWorld::StripPIEPrefixFromPackageName(FPackageName::ObjectPathToPackageName(Level.ToString()), World->StreamingLevelsPrefix);
 	FString PIELevelObjectName = UWorld::RemovePIEPrefix(FPackageName::GetLongPackageAssetName(PIELevelPackageName));
@@ -88,36 +88,36 @@ TAssetPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrFromPIE(const TAssetPtr<UWorld
 	if (PIEInstanceID < 0) // For Standalone runs.
 		PIELevelPackageName.RemoveFromStart(TEXT("/Temp/Autosaves"));
 
-	TAssetPtr<UWorld> NewWorld;
+	TSoftObjectPtr<UWorld> NewWorld;
 	NewWorld = PIELevelPackageName + TEXT(".") + PIELevelObjectName;
 	return NewWorld;
 }
 #endif
 
-TAssetPtr<UWorld> FUnrealEngineEx::GetLevelPtr(UWorld* World)
+TSoftObjectPtr<UWorld> FUnrealEngineEx::GetLevelPtr(UWorld* World)
 {
 	const FString PackageName = World->GetOutermost()->GetName();
 
 	return GetLevelPtr(PackageName);
 }
 
-TAssetPtr<UWorld> FUnrealEngineEx::GetLevelPtr(FName PackageName)
+TSoftObjectPtr<UWorld> FUnrealEngineEx::GetLevelPtr(FName PackageName)
 {
 	FString LevelObjectName = FPackageName::GetLongPackageAssetName(PackageName.ToString());
-	TAssetPtr<UWorld> NewWorld;
+	TSoftObjectPtr<UWorld> NewWorld;
 	NewWorld = PackageName.ToString() + TEXT(".") + LevelObjectName;
 	return NewWorld;
 }
 
-TAssetPtr<UWorld> FUnrealEngineEx::GetLevelPtr(FString PackageName)
+TSoftObjectPtr<UWorld> FUnrealEngineEx::GetLevelPtr(FString PackageName)
 {
 	FString LevelObjectName = FPackageName::GetLongPackageAssetName(PackageName);
-	TAssetPtr<UWorld> NewWorld;
+	TSoftObjectPtr<UWorld> NewWorld;
 	NewWorld = PackageName + TEXT(".") + LevelObjectName;
 	return NewWorld;
 }
 
-FString FUnrealEngineEx::GetLevelName(const TAssetPtr<UWorld>& Level)
+FString FUnrealEngineEx::GetLevelName(const TSoftObjectPtr<UWorld>& Level)
 {
 	//FPackageName::SearchForPackageOnDisk(LevelName.ToString() + FPackageName::GetMapPackageExtension(), &MapFullName)
 	return FPackageName::ObjectPathToObjectName(Level.ToSoftObjectPath().ToString());

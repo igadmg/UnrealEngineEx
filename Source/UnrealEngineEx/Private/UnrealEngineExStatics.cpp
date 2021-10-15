@@ -1,5 +1,6 @@
 #include "UnrealEngineExStatics.h"
 
+#include "Blueprint/WidgetTree.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
 #include "Components/PanelSlot.h"
@@ -27,21 +28,39 @@
 #include "GameMapsSettings.h"
 #include "LatentActions.h"
 
+#if WITH_EDITOR
+#include "Settings/LevelEditorPlaySettings.h"
+#endif
+
+#include "CoreEx.h"
 #include "CoordinateFrame.h"
+
+#include <functional>
 
 
 
 struct FFindStreamingLevelBy {
-	const TAssetPtr<UWorld>& LevelAssetPtr;
-	FFindStreamingLevelBy(const TAssetPtr<UWorld>& LevelAssetPtr) : LevelAssetPtr(LevelAssetPtr) {}
+	const TSoftObjectPtr<UWorld>& LevelAssetPtr;
+	FFindStreamingLevelBy(const TSoftObjectPtr<UWorld>& LevelAssetPtr) : LevelAssetPtr(LevelAssetPtr) {}
 	bool operator ()(const ULevelStreaming* Level) const { return FUnrealEngineEx::ConvertLevelPtrFromPIE(Level->GetWorldAsset(), Level->GetWorld()) == LevelAssetPtr; }
 };
 
 
-void UUnrealEngineExStatics::WorldType(const UObject* WorldContextObject, EBPWorldType& OutWorldType)
+EBPWorldType UUnrealEngineExStatics::GetWorldType(const UObject* WorldContextObject)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
-	OutWorldType = (EBPWorldType)(IsValid(World) ? (EWorldType::Type)World->WorldType : EWorldType::None);
+	return (EBPWorldType)(IsValid(World) ? (EWorldType::Type)World->WorldType : EWorldType::None);
+}
+
+void UUnrealEngineExStatics::WorldType(const UObject* WorldContextObject, EBPWorldType& OutWorldType)
+{
+	OutWorldType = GetWorldType(WorldContextObject);
+}
+
+void UUnrealEngineExStatics::NetMode(const UObject* WorldContextObject, TEnumAsByte<ENetMode>& OutNetMode)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	OutNetMode = World ? World->GetNetMode() : NM_Standalone;
 }
 
 
@@ -144,12 +163,17 @@ APlayerController* UUnrealEngineExStatics::GetLocalPlayerController(const UObjec
 	return World->GetFirstPlayerController();
 }
 
+AHUD* UUnrealEngineExStatics::GetLocalPlayerHUD(const UObject* WorldContextObject)
+{
+	return GetPlayerHUD(GetLocalPlayerController(WorldContextObject));
+}
+
 AHUD* UUnrealEngineExStatics::GetPlayerHUD(const UObject* Object)
 {
 	if (!IsValid(Object))
 		return nullptr;
 
-	const AHUD* AsHUD = Cast<AHUD>(Object);
+	auto AsHUD = Cast<AHUD>(Object);
 	if (AsHUD)
 	{
 		return const_cast<AHUD*>(AsHUD);
@@ -168,44 +192,50 @@ APlayerState* UUnrealEngineExStatics::GetPlayerState(const UObject* Object)
 		return nullptr;
 
 
-	const AActor* AsActor = Cast<AActor>(Object);
+	auto AsActor = Cast<AActor>(Object);
 	if (AsActor)
 	{
-		const APlayerState* AsPlayerState = Cast<APlayerState>(Object);
+		auto AsPlayerState = Cast<APlayerState>(AsActor);
 		if (AsPlayerState)
 		{
 			return const_cast<APlayerState*>(AsPlayerState);
 		}
 
-		const APawn* AsPawn = Cast<APawn>(Object);
+		auto AsPawn = Cast<APawn>(AsActor);
 		if (AsPawn)
 		{
 			return AsPawn->GetPlayerState();
 		}
 
-		const AController* AsController = Cast<AController>(Object);
+		auto AsController = Cast<AController>(AsActor);
 		if (AsController)
 		{
 			return AsController->PlayerState;
 		}
 
-		const AHUD* AsHUD = Cast<AHUD>(Object);
+		auto AsHUD = Cast<AHUD>(AsActor);
 		if (AsHUD)
 		{
 			return GetPlayerState(AsHUD->GetOwningPlayerController());
+		}
+
+		auto AsChildActorComponent = Cast<UChildActorComponent>(AsActor->GetParentComponent());
+		if (AsChildActorComponent)
+		{
+			return GetPlayerState(AsChildActorComponent->GetOwner());
 		}
 
 		return GetPlayerState(AsActor->GetOwner());
 	}
 	else
 	{
-		const UActorComponent* AsActorComponent = Cast<UActorComponent>(Object);
+		auto AsActorComponent = Cast<UActorComponent>(Object);
 		if (AsActorComponent)
 		{
 			return GetPlayerState(AsActorComponent->GetOwner());
 		}
 
-		const UUserWidget* AsUserWidget = Cast<UUserWidget>(Object);
+		auto AsUserWidget = Cast<UUserWidget>(Object);
 		if (AsUserWidget)
 		{
 			return GetPlayerState(AsUserWidget->GetOwningPlayer());
@@ -213,6 +243,16 @@ APlayerState* UUnrealEngineExStatics::GetPlayerState(const UObject* Object)
 	}
 
 	return GetPlayerState(Object->GetOuter());
+}
+
+float UUnrealEngineExStatics::GetPlayerScore(const UObject* Object)
+{
+	if (auto PlayerState = UUnrealEngineExStatics::GetPlayerState(Object))
+	{
+		return PlayerState->GetScore();
+	}
+
+	return 0;
 }
 
 APawn* UUnrealEngineExStatics::GetPawnOrSpectator(const UObject* Object)
@@ -251,22 +291,22 @@ AController* UUnrealEngineExStatics::GetController(const UObject* Object)
 		return nullptr;
 
 
-	const AActor* AsActor = Cast<AActor>(Object);
+	auto AsActor = Cast<AActor>(Object);
 	if (AsActor)
 	{
-		const AController* AsController = Cast<AController>(Object);
+		auto AsController = Cast<AController>(Object);
 		if (AsController)
 		{
 			return const_cast<AController*>(AsController);
 		}
 
-		const APawn* AsPawn = Cast<APawn>(Object);
+		auto AsPawn = Cast<APawn>(Object);
 		if (AsPawn)
 		{
 			return AsPawn->GetController();
 		}
 
-		const AHUD* AsHUD = Cast<AHUD>(Object);
+		auto AsHUD = Cast<AHUD>(Object);
 		if (AsHUD)
 		{
 			return AsHUD->GetOwningPlayerController();
@@ -276,20 +316,31 @@ AController* UUnrealEngineExStatics::GetController(const UObject* Object)
 	}
 	else
 	{
-		const UActorComponent* AsActorComponent = Cast<UActorComponent>(Object);
+		auto AsActorComponent = Cast<UActorComponent>(Object);
 		if (AsActorComponent)
 		{
 			return GetController(AsActorComponent->GetOwner());
 		}
 
-		const UUserWidget* AsUserWidget = Cast<UUserWidget>(Object);
+		auto AsUserWidget = Cast<UUserWidget>(Object);
 		if (AsUserWidget)
 		{
 			return AsUserWidget->GetOwningPlayer();
 		}
+
+		auto AsGameInstance = Cast<UGameInstance>(Object);
+		if (AsGameInstance)
+		{
+			return GetLocalPlayerController(AsGameInstance);
+		}
 	}
 
 	return GetController(Object->GetOuter());
+}
+
+APlayerController* UUnrealEngineExStatics::GetPlayerController(const UObject* Object)
+{
+	return Valid<APlayerController>(GetController(Object));
 }
 
 APlayerCameraManager* UUnrealEngineExStatics::GetPlayerCameraManager(const UObject* Object)
@@ -318,13 +369,13 @@ UCharacterMovementComponent* UUnrealEngineExStatics::GetCharacterMovementCompone
 	if (!IsValid(Object))
 		return nullptr;
 
-	const ACharacter* AsCharacter = Cast<ACharacter>(Object);
+	auto AsCharacter = Cast<ACharacter>(Object);
 	if (AsCharacter)
 	{
 		return AsCharacter->GetCharacterMovement();
 	}
 
-	const UActorComponent* AsActorComponent = Cast<UActorComponent>(Object);
+	auto AsActorComponent = Cast<UActorComponent>(Object);
 	if (AsActorComponent)
 	{
 		return GetCharacterMovementComponent(AsActorComponent->GetOwner());
@@ -381,7 +432,7 @@ FViewFrustum UUnrealEngineExStatics::GetViewFrustum(class ULocalPlayer* Player)
 	return FViewFrustum();
 }
 
-TAssetPtr<UWorld> UUnrealEngineExStatics::GetCurrentLevelAssetPtr(const UObject* WorldContextObject)
+TSoftObjectPtr<UWorld> UUnrealEngineExStatics::GetCurrentLevelAssetPtr(const UObject* WorldContextObject)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
 	if (!IsValid(World))
@@ -390,7 +441,7 @@ TAssetPtr<UWorld> UUnrealEngineExStatics::GetCurrentLevelAssetPtr(const UObject*
 	return FUnrealEngineEx::ConvertLevelPtrFromPIE(FUnrealEngineEx::GetLevelPtr(World), World);
 }
 
-FString UUnrealEngineExStatics::GetLevelName(const TAssetPtr<UWorld>& Level)
+FString UUnrealEngineExStatics::GetLevelName(const TSoftObjectPtr<UWorld>& Level)
 {
 	return FUnrealEngineEx::GetLevelName(Level);
 }
@@ -467,7 +518,7 @@ bool UUnrealEngineExStatics::FindLevelScriptObjects(const UObject* WorldContextO
 	return Objects.Num() != 0;
 }
 
-ULevelStreaming* UUnrealEngineExStatics::AddStreamingLevel(UObject* WorldContextObject, TAssetPtr<UWorld> Level)
+ULevelStreaming* UUnrealEngineExStatics::AddStreamingLevel(UObject* WorldContextObject, TSoftObjectPtr<UWorld> Level)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
 	if (!IsValid(World))
@@ -648,7 +699,7 @@ public:
 class FStreamLevelListAction : public FPendingLatentAction
 {
 public:
-	TArray<TAssetPtr<UWorld>> LevelList;
+	TArray<TSoftObjectPtr<UWorld>> LevelList;
 	FLatentActionInfo LatentInfo;
 	UWorld* World;
 
@@ -661,7 +712,7 @@ public:
 
 
 
-	FStreamLevelListAction(bool bIsLoading, const TArray<TAssetPtr<UWorld>>& InLevelList, bool bIsMakeVisibleAfterLoad, bool bIsShouldBlockOnLoad
+	FStreamLevelListAction(bool bIsLoading, const TArray<TSoftObjectPtr<UWorld>>& InLevelList, bool bIsMakeVisibleAfterLoad, bool bIsShouldBlockOnLoad
 		, const FUnrealEngineExOnLevelStreamedDelegate& InOnLevelStreamedCallback, const FLatentActionInfo& InLatentInfo, UWorld* InWorld)
 		: LevelList(InLevelList)
 		, LatentInfo(InLatentInfo)
@@ -709,7 +760,7 @@ public:
 	}
 #endif
 
-	ULevelStreaming* FindLevel(const TAssetPtr<UWorld>& LevelAssetPtr)
+	ULevelStreaming* FindLevel(const TSoftObjectPtr<UWorld>& LevelAssetPtr)
 	{
 		auto LevelPtr = World->GetStreamingLevels().FindByPredicate(FFindStreamingLevelBy(LevelAssetPtr));
 
@@ -794,7 +845,7 @@ public:
 	}
 };
 
-void UUnrealEngineExStatics::LoadStreamLevelList(const UObject* WorldContextObject, TArray<TAssetPtr<UWorld>> LevelList
+void UUnrealEngineExStatics::LoadStreamLevelList(const UObject* WorldContextObject, TArray<TSoftObjectPtr<UWorld>> LevelList
 	, const FUnrealEngineExOnLevelStreamedDelegate& OnLevelStreamedCallback, bool bMakeVisibleAfterLoad, bool bShouldBlockOnLoad, FLatentActionInfo LatentInfo)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
@@ -842,7 +893,7 @@ void UUnrealEngineExStatics::LoadStreamLevelStreamingList(const UObject* WorldCo
 	}
 }
 
-void UUnrealEngineExStatics::UnloadStreamLevelList(const UObject* WorldContextObject, TArray<TAssetPtr<UWorld>> LevelList
+void UUnrealEngineExStatics::UnloadStreamLevelList(const UObject* WorldContextObject, TArray<TSoftObjectPtr<UWorld>> LevelList
 	, const FUnrealEngineExOnLevelStreamedDelegate& OnLevelStreamedCallback, FLatentActionInfo LatentInfo)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
@@ -891,7 +942,7 @@ void UUnrealEngineExStatics::UnloadStreamLevelStreamingList(const UObject* World
 }
 
 
-void UUnrealEngineExStatics::UnloadStreamLevelListBlocking(const UObject* WorldContextObject, TArray<TAssetPtr<UWorld>> LevelList)
+void UUnrealEngineExStatics::UnloadStreamLevelListBlocking(const UObject* WorldContextObject, TArray<TSoftObjectPtr<UWorld>> LevelList)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
 	if (!IsValid(World))
@@ -900,7 +951,7 @@ void UUnrealEngineExStatics::UnloadStreamLevelListBlocking(const UObject* WorldC
 	if (LevelList.Num() == 0)
 		return;
 
-	for (const TAssetPtr<UWorld>& Level : LevelList)
+	for (const TSoftObjectPtr<UWorld>& Level : LevelList)
 	{
 		auto LevelPtr = World->GetStreamingLevels().FindByPredicate(FFindStreamingLevelBy(Level));
 
@@ -995,7 +1046,17 @@ void UUnrealEngineExStatics::ShowAllStreamingLevels(const UObject* WorldContextO
 	}
 }
 
-UAsyncTask* UUnrealEngineExStatics::CreateAsyncTask(const UObject* WorldContextObject, TSubclassOf<UAsyncTask> AsyncTaskClass, const FUnrealEngineExOnAsyncTaskFinishedDelegate& OnFinished, bool bAutorun)
+UAsyncTask* UUnrealEngineExStatics::CreateAsyncTask(const UObject* WorldContextObject, TSubclassOf<UAsyncTask> AsyncTaskClass)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	if (!IsValid(World))
+		return nullptr;
+
+	return NewObject<UAsyncTask>(World, AsyncTaskClass);
+}
+
+
+UAsyncTask* UUnrealEngineExStatics::CreateAsyncTaskWithCallback(const UObject* WorldContextObject, TSubclassOf<UAsyncTask> AsyncTaskClass, const FUnrealEngineExOnAsyncTaskFinishedDelegate& OnFinished, bool bAutorun)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
 	if (!IsValid(World))
@@ -1012,6 +1073,11 @@ UAsyncTask* UUnrealEngineExStatics::CreateAsyncTask(const UObject* WorldContextO
 	return AsyncTask;
 }
 
+UAsyncTask* UUnrealEngineExStatics::CreateAsyncTaskNoCallback(const UObject* WorldContextObject, TSubclassOf<class UAsyncTask> AsyncTaskClass, bool bAutorun)
+{
+	return CreateAsyncTaskWithCallback(WorldContextObject, AsyncTaskClass, FUnrealEngineExOnAsyncTaskFinishedDelegate(), bAutorun);
+}
+
 void UUnrealEngineExStatics::ClearAsyncTasks()
 {
 	for (UAsyncTask* AsyncTask : UAsyncTaskManager::Instance->Tasks)
@@ -1023,6 +1089,69 @@ void UUnrealEngineExStatics::ClearAsyncTasks()
 	}
 
 	UAsyncTaskManager::Instance->Tasks.Empty();
+}
+
+FNetworkStatus UUnrealEngineExStatics::GetNetworkStatus(const UObject* WorldContextObject)
+{
+	FNetworkStatus Result;
+
+	if (auto LocalPlayerController = UUnrealEngineExStatics::GetLocalPlayerController(WorldContextObject))
+	{
+		if (auto NetConnection = LocalPlayerController->GetNetConnection())
+		{
+			Result.Latency = NetConnection->AvgLag;
+		}
+	}
+
+	Result.ServerTime = UUnrealEngineExStatics::GetServerWorldTimeSeconds(WorldContextObject);
+
+	return Result;
+}
+
+void UUnrealEngineExStatics::NetRole(const UObject* WorldContextObject, TEnumAsByte<ENetRole>& OutNetRole)
+{
+	if (!IsValid(WorldContextObject))
+	{
+		OutNetRole = ROLE_None;
+		return;
+	}
+
+	if (auto AsActorComponent = Cast<UActorComponent>(WorldContextObject))
+	{
+		OutNetRole = GetNetRole(AsActorComponent);
+		return;
+	}
+	if (auto AsActor = Cast<AActor>(WorldContextObject))
+	{
+		OutNetRole = GetNetRole(AsActor);
+		return;
+	}
+
+	NetRole(WorldContextObject->GetOuter(), OutNetRole);
+}
+
+bool UUnrealEngineExStatics::IsSingleplayer(const UObject* WorldContextObject)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	if (!IsValid(World))
+	{
+		UE_LOG_EX_WCO(LogUnrealEngineEx, Verbose, WorldContextObject, TEXT("%s"), TEXT_BOOL(false));
+		return true;
+	}
+
+	switch (World->GetNetMode())
+	{
+	case NM_Standalone:
+		UE_LOG_EX_WCO(LogUnrealEngineEx, Verbose, WorldContextObject, TEXT("%s"), TEXT_BOOL(GetPlayNumberOfClients() < 2));
+		return GetPlayNumberOfClients() < 2;
+	case NM_DedicatedServer:
+	case NM_ListenServer:
+	case NM_Client:
+		UE_LOG_EX_WCO(LogUnrealEngineEx, Verbose, WorldContextObject, TEXT("%s"), TEXT_BOOL(false));
+		return false;
+	}
+
+	return false;
 }
 
 bool UUnrealEngineExStatics::IsServer(const UObject* WorldContextObject)
@@ -1054,6 +1183,30 @@ bool UUnrealEngineExStatics::StopServer(UObject* WorldContextObject)
 	GEngine->ShutdownWorldNetDriver(World);
 
 	return true;
+}
+
+bool UUnrealEngineExStatics::ServerTravel(const UObject* WorldContextObject, const TSoftObjectPtr<UWorld> Level, bool bAbsolute, FString Options)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	if (!IsValid(World))
+		return false;
+
+	if (auto GameMode = UGameplayStatics::GetGameMode(WorldContextObject))
+	{
+		if (World->WorldType == EWorldType::PIE)
+		{
+			GameMode->bUseSeamlessTravel = false;
+		}
+	}
+
+	FWorldContext& WorldContext = GEngine->GetWorldContextFromWorldChecked(World);
+	FString TravelURL = FPackageName::ObjectPathToPackageName(Level.ToString());
+	if (Options.Len() > 0)
+	{
+		TravelURL += FString(TEXT("?")) + Options;
+	}
+
+	return World->ServerTravel(TravelURL, bAbsolute);
 }
 
 void UUnrealEngineExStatics::ShutdownGame()
@@ -1099,6 +1252,18 @@ void UUnrealEngineExStatics::SetEditorViewTransform(FTransform Transform)
 	Client->Invalidate();
 #endif
 }
+
+int32 UUnrealEngineExStatics::GetPlayNumberOfClients()
+{
+#if WITH_EDITOR
+	const ULevelEditorPlaySettings* PlayInSettings = GetDefault<ULevelEditorPlaySettings>();
+	int32 PlayNumberOfClients(0);
+	PlayInSettings->GetPlayNumberOfClients(PlayNumberOfClients);	// Ignore 'state' of option (handled externally)
+	return PlayNumberOfClients;
+#endif
+	return 0;
+}
+
 
 FTransform UUnrealEngineExStatics::GetTransfromInFrontOfPlayer(AActor* PlayerPawnOrController, FVector Offset)
 {
@@ -1151,6 +1316,99 @@ bool UUnrealEngineExStatics::ReplaceWidget(UWidget* OldWidget, UWidget* NewWidge
 	Parent->InvalidateLayoutAndVolatility();
 
 	return true;
+}
+
+void ForeachChildWidget(UWidget* ParentWidget, std::function<bool(UWidget*)> Predicate, bool TopLevelOnly)
+{
+	if (!IsValid(ParentWidget))
+		return;
+
+	TInlineComponentArray<UWidget*> WidgetsToCheck;
+	TInlineComponentArray<UWidget*> CheckedWidgets;
+
+	WidgetsToCheck.Push(ParentWidget);
+
+	while (WidgetsToCheck.Num() > 0)
+	{
+		const bool bAllowShrinking = false;
+		UWidget* PossibleParent = WidgetsToCheck.Pop(bAllowShrinking);
+
+		if (CheckedWidgets.Contains(PossibleParent))
+			continue;
+
+		CheckedWidgets.Add(PossibleParent);
+
+		TArray<UWidget*> Widgets;
+		if (auto AsUserWidget = Cast<UUserWidget>(PossibleParent))
+		{
+			UWidgetTree::GetChildWidgets(AsUserWidget->GetRootWidget(), Widgets);
+		}
+		else
+		{
+			UWidgetTree::GetChildWidgets(PossibleParent, Widgets);
+		}
+
+		for (UWidget* Widget : Widgets)
+		{
+			if (CheckedWidgets.Contains(Widget))
+				continue;
+
+			if (!Predicate(Widget))
+				return;
+
+			if (!TopLevelOnly)
+			{
+				WidgetsToCheck.Push(Widget);
+			}
+		}
+
+		if (TopLevelOnly)
+		{
+			break;
+		}
+	}
+}
+
+void UUnrealEngineExStatics::GetAllChildWidgetsOfClass(UWidget* ParentWidget, TArray<UUserWidget*>& FoundWidgets, TSubclassOf<UUserWidget> WidgetClass, bool TopLevelOnly)
+{
+	FoundWidgets.Empty();
+
+	ForeachChildWidget(ParentWidget, [&FoundWidgets, &WidgetClass](UWidget* Widget) {
+		if (Widget->GetClass()->IsChildOf(WidgetClass))
+		{
+			FoundWidgets.Add(Cast<UUserWidget>(Widget));
+		}
+
+		return true;
+	}, TopLevelOnly);
+}
+
+void UUnrealEngineExStatics::GetAllChildWidgetsOfInterface(class UWidget* ParentWidget, TArray<UUserWidget*>& FoundWidgets, TSubclassOf<UInterface> WidgetInterface, bool TopLevelOnly)
+{
+	FoundWidgets.Empty();
+
+	ForeachChildWidget(ParentWidget, [&FoundWidgets, &WidgetInterface](UWidget* Widget) {
+		if (Widget->GetClass()->ImplementsInterface(WidgetInterface))
+		{
+			if (auto UserWidget = Cast<UUserWidget>(Widget))
+			{
+				FoundWidgets.Add(Cast<UUserWidget>(Widget));
+			}
+		}
+
+		return true;
+	}, TopLevelOnly);
+}
+
+UWidget* UUnrealEngineExStatics::GetParentEx(UWidget* Widget)
+{
+	if (!IsValid(Widget))
+		return nullptr;
+
+	if (auto Parent = Widget->GetParent())
+		return Parent;
+
+	return Widget->GetTypedOuter<UWidget>();
 }
 
 FString UUnrealEngineExStatics::GetInstanceStringID(UObject* WorldContextObject)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Engine/Scene.h"
+
 #include "Interpolator.generated.h"
 
 

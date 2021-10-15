@@ -2,12 +2,12 @@
 
 
 
-bool UReflectionStatics::IsValid(FPropertyAccessor& Property)
+bool UReflectionStatics::IsValid(FUObjectPropertyAccessor& Property)
 {
 	return Property.IsValid();
 }
 
-void UReflectionStatics::MakePropertyAccessor(FPropertyAccessor& Property, UObject* Object, FName Name)
+void UReflectionStatics::MakePropertyAccessor(FUObjectPropertyAccessor& Property, UObject* Object, FName Name)
 {
-	Property = FPropertyAccessor(Object, Name);
+	Property = FUObjectPropertyAccessor(Object, Name);
 }

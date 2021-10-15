@@ -34,7 +34,7 @@ void USynchronizedNetworkClock::SynchronizeTimeServer_Implementation(int32 InTok
 		UE_LOG(LogUnrealEngineEx, Log, TEXT("NetworkObjectInfo: %f"), NetworkObjectInfo->NextUpdateTime);
 	}
 
-	SynchronizeTimeClient(InToken, UGameplayStatics::GetRealTimeSeconds(this));
+	SynchronizeTimeClient(InToken, UGameplayStatics::GetTimeSeconds(this));
 }
 
 void USynchronizedNetworkClock::SynchronizeTimeClient_Implementation(int32 InToken, float InServerTime)
@@ -42,9 +42,9 @@ void USynchronizedNetworkClock::SynchronizeTimeClient_Implementation(int32 InTok
 	if (Token != InToken)
 		return;
 
-	ClientBTime = UGameplayStatics::GetRealTimeSeconds(this);
+	ClientBTime = UGameplayStatics::GetTimeSeconds(this);
 
-	float RoundTrip = ClientBTime - ClientBTime;
+	float RoundTrip = ClientBTime - ClientATime;
 	float Offset = InServerTime - ClientATime + RoundTrip / 2.f;
 
 	OnSynchronizedNetworkClockCallback.ExecuteIfBound(Offset, RoundTrip);
@@ -53,7 +53,7 @@ void USynchronizedNetworkClock::SynchronizeTimeClient_Implementation(int32 InTok
 void USynchronizedNetworkClock::DoSynchronizeTime()
 {
 	Token = FMath::Rand();
-	ClientATime = UGameplayStatics::GetRealTimeSeconds(this);
+	ClientATime = UGameplayStatics::GetTimeSeconds(this);
 	ClientBTime = ClientATime;
 
 	SynchronizeTimeServer(Token);
@@ -74,6 +74,8 @@ void USynchronizedNetworkClock::FinishSynchronization(const TArray<FNetworkTimeS
 	SumRoundtrip /= Samples.Num();
 
 	ClientOffset = SumOffset + CustomOffset;
+
+	OnSynchronized.ExecuteIfBound(ClientOffset);
 }
 
 // Stream Level Action
@@ -105,7 +107,7 @@ public:
 			if (Samples.Num() < NumberOfSamples)
 			{
 				bIsBusy = true;
-				RequestTime = UGameplayStatics::GetRealTimeSeconds(Clock);
+				RequestTime = UGameplayStatics::GetTimeSeconds(Clock);
 				Clock->DoSynchronizeTime();
 			}
 			else
@@ -115,7 +117,7 @@ public:
 				Response.FinishAndTriggerIf(true, LatentInfo.ExecutionFunction, LatentInfo.Linkage, LatentInfo.CallbackTarget);
 			}
 		}
-		else if (UGameplayStatics::GetRealTimeSeconds(Clock) - RequestTime > 5.f)
+		else if (UGameplayStatics::GetTimeSeconds(Clock) - RequestTime > 5.f)
 		{
 			bIsBusy = false;
 		}
@@ -128,9 +130,9 @@ public:
 	}
 };
 
-float USynchronizedNetworkClock::GetRealTimeSeconds() const
+float USynchronizedNetworkClock::GetTimeSeconds() const
 {
-	return UGameplayStatics::GetRealTimeSeconds(this) + ClientOffset;
+	return UGameplayStatics::GetTimeSeconds(this) + ClientOffset;
 }
 
 void USynchronizedNetworkClock::SynchronizeClock(int32 NumberOfSamples, FLatentActionInfo LatentInfo)

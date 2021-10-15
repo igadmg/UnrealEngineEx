@@ -32,6 +32,8 @@ public class UnrealEngineEx : ModuleRules
 			});
 
 		PublicDependencyModuleNames.AddRange(new string[] {
+				"CoreEx",
+				"ComponentEx",
 				"CoordinateSystemEx",
 			});
 

@@ -31,6 +31,7 @@ public class UnrealEditorEx : ModuleRules
 				"Engine",
 				"InputCore",
 				"UnrealEd",
+				"UMG",
 			});
 
 		PublicDependencyModuleNames.AddRange(new string[] {
@@ -46,6 +47,7 @@ public class UnrealEditorEx : ModuleRules
 			});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
+				"MathEx"
 			});
 
 

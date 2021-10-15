@@ -1,8 +1,11 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "ComponentExStatics.generated.h"
 
+#include "Components/SplineComponent.h"
+#include "AttachmentDescription.h"
+
+#include "ComponentExStatics.generated.h"
 
 
 UCLASS()
@@ -14,7 +17,13 @@ class COMPONENTEX_API UComponentExStatics : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(Category = "ComponentEx", BlueprintCallable)
 	static void SetActorEnabled(class AActor* Actor, bool bIsEnabled);
- 
+
+	UFUNCTION(Category = "ComponentEx", BlueprintPure)
+	static class UCameraComponent* GetCameraComponent(const class AActor* Actor);
+
+	//UFUNCTION(Category = "ComponentEx", BlueprintCallable)
+	static void Attach(const FAttachmentDescription& Where, class AActor* What, class AActor* ParentActor, const FAttachmentTransformRules& AttachmentRules);
+
 
 	UFUNCTION(Category = "PostProcessing", BlueprintCallable)
 	static class UObject* GetBlendable(class APostProcessVolume* Volume, int Index);
@@ -23,15 +32,31 @@ public:
 	static bool UpdateBlendableWeight(class APostProcessVolume* Volume, int Index, float Weight);
 
 	UFUNCTION(Category = "Spline", BlueprintPure)
-	static float FindDistanceClosestToWorldLocation(class USplineComponent* Target, FVector WorldLocation);
+	static float FindDistanceClosestToLocation(class USplineComponent* Spline, FVector Location, ESplineCoordinateSpace::Type CoordinateSpace = ESplineCoordinateSpace::World);
 
 	UFUNCTION(Category = "Rendering|Texture", BlueprintPure)
-	static FVector2D GetSize(class UTexture* Texture);
+	static FVector2D GetTextureSize(class UTexture* Texture);
 
+	UFUNCTION(Category = "StaticMesh", BlueprintPure)
+	static FVector GetMeshSize(class UStaticMesh* Mesh);
+
+
+	UFUNCTION(Category = "Animation", BlueprintCallable)
+	static void PlayAnimationWithCallback(class USkeletalMeshComponent* SkeletalMeshComponent, class UAnimationAsset* NewAnimToPlay, bool bLooping, const FTimerDynamicDelegate& OnFinished);
 
 	UFUNCTION(Category = "Animation", BlueprintPure)
 	static bool GetWorldBoneTransformAtTime(class USkeletalMeshComponent* SkeletalMeshComponent, class UAnimSequence* AnimSequence, FName BoneName, float Time, FTransform& OutTransform);
 
 	UFUNCTION(Category = "Animation", BlueprintPure)
 	static bool GetWorldSocketTransformAtTime(class USkeletalMeshComponent* SkeletalMeshComponent, class UAnimSequence* AnimSequence, FName SocketName, float Time, FTransform& OutTransform);
+
+
+	UFUNCTION(Category = "Spline", BlueprintCallable)
+	static void SetupSplineMeshComponentFromSpline(class USplineMeshComponent* SplineMeshComponent, class USplineComponent* Spline, float StartDistance, float EndDistance, ESplineCoordinateSpace::Type CoordinateSpace, bool bUpdateMesh = true);
+
+	UFUNCTION(Category = "Spline", BlueprintCallable)
+	static void SetupSplineMeshComponentStartFromSpline(class USplineMeshComponent* SplineMeshComponent, class USplineComponent* Spline, float DistanceAlongSpline, float TangetLength, float SplineMeshRoll, ESplineCoordinateSpace::Type CoordinateSpace, bool bUpdateMesh = true);
+
+	UFUNCTION(Category = "Spline", BlueprintCallable)
+	static void SetupSplineMeshComponentEndFromSpline(class USplineMeshComponent* SplineMeshComponent, class USplineComponent* Spline, float DistanceAlongSpline, float TangetLength, float SplineMeshRoll, ESplineCoordinateSpace::Type CoordinateSpace, bool bUpdateMesh = true);
 };

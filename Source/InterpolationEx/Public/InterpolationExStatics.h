@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
+
+#include "Engine/Scene.h"
+
 #include "InterpolationExStatics.generated.h"
 
 

@@ -1,11 +1,12 @@
-#include "InterpolationEx.h"
-
 #include "Interpolator.h"
+
+#include "InterpolationEx.h"
 
 #include "linear_spline.h"
 #include "cubic_hermite_spline.h"
 #include "quintic_hermite_spline.h"
 
+#include "Runtime/Launch/Resources/Version.h"
 
 
 namespace

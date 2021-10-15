@@ -1,10 +1,5 @@
 #include "UnrealEditorEx.h"
 
-#include "Editor/PeekEdMode.h"
-#include "Editor/PeekEditorCommands.h"
-#include "Visualizers/VisualizerComponentVisualizer.h"
-#include "VisualizerComponent.h"
-
 #include "Editor/UnrealEdEngine.h"
 #include "Core.h"
 #include "UnrealEdGlobals.h"
@@ -17,6 +12,7 @@
 
 void FUnrealEditorExModule::StartupModule()
 {
+#if 0
 	FPeekEditorCommands::Register();
 
 	FEditorModeRegistry::Get().RegisterMode<FPeekEdMode>(
@@ -38,17 +34,18 @@ void FUnrealEditorExModule::StartupModule()
 			Visualizer->OnRegister();
 		}
 	}
+#endif
 }
 
 void FUnrealEditorExModule::ShutdownModule()
 {
+#if 0
 	if (!IsValid(GUnrealEd))
 		return;
 
 	GUnrealEd->UnregisterComponentVisualizer(UVisualizerComponent::StaticClass()->GetFName());
+#endif
 }
-
-
 
 #undef LOCTEXT_NAMESPACE
 

@@ -20,6 +20,4 @@ public:
 
 struct FUnrealEditorEx
 {
-	// Declare module static functions here
 };
-

@@ -34,6 +34,7 @@ public class UnrealDeveloperEx : ModuleRules
 			});
 
 		PublicDependencyModuleNames.AddRange(new string[] {
+				"CoreEx"
 			});
 
 
@@ -42,6 +43,7 @@ public class UnrealDeveloperEx : ModuleRules
 			});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
+				"UnrealEngineEx",
 			});
 
 

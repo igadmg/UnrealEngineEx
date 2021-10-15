@@ -12,19 +12,24 @@
   "SupportURL": "",
   "Modules": [
     {
+      "Name": "CoreEx",
+      "Type": "Runtime",
+      "LoadingPhase": "PreDefault"
+    },
+    {
       "Name": "ComponentEx",
       "Type": "Runtime",
-      "LoadingPhase": "PostConfigInit"
+      "LoadingPhase": "PreDefault"
     },
     {
       "Name": "CoordinateSystemEx",
       "Type": "Runtime",
-      "LoadingPhase": "PostConfigInit"
+      "LoadingPhase": "PreDefault"
     },
     {
       "Name": "MathEx",
       "Type": "Runtime",
-      "LoadingPhase": "PostConfigInit"
+      "LoadingPhase": "PreDefault"
     },
     {
       "Name": "UnrealDeveloperEx",
@@ -34,7 +39,7 @@
     {
       "Name": "UnrealEngineEx",
       "Type": "Runtime",
-      "LoadingPhase": "PostConfigInit"
+      "LoadingPhase": "Default"
     },
     {
       "Name": "UnrealEditorEx",
@@ -45,5 +50,5 @@
   "EnabledByDefault": true,
   "CanContainContent": true,
   "IsBetaVersion": false,
-  "Installed": false
+  "Installed": true
 }

@@ -5,6 +5,7 @@
 
 
 DECLARE_DELEGATE_TwoParams(FSynchronizedNetworkClockDelegate, float, float);
+DECLARE_DELEGATE_OneParam(FSynchronizedNetworkClockSynchronizedDelegate, float);
 
 
 
@@ -18,9 +19,8 @@ UCLASS(Transient)
 class UNREALENGINEEX_API USynchronizedNetworkClock : public UActorComponent
 {
 	GENERATED_BODY()
-		
-	friend class FSynchronizeNetworkClockAction;
 
+	friend class FSynchronizeNetworkClockAction;
 
 
 public:
@@ -28,12 +28,11 @@ public:
 	float CustomOffset = 0.f;
 
 
-
 public:
 	UFUNCTION(Category = "Synchronized Network Clock", BlueprintPure)
-	float GetRealTimeSeconds() const;
+	float GetTimeSeconds() const;
 
-	UFUNCTION(Category = "Synchronized Network Clock", BlueprintCallable, meta = (Latent = "", LatentInfo = "LatentInfo"))
+	UFUNCTION(Category = "Synchronized Network Clock", BlueprintCallable, meta = (Latent, LatentInfo = "LatentInfo"))
 	void SynchronizeClock(int32 NumberOfSamples, FLatentActionInfo LatentInfo);
 
 
@@ -47,10 +46,13 @@ protected:
 	void FinishSynchronization(const TArray<FNetworkTimeSample>& Samples);
 
 
-	
+
 public:
 	USynchronizedNetworkClock(const FObjectInitializer& ObjectInitializer);
 
+
+public:
+	FSynchronizedNetworkClockSynchronizedDelegate OnSynchronized;
 
 
 protected:

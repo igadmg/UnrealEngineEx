@@ -28,6 +28,10 @@ public class ComponentEx : ModuleRules
 				"Engine"
 			});
 
+		PublicDependencyModuleNames.AddRange(new string[] {
+				"CoreEx"
+			});
+
 
 		DynamicallyLoadedModuleNames.AddRange(new string[]{});
 	}

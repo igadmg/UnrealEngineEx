@@ -11,8 +11,11 @@ UAsyncTaskManager* UAsyncTaskManager::Instance = nullptr;
 UAsyncTaskManager::UAsyncTaskManager(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	Instance = this;
-	TickUpdateHandle = FWorldDelegates::OnWorldTickStart.AddUObject(this, &UAsyncTaskManager::TickUpdate);
+	if (!HasAnyFlags(EObjectFlags::RF_ClassDefaultObject))
+	{
+		Instance = this;
+		TickUpdateHandle = FWorldDelegates::OnWorldTickStart.AddUObject(this, &UAsyncTaskManager::TickUpdate);
+	}
 }
 
 void UAsyncTaskManager::BeginDestroy()
@@ -29,6 +32,7 @@ void UAsyncTaskManager::TickUpdate(UWorld* World, ELevelTick TickType, float Del
 	if (TickType != LEVELTICK_All)
 		return;
 
+	TArray<UAsyncTask*> TasksToRemove;
 	for (UAsyncTask* Task : Tasks)
 	{
 		if (!IsValid(Task))
@@ -38,7 +42,7 @@ void UAsyncTaskManager::TickUpdate(UWorld* World, ELevelTick TickType, float Del
 		{
 			Task->Finish(EAsyncTaskResult::Complete);
 			Task->OnFinishedDelegate.ExecuteIfBound(EAsyncTaskResult::Complete);
-			Tasks.Remove(Task);
+			TasksToRemove.Add(Task);
 			Task->ConditionalBeginDestroy();
 		}
 
@@ -47,8 +51,13 @@ void UAsyncTaskManager::TickUpdate(UWorld* World, ELevelTick TickType, float Del
 		{
 			Task->Finish(EAsyncTaskResult::Timeout);
 			Task->OnFinishedDelegate.ExecuteIfBound(EAsyncTaskResult::Timeout);
-			Tasks.Remove(Task);
+			TasksToRemove.Add(Task);
 			Task->ConditionalBeginDestroy();
 		}
+	}
+
+	for (UAsyncTask* Task : TasksToRemove)
+	{
+		Tasks.Remove(Task);
 	}
 }

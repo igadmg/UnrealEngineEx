@@ -3,6 +3,8 @@
 #include "Framework/Application/SlateApplication.h"
 #include "Framework/Application/SlateUser.h"
 
+#include "CoreEx.h"
+
 
 UUserWidgetEx::UUserWidgetEx(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -24,6 +26,6 @@ void UUserWidgetEx::NativeOnFocusChanging(const FWeakWidgetPath& PreviousFocusPa
 			return; // success on preventing focus switch.
 		}
 	}
-	
+
 	Super::NativeOnFocusChanging(PreviousFocusPath, NewWidgetPath, InFocusEvent);
 }

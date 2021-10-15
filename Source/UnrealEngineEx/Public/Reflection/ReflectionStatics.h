@@ -14,8 +14,8 @@ class UNREALENGINEEX_API UReflectionStatics : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "UnrealEngineEx|Reflection")
-	static bool IsValid(UPARAM(ref) FPropertyAccessor& Property);
+	static bool IsValid(UPARAM(ref) FUObjectPropertyAccessor& Property);
 
-    UFUNCTION(BlueprintCallable, Category = "UnrealEngineEx|Reflection")
-	static void MakePropertyAccessor(UPARAM(ref) FPropertyAccessor& Property, UObject* Object, FName Name);
+	UFUNCTION(BlueprintCallable, Category = "UnrealEngineEx|Reflection")
+	static void MakePropertyAccessor(UPARAM(ref) FUObjectPropertyAccessor& Property, UObject* Object, FName Name);
 };

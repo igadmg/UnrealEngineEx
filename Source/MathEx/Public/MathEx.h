@@ -11,7 +11,7 @@ class FMathExModule : public IModuleInterface
 public:
 	static inline FMathExModule& Get() { return FModuleManager::LoadModuleChecked<FMathExModule>("MathEx"); }
 	static inline bool IsAvailable() { return FModuleManager::Get().IsModuleLoaded("MathEx"); }
-	
+
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
@@ -66,4 +66,9 @@ struct FMathEx
 
 	static MATHEX_API float ProjectPointOnLineSegment(const FVector& LineStart, const FVector& LineEnd, const FVector& Point);
 	static MATHEX_API FVector ClosestPointOnLineSegment(const FVector& LineStart, const FVector& LineEnd, const FVector& Point);
+
+	static FQuat DeltaRotation(const FQuat& A, const FQuat& B)
+	{
+		return B * A.Inverse();
+	}
 };

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 .vs
 Binaries
 Build
@@ -13,7 +12,3 @@ x64
 *.sln
 *.opendb
 *.db
-=======
-Binaries
-Intermediate 
->>>>>>> 44f1a5e9a84d55167ac74f1c68016fb37cad5d5d
