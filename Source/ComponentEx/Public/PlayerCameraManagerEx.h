@@ -4,7 +4,7 @@
 
 
 
-struct FPlayerCameraManagerEx
+struct COMPONENTEX_API FPlayerCameraManagerEx
 {
 	FPlayerCameraManagerEx(APlayerCameraManager* This)
 		: This(This)
@@ -12,6 +12,7 @@ struct FPlayerCameraManagerEx
 	}
 
 
+public:
 	template <typename T>
 	T* FindCameraModifierByClass()
 	{

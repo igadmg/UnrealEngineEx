@@ -1,7 +1,6 @@
 #include "DebugDrawHelpersEx.h"
 #include "DrawDebugHelpers.h"
 #include "EngineGlobals.h"
-#include "Engine/Engine.h"
 #include "CanvasItem.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/WorldSettings.h"

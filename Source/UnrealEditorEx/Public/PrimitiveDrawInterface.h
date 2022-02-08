@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/EngineTypes.h"
+#include "Materials/MaterialInterface.h"
 
 #include "PrimitiveDrawInterface.generated.h"
 
@@ -50,7 +51,11 @@ public:
 	void DrawFlatArrow(const FVector& Base, const FVector& XAxis, const FVector& YAxis, FColor Color, float Length, int32 Width, UMaterialInterface* MaterialInterface, ESceneDepthPriorityGroup DepthPriority, float Thickness);
 
 	UFUNCTION(Category = "Draw", BlueprintCallable)
+	void DrawArrowIn3D(const FVector& Start, const FVector& End, const FLinearColor& Color, uint8 DepthPriorityGroup, float ArrowTipSizeInPercents = 10.0f, float ArrowTipHalfAngleInDegrees = 30.0f, float Thickness = 0.0f, float DepthBias = 0.0f, bool bScreenSpace = false);
+
+	UFUNCTION(Category = "Draw", BlueprintCallable)
 	void DrawArc(const FVector Base, const FVector X, const FVector Y, const float MinAngle, const float MaxAngle, const float Radius, const int32 Sections, const FLinearColor& Color, ESceneDepthPriorityGroup DepthPriority, float Thickness = 0.0f, float DepthBias = 0.0f, bool bScreenSpace = false);
+	void DrawArc(FPrimitiveDrawInterface* PDI, const FVector Base, const FVector X, const FVector Y, const float MinAngle, const float MaxAngle, const float Radius, const int32 Sections, const FLinearColor& Color, uint8 DepthPriority, float Thickness, float DepthBias, bool bScreenSpace);
 
 	UFUNCTION(Category = "Draw", BlueprintCallable)
 	void DrawArcByTwoPointsAndRadiusVector(const FVector A, const FVector B, const FVector R, const int32 Sections, const FLinearColor& Color, ESceneDepthPriorityGroup DepthPriority, float Thickness = 0.0f, float DepthBias = 0.0f, bool bScreenSpace = false);

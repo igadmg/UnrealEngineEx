@@ -6,6 +6,10 @@
 #include "Animation/AnimationAsset.h"
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimSequence.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ActorComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -41,6 +45,92 @@ void UComponentExStatics::Attach(const FAttachmentDescription& Where, AActor* Wh
 	{
 		What->AttachToComponent(Where.Component, AttachmentRules, Where.SocketName);
 	}
+}
+
+bool UComponentExStatics::RunBehaviorTree(AController* Controller, UBehaviorTree* BehaviorTreeAsset, UBehaviorTreeComponent* BehaviourTreeComponent, UBlackboardComponent* BlackboardComponent)
+{
+	if (!IsValid(BehaviorTreeAsset) || !IsValid(BehaviorTreeAsset->BlackboardAsset))
+	{
+		//UE_VLOG(this, LogBehaviorTree, Warning, TEXT("RunBehaviorTree: Unable to run NULL behavior tree"));
+		return false;
+	}
+
+	// see if need a blackboard component at all
+	if (BlackboardComponent == nullptr || !BlackboardComponent->IsCompatibleWith(BehaviorTreeAsset->BlackboardAsset))
+	{
+		if (!UseBlackboard(Controller, BehaviorTreeAsset->BlackboardAsset, BlackboardComponent))
+			return false;
+	}
+
+	if (!IsValid(BlackboardComponent))
+		return false;
+
+	if (!IsValid(BehaviourTreeComponent))
+	{
+		BehaviourTreeComponent = Controller->FindComponentByClass<UBehaviorTreeComponent>();
+		if (!IsValid(BehaviourTreeComponent))
+		{
+			//UE_VLOG(this, LogBehaviorTree, Log, TEXT("RunBehaviorTree: spawning BehaviorTreeComponent.."));
+
+			BehaviourTreeComponent = NewObject<UBehaviorTreeComponent>(Controller, TEXT("BehaviourTreeComponent"));
+			BehaviourTreeComponent->RegisterComponent();
+		}
+	}
+
+	BehaviourTreeComponent->StartTree(*BehaviorTreeAsset, EBTExecutionMode::Looped);
+
+	return true;
+}
+
+bool UComponentExStatics::InitializeBlackboard(AController* Controller, UBlackboardComponent& BlackboardComp, UBlackboardData& BlackboardAsset)
+{
+	check(BlackboardComp.GetOwner() == Controller);
+
+	if (!BlackboardComp.InitializeBlackboard(BlackboardAsset))
+		return false;
+
+	// find the "self" key and set it to our pawn
+	const FBlackboard::FKey SelfKey = BlackboardAsset.GetKeyID(FBlackboard::KeySelf);
+	if (SelfKey != FBlackboard::InvalidKey)
+	{
+		BlackboardComp.SetValue<UBlackboardKeyType_Object>(SelfKey, Controller->GetPawn());
+	}
+
+	return true;
+}
+
+bool UComponentExStatics::UseBlackboard(AController* Controller, UBlackboardData* BlackboardAsset, UBlackboardComponent*& BlackboardComponent)
+{
+	if (!IsValid(BlackboardAsset))
+	{
+		//UE_VLOG(this, LogBehaviorTree, Log, TEXT("UseBlackboard: trying to use NULL Blackboard asset. Ignoring"));
+		return false;
+	}
+
+	if (!IsValid(BlackboardComponent))
+	{
+		BlackboardComponent = Controller->FindComponentByClass<UBlackboardComponent>();
+
+		if (!IsValid(BlackboardComponent))
+		{
+			BlackboardComponent = NewObject<UBlackboardComponent>(Controller, TEXT("BlackboardComponent"));
+			BlackboardComponent->RegisterComponent();
+		}
+	}
+	
+	if (BlackboardComponent->GetBlackboardAsset() == nullptr)
+	{
+		InitializeBlackboard(Controller, *BlackboardComponent, *BlackboardAsset);
+	}
+	else if (BlackboardComponent->GetBlackboardAsset() != BlackboardAsset)
+	{
+		// @todo this behavior should be opt-out-able.
+		//UE_VLOG(this, LogBehaviorTree, Log, TEXT("UseBlackboard: requested blackboard %s while already has %s instantiated. Forcing new BB.")
+		//	, *GetNameSafe(BlackboardAsset), *GetNameSafe(Blackboard->GetBlackboardAsset()));
+		InitializeBlackboard(Controller, *BlackboardComponent, *BlackboardAsset);
+	}
+
+	return true;
 }
 
 UObject* UComponentExStatics::GetBlendable(APostProcessVolume* Volume, int Index)
@@ -179,7 +269,7 @@ bool UComponentExStatics::GetWorldBoneTransformAtTime(USkeletalMeshComponent* Sk
 	for (const FName& LocalBoneName : BoneStack)
 	{
 		int32 TrackIndex =
-#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 23
+#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 23 || ENGINE_MAJOR_VERSION >= 5
 			Skeleton->GetRawAnimationTrackIndex(SkeletalMeshComponent->GetBoneIndex(LocalBoneName), AnimSequence);
 #elif ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 0
 			Skeleton->GetAnimationTrackIndex(SkeletalMeshComponent->GetBoneIndex(LocalBoneName), AnimSequence, true);

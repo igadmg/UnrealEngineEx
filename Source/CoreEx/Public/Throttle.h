@@ -3,6 +3,9 @@
 #include "Engine/World.h"
 
 
+/**
+ Throttle execution of function. Don't run it more often as needed.
+*/
 struct FThrottle
 {
 	float LastCallTime = -1;

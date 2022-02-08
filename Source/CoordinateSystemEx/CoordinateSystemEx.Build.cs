@@ -8,9 +8,9 @@ public class CoordinateSystemEx : ModuleRules
 	public CoordinateSystemEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
-#if UE_4_21_OR_LATER
-		PrivatePCHHeaderFile = "Private/CoordinateSystemExPrivatePCH.h";
-#endif
+		bEnforceIWYU = true;
+		DefaultBuildSettings = BuildSettingsVersion.V2;
+
 
 		PublicIncludePaths.AddRange(new string[] {
 				Path.Combine(ModuleDirectory, "Public"),

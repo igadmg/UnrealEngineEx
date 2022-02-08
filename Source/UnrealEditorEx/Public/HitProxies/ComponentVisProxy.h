@@ -13,10 +13,10 @@ class UNREALEDITOREX_API UComponentVisProxy : public UHitProxy
 
 
 public:
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(Category = "ComponentVisProxy", BlueprintReadOnly)
 	const class UActorComponent* Component;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(Category = "ComponentVisProxy", BlueprintReadOnly)
 	TEnumAsByte<EHitProxyPriority> Priority;
 
 

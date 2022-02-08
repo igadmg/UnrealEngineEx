@@ -9,9 +9,9 @@ public class InterpolationEx : ModuleRules
 	public InterpolationEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
-#if UE_4_21_OR_LATER
-		PrivatePCHHeaderFile = "Public/InterpolationEx.h";
-#endif
+		bEnforceIWYU = true;
+		DefaultBuildSettings = BuildSettingsVersion.V2;
+
 
 		PublicIncludePaths.AddRange(new string[] {
 				Path.Combine(ModuleDirectory, "Public"),

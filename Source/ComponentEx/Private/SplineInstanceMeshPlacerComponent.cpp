@@ -1,4 +1,5 @@
 #include "SplineInstanceMeshPlacerComponent.h"
+#include "ComponentExPrivatePCH.h"
 
 #include "Components/SplineComponent.h"
 
@@ -13,6 +14,8 @@ USplineInstanceMeshPlacerComponent::USplineInstanceMeshPlacerComponent(const FOb
 
 void USplineInstanceMeshPlacerComponent::FillSplineMesh(float Interval, FVector InstanceOffset)
 {
+	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("USplineInstanceMeshPlacerComponent::FillSplineMesh"), STAT_SplineInstanceMeshPlacerComponentFillSplineMesh, STATGROUP_ComponentEx);
+
 	ClearInstances();
 	SetCollisionEnabled(ECollisionEnabled::NoCollision);
 

@@ -8,9 +8,9 @@ public class ComponentEx : ModuleRules
 	public ComponentEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
-#if UE_4_21_OR_LATER
-		PrivatePCHHeaderFile = "Private/ComponentExPrivatePCH.h";
-#endif
+		bEnforceIWYU = true;
+		DefaultBuildSettings = BuildSettingsVersion.V2;
+
 
 		PublicIncludePaths.AddRange(new string[] {
 				Path.Combine(ModuleDirectory, "Public"),
@@ -25,7 +25,9 @@ public class ComponentEx : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] {
 				"Core",
 				"CoreUObject",
-				"Engine"
+				"Engine",
+
+				"AIModule",
 			});
 
 		PublicDependencyModuleNames.AddRange(new string[] {

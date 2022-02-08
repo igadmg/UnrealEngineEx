@@ -23,6 +23,14 @@ public:
 #include "ActorEx.h"
 #endif
 
+#ifdef ENGINE_PlayerCameraManager_generated_h
+#include "PlayerCameraManagerEx.h"
+#endif
+
+#ifdef ENGINE_PlayerController_generated_h
+#include "PlayerControllerEx.h"
+#endif
+
 #ifdef ENGINE_SkeletalMesh_generated_h
 #include "SkeletalMeshEx.h"
 #endif

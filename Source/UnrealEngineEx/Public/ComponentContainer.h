@@ -17,21 +17,21 @@ class UNREALENGINEEX_API UComponentContainer : public UActorComponent
 
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(Category = "ComponentContainer", EditAnywhere, BlueprintReadOnly)
 	TArray<TSubclassOf<class UContainedComponent>> InitialComponents;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(Category = "ComponentContainer", VisibleAnywhere, BlueprintReadOnly)
 	TArray<class UContainedComponent*> Components;
 
 
 public:
-	UFUNCTION(BlueprintPure, BlueprintAuthorityOnly)
+	UFUNCTION(Category = "UnrealEditorEx: ComponentContainer", BlueprintPure, BlueprintAuthorityOnly)
 	class UContainedComponent* GetComponent(TSubclassOf<class UContainedComponent> Class) const;
 
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	UFUNCTION(Category = "UnrealEditorEx: ComponentContainer", BlueprintCallable, BlueprintAuthorityOnly)
 	class UContainedComponent* AddComponent(TSubclassOf<class UContainedComponent> Class);
 
-	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	UFUNCTION(Category = "UnrealEditorEx: ComponentContainer", BlueprintCallable, BlueprintAuthorityOnly)
 	bool RemoveComponent(TSubclassOf<class UContainedComponent> Class);
 
 
@@ -50,7 +50,7 @@ public:
 	bool RemoveComponent() { return RemoveComponent(T::StaticClass()); }
 
 	template <typename T, typename TComponent = UContainedComponent>
-	void ForeachComponent(std::function<void (TComponent*)> Callback) const
+	void ForeachComponent(TFunction<void (TComponent*)> Callback) const
 	{
 		for (class UContainedComponent* Component : Components)
 		{
@@ -130,20 +130,20 @@ public:
 
 
 public:
-	UPROPERTY()
+	UPROPERTY(Category = "ComponentContainer", EditAnywhere)
 	TArray<class UContainedComponent*> Components;
 
 	/* client side cosmetic event */
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(Category = "ComponentContainer", BlueprintAssignable)
 	FComponentContainerOnActorComponent OnComponentAdded;
 
 	/* client side cosmetic event */
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(Category = "ComponentContainer", BlueprintAssignable)
 	FComponentContainerOnActorComponent OnComponentRemoved;
 
 
 protected:
-	UPROPERTY()
+	UPROPERTY(Category = "ComponentContainer", EditAnywhere)
 	TArray<class UContainedComponent*> PendingComponents;
 
 	FDelegateHandle RegisterPendingComponentsHandle;
@@ -163,7 +163,7 @@ class UNREALENGINEEX_API UContainedComponent : public UActorComponent
 
 
 public:
-	UFUNCTION(BlueprintPure, BlueprintAuthorityOnly)
+	UFUNCTION(Category = "UnrealEditorEx: ComponentContainer", BlueprintPure, BlueprintAuthorityOnly)
 	int32 GetReplicatedNumberOfPlayers() const { return ReplicatedChannels.Num(); }
 
 

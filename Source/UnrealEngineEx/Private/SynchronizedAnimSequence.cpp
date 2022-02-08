@@ -16,7 +16,11 @@ void USynchronizedAnimSequenceStatics::Play(USkeletalMeshComponent* SkeletalMesh
 		return;
 
 	float AbsPlayRate = FMath::Abs(SynchronizedAnimSequence.PlayRate);
+#if ENGINE_MAJOR_VERSION >= 5
+	float AnimDuration = SynchronizedAnimSequence.Animation->GetPlayLength() * AbsPlayRate;
+#else
 	float AnimDuration = SynchronizedAnimSequence.Animation->SequenceLength * AbsPlayRate;
+#endif
 	float ServerTime = UUnrealEngineExStatics::GetServerWorldTimeSeconds(SkeletalMeshComponent);
 
 	float DeltaTime = ServerTime - SynchronizedAnimSequence.PlayStartServerTime;
@@ -31,7 +35,11 @@ void USynchronizedAnimSequenceStatics::Play(USkeletalMeshComponent* SkeletalMesh
 		}
 		else
 		{
+#if ENGINE_MAJOR_VERSION >= 5
+			SkeletalMeshComponent->SetPosition(SynchronizedAnimSequence.Animation->GetPlayLength(), false);
+#else
 			SkeletalMeshComponent->SetPosition(SynchronizedAnimSequence.Animation->SequenceLength, false);
+#endif
 		}
 	}
 	else
@@ -41,7 +49,11 @@ void USynchronizedAnimSequenceStatics::Play(USkeletalMeshComponent* SkeletalMesh
 		SkeletalMeshComponent->SetPlayRate(PlayRate);
 		if (PlayRate < 0)
 		{
+#if ENGINE_MAJOR_VERSION >= 5
+			SkeletalMeshComponent->SetPosition(SynchronizedAnimSequence.Animation->GetPlayLength());
+#else
 			SkeletalMeshComponent->SetPosition(SynchronizedAnimSequence.Animation->SequenceLength);
+#endif
 		}
 		SkeletalMeshComponent->Play(false);
 	}

@@ -17,7 +17,7 @@ public:
 
 
 public:
-	UPROPERTY()
+	UPROPERTY(Category = "AsyncTaskManager", EditAnywhere)
 	TSet<class UAsyncTask*> Tasks;
 
 

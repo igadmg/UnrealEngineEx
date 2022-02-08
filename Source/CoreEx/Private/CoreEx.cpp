@@ -1,8 +1,9 @@
 #include "CoreEx.h"
+#include "CoreExPrivatePCH.h"
 
 #include "Modules/ModuleInterface.h"
 #include "Modules/ModuleManager.h"
-
+#include "Engine/Engine.h"
 #include "GameFramework/Actor.h"
 
 
@@ -43,8 +44,6 @@ bool FCoreEx::IsObjectReinst(UObject* Object)
 
 	return false;
 }
-
-
 
 IMPLEMENT_MODULE(FCoreExModule, CoreEx)
 

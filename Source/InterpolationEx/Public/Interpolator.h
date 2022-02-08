@@ -47,16 +47,16 @@ public:
 
 
 public:
-	UFUNCTION(Category = "Interpolator", BlueprintPure, meta = (DisplayName = "First", CompactNodeTitle = "First"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure, meta = (DisplayName = "First", CompactNodeTitle = "First"))
 	float First() { return Start[0]; }
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure, meta = (DisplayName = "Last", CompactNodeTitle = "Last"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure, meta = (DisplayName = "Last", CompactNodeTitle = "Last"))
 	float Last() { return End[0]; }
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure)
 	float Interpolate(float Alpha);
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure)
 	static float InterpolateFloat(float A, float B, float Alpha);
 };
 
@@ -83,16 +83,16 @@ public:
 
 
 public:
-	UFUNCTION(Category = "Interpolator", BlueprintPure, meta = (DisplayName = "First", CompactNodeTitle = "First"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure, meta = (DisplayName = "First", CompactNodeTitle = "First"))
 	FVector2D First() { return Start[0]; }
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure, meta = (DisplayName = "Last", CompactNodeTitle = "Last"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure, meta = (DisplayName = "Last", CompactNodeTitle = "Last"))
 	FVector2D Last() { return End[0]; }
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure)
 	FVector2D Interpolate(float Alpha);
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure)
 	static FVector2D InterpolateVector2D(const FVector2D& A, const FVector2D& B, float Alpha);
 };
 
@@ -119,16 +119,16 @@ public:
 
 
 public:
-	UFUNCTION(Category = "Interpolator", BlueprintPure, meta = (DisplayName = "First", CompactNodeTitle = "First"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure, meta = (DisplayName = "First", CompactNodeTitle = "First"))
 	FVector First() { return Start[0]; }
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure, meta = (DisplayName = "Last", CompactNodeTitle = "Last"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure, meta = (DisplayName = "Last", CompactNodeTitle = "Last"))
 	FVector Last() { return End[0]; }
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure)
 	FVector Interpolate(float Alpha);
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure)
 	static FVector InterpolateVector(const FVector& A, const FVector& B, float Alpha);
 };
 
@@ -140,34 +140,34 @@ class INTERPOLATIONEX_API UInterpolatorRotator : public UObject
 
 
 public:
-	UPROPERTY(Category = "Interpolator", EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
+	UPROPERTY(Category = "UnrealEngineEx: Interpolator", EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
 	EInterpolatorType CurveType;
 
-	UPROPERTY(Category = "Interpolator", EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
+	UPROPERTY(Category = "UnrealEngineEx: Interpolator", EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
 	EInterpolatorDegree CurveDegree;
 
-	UPROPERTY(Category = "Interpolator", EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
+	UPROPERTY(Category = "UnrealEngineEx: Interpolator", EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
 	bool bShortestPath;
 
-	UPROPERTY(Category = "Interpolator", EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
+	UPROPERTY(Category = "UnrealEngineEx: Interpolator", EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
 	TArray<FRotator> Start;
 
-	UPROPERTY(Category = "Interpolator", EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
+	UPROPERTY(Category = "UnrealEngineEx: Interpolator", EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true))
 	TArray<FRotator> End;
 
 
 
 public:
-	UFUNCTION(Category = "Interpolator", BlueprintPure, meta = (DisplayName = "First", CompactNodeTitle = "First"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure, meta = (DisplayName = "First", CompactNodeTitle = "First"))
 	FRotator First() { return Start[0]; }
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure, meta = (DisplayName = "Last", CompactNodeTitle = "Last"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure, meta = (DisplayName = "Last", CompactNodeTitle = "Last"))
 	FRotator Last() { return End[0]; }
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure)
 	FRotator Interpolate(float Alpha);
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure)
 	static FRotator InterpolateRotator(const FRotator& A, const FRotator& B, float Alpha);
 };
 
@@ -194,16 +194,16 @@ public:
 
 
 public:
-	UFUNCTION(Category = "Interpolator", BlueprintPure, meta = (DisplayName = "First", CompactNodeTitle = "First"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure, meta = (DisplayName = "First", CompactNodeTitle = "First"))
 	FVector4 First() { return Start[0]; }
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure, meta = (DisplayName = "Last", CompactNodeTitle = "Last"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure, meta = (DisplayName = "Last", CompactNodeTitle = "Last"))
 	FVector4 Last() { return End[0]; }
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure)
 	FVector4 Interpolate(float Alpha);
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure)
 	static FVector4 InterpolateVector4(const FVector4& A, const FVector4& B, float Alpha);
 };
 
@@ -230,13 +230,13 @@ public:
 
 
 public:
-	UFUNCTION(Category = "Interpolator", BlueprintPure, meta = (DisplayName = "First", CompactNodeTitle = "First"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure, meta = (DisplayName = "First", CompactNodeTitle = "First"))
 	FLinearColor First() { return Start[0]; }
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure, meta = (DisplayName = "Last", CompactNodeTitle = "Last"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure, meta = (DisplayName = "Last", CompactNodeTitle = "Last"))
 	FLinearColor Last() { return End[0]; }
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure)
 	FLinearColor Interpolate(float Alpha);
 };
 
@@ -263,12 +263,12 @@ public:
 
 
 public:
-	UFUNCTION(Category = "Interpolator", BlueprintPure, meta = (DisplayName = "First", CompactNodeTitle = "First"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure, meta = (DisplayName = "First", CompactNodeTitle = "First"))
 	FPostProcessSettings First() { return Start[0]; }
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure, meta = (DisplayName = "Last", CompactNodeTitle = "Last"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure, meta = (DisplayName = "Last", CompactNodeTitle = "Last"))
 	FPostProcessSettings Last() { return End[0]; }
 
-	UFUNCTION(Category = "Interpolator", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: Interpolator", BlueprintPure)
 	FPostProcessSettings Interpolate(float Alpha);
 };

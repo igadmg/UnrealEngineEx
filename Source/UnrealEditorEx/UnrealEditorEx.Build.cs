@@ -8,12 +8,9 @@ public class UnrealEditorEx : ModuleRules
 	public UnrealEditorEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
-#if UE_4_21_OR_LATER
-#if UE_4_24_OR_LATER
+		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
-#endif
-		PrivatePCHHeaderFile = "Private/UnrealEditorExPrivatePCH.h";
-#endif
+
 
 		PublicIncludePaths.AddRange(new string[] {
 				Path.Combine(ModuleDirectory, "Public"),

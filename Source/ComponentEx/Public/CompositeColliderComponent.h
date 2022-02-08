@@ -14,8 +14,9 @@ class COMPONENTEX_API UCompositeColliderComponent : public UActorComponent
 
 
 protected:
-	UPROPERTY(Category = Shape, EditAnywhere, BlueprintReadOnly, export)
+	UPROPERTY(Category = "Shape", EditAnywhere, BlueprintReadOnly, export)
 	TArray<class UShapeComponent*> Colliders;
+
 public:
 	UPROPERTY(Category = "Collision", BlueprintAssignable)
 	FComponentHitSignature OnComponentHit;

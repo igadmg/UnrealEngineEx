@@ -15,22 +15,22 @@ class COMPONENTEX_API USplineMeshBuilderComponent
 
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "SplineMeshBuilderComponent", VisibleAnywhere, BlueprintReadWrite)
 	class USplineComponent* SplineComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "SplineMeshBuilderComponent", EditAnywhere, BlueprintReadWrite)
 	class UStaticMesh* Mesh;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "SplineMeshBuilderComponent", EditAnywhere, BlueprintReadWrite)
 	class UMaterial* Material;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "SplineMeshBuilderComponent", EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<ECollisionEnabled::Type> CollisionEnabled;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "SplineMeshBuilderComponent", EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<ECollisionChannel> CollisionChannel;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "SplineMeshBuilderComponent", EditAnywhere, BlueprintReadWrite)
 	float SplineMeshCullDistance = 15000.f;
 
 	UPROPERTY(Category = "Internal", BlueprintReadOnly)
@@ -38,10 +38,10 @@ public:
 
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "UnrealEngineEx: SplineMeshBuilderComponent", BlueprintCallable)
 	void BuildSplineMesh();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "UnrealEngineEx: SplineMeshBuilderComponent", BlueprintCallable)
 	void SetCollisionEnabled(ECollisionEnabled::Type NewType);
 
 

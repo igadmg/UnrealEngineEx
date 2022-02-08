@@ -62,3 +62,6 @@ struct FUnrealEngineEx
 #else
 #define EDITOR_MODIFY() do {} while(0)
 #endif
+
+//General Log
+DECLARE_LOG_CATEGORY_EXTERN(LogUnrealEngineEx, Log, All);

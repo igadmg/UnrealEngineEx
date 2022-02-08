@@ -15,7 +15,7 @@ class UNREALEDITOREX_API UHitProxy : public UObject
 
 
 private:
-	static TMap<HHitProxyType*, std::function<UHitProxy* (HHitProxy* HitProxy)>> HHitProxyToUHitProxy;
+	static TMap<HHitProxyType*, TFunction<UHitProxy* (HHitProxy* HitProxy)>> HHitProxyToUHitProxy;
 
 
 public:

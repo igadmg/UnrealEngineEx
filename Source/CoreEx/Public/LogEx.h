@@ -2,6 +2,11 @@
 
 #include "EnumEx.h"
 
+/**
+ Extended logging.
+ Automaticaly append function name, net mode and authority to log message.
+*/
+
 
 #define TEXT_BOOL(Bool) \
 	((Bool) ? TEXT("true") : TEXT("false"))

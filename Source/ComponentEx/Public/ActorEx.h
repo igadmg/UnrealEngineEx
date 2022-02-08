@@ -62,6 +62,32 @@ public:
 		return nullptr;
 	}
 
+	template <typename T>
+	void ForEachAttachedActorOfType(TFunctionRef<bool(T*)> Functor) const
+	{
+		This_->ForEachAttachedActors([&Functor](T* Actor) {
+			if (auto TA = Cast<T>(Actor))
+			{
+				return Functor(TA);
+			}
+
+			return true;
+		});
+	}
+
+	template <typename T>
+	void ForEachAttachedActorOfInterface(TFunctionRef<bool(AActor*)> Functor) const
+	{
+		This_->ForEachAttachedActors([&Functor](AActor* Actor) {
+			if (auto TA = ValidInterface<T>(Actor))
+			{
+				return Functor(TA);
+			}
+
+			return true;
+		});
+	}
+
 private:
 	const AActor* This_;
 };

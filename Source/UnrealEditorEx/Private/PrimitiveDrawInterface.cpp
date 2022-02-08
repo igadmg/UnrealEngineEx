@@ -58,9 +58,48 @@ void UPrimitiveDrawInterface::DrawFlatArrow(const FVector& Base, const FVector& 
 	::DrawFlatArrow(PDI, Base, XAxis, YAxis, Color, Length, Width, GET_RENDERPROXY(MaterialInterface), DepthPriority, Thickness);
 }
 
+void UPrimitiveDrawInterface::DrawArrowIn3D(const FVector& Start, const FVector& End, const FLinearColor& Color, uint8 DepthPriorityGroup, float ArrowTipSizeInPercents, float ArrowTipHalfAngleInDegrees, float Thickness, float DepthBias, bool bScreenSpace)
+{
+	DrawLine(Start, End, Color, DepthPriorityGroup, Thickness, DepthBias, bScreenSpace);
+
+	float ArrowLength = (End - Start).Size();
+	FVector TipProjectionOnArrow = Start + (1.f - ArrowTipSizeInPercents / 100.f) * ArrowLength * (End - Start).GetSafeNormal();
+	float TipProjectionLength = ArrowTipSizeInPercents / 100.f * ArrowLength * FMath::Tan(PI / (180.f) * ArrowTipHalfAngleInDegrees);
+
+	FVector TipProjectionDirection1 = FRotationMatrix((End - Start).ToOrientationRotator()).GetScaledAxis(EAxis::Z);
+	FVector TipProjectionDirection2 = TipProjectionDirection1.RotateAngleAxis(90.f, (End - Start).GetSafeNormal());
+
+	FVector Tip1_StartLoc = TipProjectionOnArrow + TipProjectionLength * TipProjectionDirection1;
+	FVector Tip2_StartLoc = TipProjectionOnArrow + TipProjectionLength * TipProjectionDirection2;
+	FVector Tip3_StartLoc = TipProjectionOnArrow + TipProjectionLength * TipProjectionDirection1 * -1.f;
+	FVector Tip4_StartLoc = TipProjectionOnArrow + TipProjectionLength * TipProjectionDirection2 * -1.f;
+
+	DrawLine(Tip1_StartLoc, End, Color, DepthPriorityGroup, Thickness, DepthBias, bScreenSpace);
+	DrawLine(Tip2_StartLoc, End, Color, DepthPriorityGroup, Thickness, DepthBias, bScreenSpace);
+	DrawLine(Tip3_StartLoc, End, Color, DepthPriorityGroup, Thickness, DepthBias, bScreenSpace);
+	DrawLine(Tip4_StartLoc, End, Color, DepthPriorityGroup, Thickness, DepthBias, bScreenSpace);
+}
+
 void UPrimitiveDrawInterface::DrawArc(const FVector Base, const FVector X, const FVector Y, const float MinAngle, const float MaxAngle, const float Radius, const int32 Sections, const FLinearColor& Color, ESceneDepthPriorityGroup DepthPriority, float Thickness, float DepthBias, bool bScreenSpace)
 {
-	::DrawArc(PDI, Base, X, Y, MinAngle, MaxAngle, Radius, Sections, Color, DepthPriority, Thickness, DepthBias, bScreenSpace);
+	DrawArc(PDI, Base, X, Y, MinAngle, MaxAngle, Radius, Sections, Color, DepthPriority, Thickness, DepthBias, bScreenSpace);
+}
+
+void UPrimitiveDrawInterface::DrawArc(FPrimitiveDrawInterface* InPDI, const FVector Base, const FVector X, const FVector Y, const float MinAngle, const float MaxAngle, const float Radius, const int32 Sections, const FLinearColor& Color, uint8 DepthPriority, float Thickness, float DepthBias, bool bScreenSpace)
+{
+	float AngleStep = (MaxAngle - MinAngle) / ((float)(Sections));
+	float CurrentAngle = MinAngle;
+
+	FVector LastVertex = Base + Radius * (FMath::Cos(CurrentAngle * (PI / 180.0f)) * X + FMath::Sin(CurrentAngle * (PI / 180.0f)) * Y);
+	CurrentAngle += AngleStep;
+
+	for (int32 i = 0; i < Sections; i++)
+	{
+		FVector ThisVertex = Base + Radius * (FMath::Cos(CurrentAngle * (PI / 180.0f)) * X + FMath::Sin(CurrentAngle * (PI / 180.0f)) * Y);
+		InPDI->DrawLine(LastVertex, ThisVertex, Color, DepthPriority, Thickness, DepthBias, bScreenSpace);
+		LastVertex = ThisVertex;
+		CurrentAngle += AngleStep;
+	}
 }
 
 void UPrimitiveDrawInterface::DrawArcByTwoPointsAndRadiusVector(const FVector A, const FVector B, const FVector R, const int32 Sections, const FLinearColor& Color, ESceneDepthPriorityGroup DepthPriority, float Thickness, float DepthBias, bool bScreenSpace)

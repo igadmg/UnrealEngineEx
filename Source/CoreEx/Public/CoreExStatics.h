@@ -21,10 +21,12 @@ class COREEX_API UCoreExStatics : public UBlueprintFunctionLibrary
 
 
 public:
+	/** Return self class to blueprint. */
 	UFUNCTION(Category = "CoreEx", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static UClass* GetSelfClass(const UObject* WorldContextObject);
 
-	UFUNCTION(BlueprintCallable)
+	/** Filter Array by predicate */
+	UFUNCTION(Category = "CoreEx", BlueprintCallable)
 	static TArray<UObject*> ArrayFilter(UPARAM(ref) TArray<UObject*>& Array, FObjectArrayPredicate Predicate);
 };
 

@@ -40,25 +40,25 @@ public:
 
 
 public:
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintPure)
 	TEnumAsByte<ECoordSystem> GetWidgetCoordSystemSpace() const { return EditorViewportClient ? EditorViewportClient->GetWidgetCoordSystemSpace() : COORD_None; }
 
-	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = "OutWidgetCoordSystemSpace"))
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintCallable, meta = (ExpandEnumAsExecs = "OutWidgetCoordSystemSpace"))
 	void SwitchWidgetCoordSystemSpace(TEnumAsByte<ECoordSystem>& OutWidgetCoordSystemSpace) { OutWidgetCoordSystemSpace = GetWidgetCoordSystemSpace(); }
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintPure)
 	EWidgetModeBP GetWidgetMode() const { return EditorViewportClient ? (EWidgetModeBP)EditorViewportClient->GetWidgetMode() : EWidgetModeBP::None; }
 
-	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = "OutWidgetMode"))
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintCallable, meta = (ExpandEnumAsExecs = "OutWidgetMode"))
 	void SwitchWidgetMode(EWidgetModeBP& OutWidgetMode) { OutWidgetMode = GetWidgetMode(); }
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintPure)
 	bool IsAltPressed() const { return EditorViewportClient->IsAltPressed(); }
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintPure)
 	bool IsCtrlPressed() const { return EditorViewportClient->IsCtrlPressed(); }
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintPure)
 	bool IsShiftPressed() const { return EditorViewportClient->IsShiftPressed(); }
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintPure)
 	bool IsCmdPressed() const { return EditorViewportClient->IsCmdPressed(); }
 
 

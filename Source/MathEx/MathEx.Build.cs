@@ -8,9 +8,9 @@ public class MathEx : ModuleRules
 	public MathEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
-#if UE_4_21_OR_LATER
-		PrivatePCHHeaderFile = "Private/MathExPrivatePCH.h";
-#endif
+		bEnforceIWYU = true;
+		DefaultBuildSettings = BuildSettingsVersion.V2;
+
 
 		PublicIncludePaths.AddRange(new string[] {
 				Path.Combine(ModuleDirectory, "Public"),

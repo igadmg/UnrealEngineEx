@@ -17,7 +17,7 @@ class UNREALENGINEEX_API IPropertyVisitorInterface
 
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(Category = "PropertyVisitorInterface", BlueprintCallable, BlueprintNativeEvent)
 	void VisitBoolProperty(class UBoolPropertyAccessor* Property);
 };
 

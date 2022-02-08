@@ -29,10 +29,10 @@ public:
 
 
 public:
-	UFUNCTION(Category = "Input Trigger", BlueprintCallable)
+	UFUNCTION(Category = "UnrealEngineEx: Input Trigger", BlueprintCallable)
 	bool Trigger(float Value, float& OutputValue);
 
-	UFUNCTION(Category = "Input Trigger", BlueprintCallable)
+	UFUNCTION(Category = "UnrealEngineEx: Input Trigger", BlueprintCallable)
 	void Reset();
 
 

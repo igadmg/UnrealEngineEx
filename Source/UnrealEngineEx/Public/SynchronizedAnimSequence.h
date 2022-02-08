@@ -4,7 +4,11 @@
 #include "SynchronizedAnimSequence.generated.h"
 
 
-
+/**
+* This struct is used to store AnimSequence reference which later can be uase to Play it on a SkeletalMeshComponent
+* It should be replicated to remote host and played from the same time - as there will be some lag the sequence would be
+* revinded forward for the lag value, thus skipping some start.
+*/
 USTRUCT(BlueprintType)
 struct UNREALENGINEEX_API FSynchronizedAnimSequence
 {
@@ -12,14 +16,14 @@ struct UNREALENGINEEX_API FSynchronizedAnimSequence
 
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly) /* Not Replicated */
-	class UAnimSequenceBase* Animation;
+	UPROPERTY(Category = "SynchronizedAnimSequence", EditAnywhere, BlueprintReadOnly) /* Not Replicated */
+	class UAnimSequenceBase* Animation = nullptr;
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly) /* Replicated */
+	UPROPERTY(Category = "SynchronizedAnimSequence", VisibleInstanceOnly, BlueprintReadOnly) /* Replicated */
 	float PlayStartServerTime;
 
-	/** Play Rate. Negative means backward paly. */
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly) /* Replicaterd */
+	/** Play Rate. Negative means backward play. */
+	UPROPERTY(Category = "SynchronizedAnimSequence", VisibleInstanceOnly, BlueprintReadOnly) /* Replicaterd */
 	float PlayRate;
 
 
@@ -55,7 +59,7 @@ class UNREALENGINEEX_API USynchronizedAnimSequenceStatics : public UBlueprintFun
 
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "UnrealEditorEx: SynchronizedAnimSequence", BlueprintCallable)
 	static void Play(class USkeletalMeshComponent* SkeletalMeshComponent, struct FSynchronizedAnimSequence& SynchronizedAnimSequence);
 };
 

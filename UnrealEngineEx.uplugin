@@ -27,6 +27,11 @@
       "LoadingPhase": "PreDefault"
     },
     {
+      "Name": "InterpolationEx",
+      "Type": "Runtime",
+      "LoadingPhase": "PreDefault"
+    },
+    {
       "Name": "MathEx",
       "Type": "Runtime",
       "LoadingPhase": "PreDefault"
@@ -34,7 +39,7 @@
     {
       "Name": "UnrealDeveloperEx",
       "Type": "UncookedOnly",
-      "LoadingPhase": "Default"
+      "LoadingPhase": "PreDefault"
     },
     {
       "Name": "UnrealEngineEx",
@@ -47,7 +52,7 @@
       "LoadingPhase": "PostEngineInit"
     }
   ],
-  "EnabledByDefault": true,
+  "EnabledByDefault": false,
   "CanContainContent": true,
   "IsBetaVersion": false,
   "Installed": true

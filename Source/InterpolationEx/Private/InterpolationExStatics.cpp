@@ -151,14 +151,14 @@ UInterpolatorPostProcessSettings* UInterpolationExStatics::ReusePostProcessSetti
 	NORMALIZE_ZERO(DepthOfFieldNearTransitionRegion, Start, End);
 	NORMALIZE_ZERO(DepthOfFieldFarTransitionRegion, Start, End);
 	NORMALIZE_ZERO(DepthOfFieldScale, Start, End);
-#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 21
+#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 21 || ENGINE_MAJOR_VERSION >= 5
 #else
 	NORMALIZE_ZERO(DepthOfFieldMaxBokehSize, Start, End);
 #endif
 	NORMALIZE_ZERO(DepthOfFieldNearBlurSize, Start, End);
 	NORMALIZE_ZERO(DepthOfFieldFarBlurSize, Start, End);
 	NORMALIZE_ZERO(DepthOfFieldOcclusion, Start, End);
-#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 21
+#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 21 || ENGINE_MAJOR_VERSION >= 5
 #else
 	NORMALIZE_ZERO(DepthOfFieldColorThreshold, Start, End);
 	NORMALIZE_ZERO(DepthOfFieldSizeThreshold, Start, End);

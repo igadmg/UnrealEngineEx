@@ -4,7 +4,7 @@
 
 
 
-struct FSkeletalMeshEx
+struct COMPONENTEX_API FSkeletalMeshEx
 {
 	FSkeletalMeshEx(USkeletalMesh* This)
 		: This(This)
@@ -12,10 +12,8 @@ struct FSkeletalMeshEx
 	}
 
 
-
 public:
-	COMPONENTEX_API TArray<USkeletalMeshSocket*> SearchSocketsStartWith(FString InSocketName) const;
-
+	TArray<USkeletalMeshSocket*> SearchSocketsStartWith(FString InSocketName) const;
 
 
 protected:

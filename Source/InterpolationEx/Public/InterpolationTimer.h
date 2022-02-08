@@ -26,11 +26,11 @@ public:
 public:
 	bool IsFinished() const { return CurrentTime >= Duration; }
 
-	UFUNCTION(Category = "Interpolation Timer", BlueprintPure, meta = (DisplayName = "Alpha", CompactNodeTitle = "Alpha"))
+	UFUNCTION(Category = "UnrealEngineEx: Interpolation Timer", BlueprintPure, meta = (DisplayName = "Alpha", CompactNodeTitle = "Alpha"))
 	float Alpha() const { return Duration > 0 ? FMath::Clamp(CurrentTime/Duration, 0.f, 1.f) : 1.f; }
 
 	/** Advances timer by DeltaSeconds. Returns ture if timer is finished. */
-	UFUNCTION(Category = "Interpolation Timer", BlueprintCallable)
+	UFUNCTION(Category = "UnrealEngineEx: Interpolation Timer", BlueprintCallable)
 	bool Advance(float DeltaSeconds)
 	{
 		CurrentTime += DeltaSeconds;

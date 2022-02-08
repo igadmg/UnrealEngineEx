@@ -37,12 +37,12 @@ struct UNREALENGINEEX_API FUObjectPropertyAccessor : public FPropertyAccessor
 
 
 protected:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	UObject* Object;
+	UPROPERTY(Category = "ObjectPropertyAccessor", BlueprintReadOnly, VisibleAnywhere)
+	UObject* Object = nullptr;
 
-	FProperty* Property;
+	FProperty* Property = nullptr;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(Category = "ObjectPropertyAccessor", BlueprintReadOnly, VisibleAnywhere)
 	FName PropertyName;
 
 
@@ -50,7 +50,6 @@ public:
 	FUObjectPropertyAccessor() {}
 	FUObjectPropertyAccessor(UObject* Object, FName PropertyName)
 		: Object(Object)
-		, Property(nullptr)
 		, PropertyName(PropertyName)
 	{
 		if (::IsValid(Object))
@@ -94,14 +93,14 @@ struct UNREALENGINEEX_API FUStructPropertyAccessor : public FPropertyAccessor
 
 
 protected:
-	void* Object;
+	void* Object = nullptr;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	UStruct* PropertyType;
+	UPROPERTY(Category = "StructPropertyAccessor", BlueprintReadOnly, VisibleAnywhere)
+	UStruct* PropertyType = nullptr;
 
-	FProperty* Property;
+	FProperty* Property = nullptr;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(Category = "StructPropertyAccessor", BlueprintReadOnly, VisibleAnywhere)
 	FName PropertyName;
 
 
@@ -110,7 +109,6 @@ public:
 	FUStructPropertyAccessor(void* Object, UStruct* PropertyType, FName PropertyName)
 		: Object(Object)
 		, PropertyType(PropertyType)
-		, Property(nullptr)
 		, PropertyName(PropertyName)
 	{
 		if (::IsValid(PropertyType))
@@ -156,13 +154,13 @@ class UNREALENGINEEX_API UBoolPropertyAccessor : public UObject
 
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "BoolPropertyAccessor", BlueprintCallable)
 	bool GetValue()
 	{
 		return false;
 	}
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "BoolPropertyAccessor", BlueprintCallable)
 	void SetValue(bool vlaue)
 	{
 

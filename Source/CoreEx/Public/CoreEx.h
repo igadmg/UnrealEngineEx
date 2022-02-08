@@ -1,7 +1,14 @@
-#pragma once
+#ifndef COREEX_CoreEx_h
+#define COREEX_CoreEx_h
 
+#include "CoreMinimal.h"
 #include "Engine/EngineTypes.h"
-#include "Engine.h"
+#include "Engine/Engine.h"
+
+
+#define EXPAND(x) x
+#define GET_MACRO_1_2(_1,_2,NAME,...) NAME
+#define GET_MACRO_2_3(_1,_2,_3,NAME,...) NAME
 
 
 struct FCoreEx
@@ -34,9 +41,7 @@ const T* ValidInterface(const T* v) { return IsValid(v) && FCoreEx::DoesImplemen
 template <typename UT, typename T>
 T* ValidInterface(T* v) { return IsValid(v) && FCoreEx::DoesImplementInterface<UT>(v) ? v : nullptr; }
 
-#define EXPAND(x) x
-#define GET_MACRO_if_Implements(_1,_2,_3,NAME,...) NAME
-#define if_Implements(...) EXPAND(GET_MACRO_if_Implements(__VA_ARGS__, if_Implements3, if_Implements2)(__VA_ARGS__))
+#define if_Implements(...) EXPAND(GET_MACRO_2_3(__VA_ARGS__, if_Implements3, if_Implements2)(__VA_ARGS__))
 
 #define if_Implements2(TypeAndName, Expression) \
 if (auto TypeAndName = ValidInterface<U ## TypeAndName>(Expression))
@@ -90,7 +95,12 @@ if ((WorldContextObject->GetFlags() & RF_ClassDefaultObject) == 0)
 
 #if WITH_EDITOR
 
-#define if_PropertyChanged(ClassName, MemberName) \
+#define if_PropertyChanged(...) EXPAND(GET_MACRO_1_2(__VA_ARGS__, if_PropertyChanged2, if_PropertyChanged1)(__VA_ARGS__))
+
+#define if_PropertyChanged1(MemberName) \
+if (PropertyChangedEvent.Property && PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(ThisClass, MemberName))
+
+#define if_PropertyChanged2(ClassName, MemberName) \
 if (PropertyChangedEvent.Property && PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(ClassName, MemberName))
 
 #define if_MemberPropertyChanged(ClassName, MemberName) \
@@ -98,11 +108,13 @@ if (PropertyChangedEvent.PropertyChain.GetActiveMemberNode()->GetValue()->GetFNa
 
 #endif
 
-
 #include "LogEx.h"
 #include "EnumEx.h"
-#include "IsValidEx.h"
 #include "Throttle.h"
-#include "ValidEx.h"
 
 #include "ArrayEx.h"
+
+#endif
+
+#include "IsValidEx.h"
+#include "ValidEx.h"

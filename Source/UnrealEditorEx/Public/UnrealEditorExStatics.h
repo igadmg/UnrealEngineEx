@@ -15,17 +15,17 @@ class UNREALEDITOREX_API UUnrealEditorExStatics : public UBlueprintFunctionLibra
 
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintCallable)
 	static void SelectActorComponent(UActorComponent* InActorComponent);
 
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintPure)
 	static FSlateUIAction MakeUIAction(FSlateExecuteAction ExecuteAction)
 	{
 		return FSlateUIAction { ExecuteAction };
 	}
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintPure)
 	static FSlateUIAction MakeUIActionC(FSlateExecuteAction ExecuteAction, FSlateCanExecuteAction CanExecuteAction)
 	{
 		return FSlateUIAction { ExecuteAction, CanExecuteAction };

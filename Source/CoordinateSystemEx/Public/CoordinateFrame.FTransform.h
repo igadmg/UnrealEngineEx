@@ -23,7 +23,7 @@ public:
 	FORCEINLINE FVector GetWorldScale() const { return Object.GetScale3D(); }
 	FORCEINLINE FTransform GetWorldTransform() const { return Object; }
 
-	FORCEINLINE FVector GetForwardVector() const { return Object.GetUnitAxis(EAxis::X); } 
+	FORCEINLINE FVector GetForwardVector() const { return Object.GetUnitAxis(EAxis::X); }
 	FORCEINLINE FVector GetRightVector() const { return Object.GetUnitAxis(EAxis::Y); }
 	FORCEINLINE FVector GetUpVector() const { return Object.GetUnitAxis(EAxis::Z); }
 

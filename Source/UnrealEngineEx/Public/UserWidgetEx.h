@@ -4,7 +4,10 @@
 #include "UserWidgetEx.generated.h"
 
 
-
+/**
+ That was a /USerWidget which can prevent Focus Change. But it stopped working after UE dev's hid their internals.
+ Now I don't know how to do that.
+*/
 UCLASS()
 class UNREALENGINEEX_API UUserWidgetEx : public UUserWidget
 {
@@ -12,7 +15,7 @@ class UNREALENGINEEX_API UUserWidgetEx : public UUserWidget
 
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction", meta = (Bitmask, BitmaskEnum = "EFocusCause"))
+	UPROPERTY(Category = "Interaction", EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = "EFocusCause"))
 	int32 PreventFocusChange;
 
 

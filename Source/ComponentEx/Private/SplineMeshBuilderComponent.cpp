@@ -1,4 +1,5 @@
 #include "SplineMeshBuilderComponent.h"
+#include "ComponentExPrivatePCH.h"
 
 #include "Components/SplineComponent.h"
 #include "Components/SplineMeshComponent.h"
@@ -17,6 +18,8 @@ USplineMeshBuilderComponent::USplineMeshBuilderComponent(const FObjectInitialize
 
 void USplineMeshBuilderComponent::BuildSplineMesh()
 {
+	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("USplineMeshBuilderComponent::BuildSplineMesh"), STAT_SplineMeshBuilderComponentBuildSplineMesh, STATGROUP_ComponentEx);
+
 	auto SpareSplineMeshComponents = SplineMeshComponents;
 	Algo::Reverse(SpareSplineMeshComponents);
 	SplineMeshComponents.Empty();
@@ -41,7 +44,7 @@ void USplineMeshBuilderComponent::BuildSplineMesh()
 			}
 			if (!IsValid(SplineMeshComponent))
 			{
-				SplineMeshComponent = NewObject<USplineMeshComponent>(this, NAME_None, RF_Transactional);
+				SplineMeshComponent = NewObject<USplineMeshComponent>(GetOuter(), NAME_None, RF_Transactional);
 
 				SplineMeshComponent->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 				SplineMeshComponent->RegisterComponent();
@@ -50,8 +53,8 @@ void USplineMeshBuilderComponent::BuildSplineMesh()
 			SplineMeshComponent->SetStaticMesh(Mesh);
 			if (IsValid(Material))
 				SplineMeshComponent->SetMaterial(0, Material);
-			SplineMeshComponent->SetCollisionObjectType(CollisionChannel);
 			SplineMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			SplineMeshComponent->SetCollisionObjectType(CollisionChannel);
 			SplineMeshComponent->SetCullDistance(SplineMeshCullDistance);
 			SplineMeshComponent->SetRelativeTransform(SplineComponent->GetRelativeTransform());
 

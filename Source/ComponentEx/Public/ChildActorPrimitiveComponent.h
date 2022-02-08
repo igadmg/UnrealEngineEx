@@ -12,38 +12,39 @@ class COMPONENTEX_API UChildActorPrimitiveComponent : public UPrimitiveComponent
 
 protected:
 	UPROPERTY(Category = "ChildActorPrimitiveComponent", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", OnlyPlaceable))
-	TSubclassOf<AActor>	ChildActorClass;
+	TSubclassOf<AActor> ChildActorClass;
 
 	UPROPERTY(Category = "ChildActorPrimitiveComponent", VisibleAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<AActor> ChildActorPtr;
 
+	/** Temprory storage of Actors attached to Child Actor. They are reattached if actor is recreated. */
 	UPROPERTY()
 	TArray<class AActor*> ChildAttachedActors;
 
 
 public:
-	UFUNCTION(Category = "ChildActorPrimitiveComponent", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: ChildActorPrimitiveComponent", BlueprintPure)
 	AActor* GetChildActor() const { return ChildActorPtr.Get(); }
 
-	UFUNCTION(Category = "ChildActorPrimitiveComponent", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: ChildActorPrimitiveComponent", BlueprintPure)
 	AActor* GetChildActorTemplate() const { return ChildActorClass ? ChildActorClass->GetDefaultObject<AActor>() : nullptr; }
 
-	UFUNCTION(Category = "ChildActorPrimitiveComponent", BlueprintCallable)
+	UFUNCTION(Category = "UnrealEngineEx: ChildActorPrimitiveComponent", BlueprintCallable)
 	void SetChildActorClass(TSubclassOf<AActor> InClass)
 	{
 		SetChildActorClass(InClass, nullptr);
 	}
 
-	UFUNCTION(Category = "ChildActorPrimitiveComponent", BlueprintCallable)
+	UFUNCTION(Category = "UnrealEngineEx: ChildActorPrimitiveComponent", BlueprintCallable)
 	void CreateChildActor(AActor* ActorTemplate = nullptr);
 
-	UFUNCTION(Category = "ChildActorPrimitiveComponent", BlueprintCallable)
+	UFUNCTION(Category = "UnrealEngineEx: ChildActorPrimitiveComponent", BlueprintCallable)
 	void DestroyChildActor();
 
-	UFUNCTION(Category = "ChildActorPrimitiveComponent", BlueprintCallable)
+	UFUNCTION(Category = "UnrealEngineEx: ChildActorPrimitiveComponent", BlueprintCallable)
 	void ClearChildActor();
 
-	UFUNCTION(Category = "ChildActorPrimitiveComponent", BlueprintCallable)
+	UFUNCTION(Category = "UnrealEngineEx: ChildActorPrimitiveComponent", BlueprintCallable)
 	void CloneChildActor(AActor* SrcActor);
 
 

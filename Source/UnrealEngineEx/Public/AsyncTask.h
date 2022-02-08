@@ -25,7 +25,7 @@ public:
 	UPROPERTY(Category = "AsyncTask", VisibleInstanceOnly, transient)
 	float RunTime;
 
-	UPROPERTY()
+	UPROPERTY(Category = "UnrealEditorEx", EditAnywhere)
 	FUnrealEngineExOnAsyncTaskFinishedDelegate OnFinishedDelegate;
 
 

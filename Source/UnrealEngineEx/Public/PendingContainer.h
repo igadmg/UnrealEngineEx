@@ -15,30 +15,30 @@ class UNREALENGINEEX_API UPendingContainer : public UObject
 
 
 protected:
-	UPROPERTY()
+	UPROPERTY(Category = "PendingContainer", EditAnywhere)
 	TArray<UObject*> PendingObjects;
 
-	UPROPERTY()
+	UPROPERTY(Category = "PendingContainer", EditAnywhere)
 	FPendingContainerOnObjectCallback OnAddObject;
-	std::function<void(UObject*)> OnAddObjectFp;
+	TFunction<void(UObject*)> OnAddObjectFp;
 	
-	UPROPERTY()
+	UPROPERTY(Category = "PendingContainer", EditAnywhere)
 	FPendingContainerOnObjectCallback OnRemoveObject;
-	std::function<void(UObject*)> OnRemoveObjectFp;
+	TFunction<void(UObject*)> OnRemoveObjectFp;
 
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "UnrealEditorEx: PendingContainer", BlueprintCallable)
 	void AddObject(UObject* Object);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "UnrealEditorEx: PendingContainer", BlueprintCallable)
 	void RemoveObject(UObject* Object);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "UnrealEditorEx: PendingContainer", BlueprintCallable)
 	void Consume(FPendingContainerOnObjectCallback OnObjectAdd, FPendingContainerOnObjectCallback OnObjectRemove);
 
 	template <typename T>
-	void Consume(std::function<void(T*)> OnObjectAdd, std::function<void(T*)> OnObjectRemove)
+	void Consume(TFunction<void(T*)> OnObjectAdd, TFunction<void(T*)> OnObjectRemove)
 	{
 		OnAddObjectFp = [OnObjectAdd](UObject* Object) { OnObjectAdd(Cast<T>(Object)); };
 		OnRemoveObjectFp = [OnObjectRemove](UObject* Object) { OnObjectRemove(Cast<T>(Object)); };

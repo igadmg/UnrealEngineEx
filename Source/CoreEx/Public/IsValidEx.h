@@ -2,6 +2,10 @@
 #include "UObject/ScriptInterface.h"
 #include "HitProxies.h"
 
+/**
+ Functions to check validity of objects of different UE types.
+*/
+
 
 #ifndef IsValid_Common
 #define IsValid_Common
@@ -23,6 +27,12 @@ static bool IsValid(void* Ptr)
 FORCEINLINE static bool IsValid(UObject* Test)
 {
 	return Test && !Test->IsPendingKill();
+}
+
+template <typename FuncType>
+bool IsValid(TFunction<FuncType> Func)
+{
+	return (bool)Func;
 }
 
 template <typename T>
@@ -90,5 +100,13 @@ static bool IsValid(const FDataTableRowHandle& DataTableRowHandle)
 static bool IsValid(const FGameplayAbilitySpecHandle& GameplayAbilitySpecHandle)
 {
 	return GameplayAbilitySpecHandle.IsValid();
+}
+#endif
+
+#if defined(ENGINE_EdGraphPin_generated_h) && !defined(IsValid_ENGINE_EdGraphPin_generated_h)
+#define IsValid_ENGINE_EdGraphPin_generated_h
+static bool IsValid(const FEdGraphPinType& EdGraphPinType)
+{
+	return EdGraphPinType.PinCategory != NAME_None;
 }
 #endif

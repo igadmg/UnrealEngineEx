@@ -75,12 +75,12 @@ void UChildActorPrimitiveComponent::PreEditChange(FProperty* PropertyThatWillCha
 
 void UChildActorPrimitiveComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	if_PropertyChanged(UChildActorPrimitiveComponent, ChildActorClass)
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	if_PropertyChanged(ChildActorClass)
 	{
 		SetChildActorClass(ChildActorClass, nullptr);
 	}
-
-	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 
 void UChildActorPrimitiveComponent::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
@@ -144,6 +144,7 @@ void UChildActorPrimitiveComponent::CreateChildActor(AActor* ActorTemplate)
 	if (auto World = Valid(GetWorld()))
 	{
 		FActorSpawnParameters Params;
+		Params.Owner = MyOwner;
 		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		Params.bDeferConstruction = true; // We defer construction so that we set ParentComponent prior to component registration so they appear selected
 		Params.bAllowDuringConstructionScript = true;

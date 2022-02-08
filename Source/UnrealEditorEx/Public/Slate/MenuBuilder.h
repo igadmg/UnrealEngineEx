@@ -22,19 +22,19 @@ struct UNREALEDITOREX_API FSlateUIAction
 
 
 	/** Holds a delegate that is executed when this action is activated. */
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(Category = "SlateUIAction", BlueprintReadWrite)
 	FSlateExecuteAction ExecuteAction;
 
 	/** Holds a delegate that is executed when determining whether this action can execute. */
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(Category = "SlateUIAction", BlueprintReadWrite)
 	FSlateCanExecuteAction CanExecuteAction;
 
 	/** Holds a delegate that is executed when determining the check state of this action. */
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(Category = "SlateUIAction", BlueprintReadWrite)
 	FSlateGetActionCheckState GetActionCheckState;
 
 	/** Holds a delegate that is executed when determining whether this action is visible. */
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(Category = "SlateUIAction", BlueprintReadWrite)
 	FSlateIsActionButtonVisible IsActionVisibleDelegate;
 
 
@@ -94,22 +94,22 @@ public:
 
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "MenuBuilder", BlueprintCallable)
 	void BeginSection(FName InExtensionHook, FText InHeadingText);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "MenuBuilder", BlueprintCallable)
 	void EndSection();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "MenuBuilder", BlueprintCallable)
 	void AddMenuEntry(FText InLabel, FText InToolTip, /*const FSlateIcon& InIcon,*/ FSlateUIAction UIAction);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "MenuBuilder", BlueprintCallable)
 	void AddArrayMenuEntries(const TArray<UObject*>& Objects, FAddArrayMenuEntriesAction ObjectAction);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "MenuBuilder", BlueprintCallable)
 	void AddSubMenu(FText InMenuLabel, FText InToolTip, FSlateNewMenuDelegate SubMenuDelegate);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "MenuBuilder", BlueprintCallable)
 	void AddArraySubMenues(const TArray<UObject*>& Objects, FAddArrayNewMenuDelegate SubMenuDelegate);
 
 

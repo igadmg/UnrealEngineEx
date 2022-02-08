@@ -37,6 +37,7 @@ void FComponentEx::SetActorEnabled(AActor* Actor, bool bIsEnabled)
 	Actor->SetActorTickEnabled(bIsEnabled);
 	for (auto Component : Actor->GetComponents())
 	{
+		Component->SetActive(bIsEnabled);
 		Component->SetComponentTickEnabled(bIsEnabled);
 	}
 

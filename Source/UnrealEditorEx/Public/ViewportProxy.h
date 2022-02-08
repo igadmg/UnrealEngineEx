@@ -27,16 +27,16 @@ public:
 
 
 public:
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintPure)
 	FKey GetKey() const { return Click->GetKey(); }
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintPure)
 	bool IsKey(FKey Key) const { return Click->GetKey() == Key; }
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintPure)
 	EInputEvent GetEvent() const { return Click->GetEvent(); }
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintPure)
 	bool IsControlDown() const { return Click->IsControlDown(); }
 
 

@@ -22,11 +22,11 @@ protected:
 
 protected:
 	/** Radius of the disc **/
-	UPROPERTY(Category = Shape, EditAnywhere, BlueprintReadOnly, export)
+	UPROPERTY(Category = "Shape", EditAnywhere, BlueprintReadOnly, export)
 	float Radius;
 
 	/** Height of the disc **/
-	UPROPERTY(Category = Shape, EditAnywhere, BlueprintReadOnly, export)
+	UPROPERTY(Category = "Shape", EditAnywhere, BlueprintReadOnly, export)
 	float Height;
 
 

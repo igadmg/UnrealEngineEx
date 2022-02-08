@@ -29,17 +29,17 @@ public:
 
 
 public:
-	UFUNCTION(Category = "Synchronized Network Clock", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx: Synchronized Network Clock", BlueprintPure)
 	float GetTimeSeconds() const;
 
-	UFUNCTION(Category = "Synchronized Network Clock", BlueprintCallable, meta = (Latent, LatentInfo = "LatentInfo"))
+	UFUNCTION(Category = "UnrealEngineEx: Synchronized Network Clock", BlueprintCallable, meta = (Latent, LatentInfo = "LatentInfo"))
 	void SynchronizeClock(int32 NumberOfSamples, FLatentActionInfo LatentInfo);
 
 
 
 protected:
-	UFUNCTION(server, unreliable, WithValidation) void SynchronizeTimeServer(int32 InToken);
-	UFUNCTION(client, unreliable) void SynchronizeTimeClient(int32 InToken, float InServerTime);
+	UFUNCTION(Category = "UnrealEditorEx: Synchronized Network Clock", server, unreliable, WithValidation) void SynchronizeTimeServer(int32 InToken);
+	UFUNCTION(Category = "UnrealEditorEx: Synchronized Network Clock", client, unreliable) void SynchronizeTimeClient(int32 InToken, float InServerTime);
 	void DoSynchronizeTime();
 
 	FSynchronizedNetworkClockDelegate OnSynchronizedNetworkClockCallback;

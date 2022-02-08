@@ -1,4 +1,5 @@
 #include "UnrealEngineExStatics.h"
+#include "UnrealEngineExPrivatePCH.h"
 
 #include "Blueprint/WidgetTree.h"
 #include "Blueprint/UserWidget.h"
@@ -11,6 +12,8 @@
 #include "Engine/LevelStreaming.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "Engine/LocalPlayer.h"
+#include "Engine/NetConnection.h"
+#include "Engine/World.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/GameStateBase.h"
@@ -27,6 +30,7 @@
 #include "EngineUtils.h"
 #include "GameMapsSettings.h"
 #include "LatentActions.h"
+#include "UnrealEngineEx.h"
 
 #if WITH_EDITOR
 #include "Settings/LevelEditorPlaySettings.h"
@@ -34,9 +38,6 @@
 
 #include "CoreEx.h"
 #include "CoordinateFrame.h"
-
-#include <functional>
-
 
 
 struct FFindStreamingLevelBy {
@@ -168,19 +169,74 @@ AHUD* UUnrealEngineExStatics::GetLocalPlayerHUD(const UObject* WorldContextObjec
 	return GetPlayerHUD(GetLocalPlayerController(WorldContextObject));
 }
 
-AHUD* UUnrealEngineExStatics::GetPlayerHUD(const UObject* Object)
+template <typename TResult>
+TResult* ForEachOwningActor(UObject* Object, TFunction<TResult* (AActor*)> Function)
 {
 	if (!IsValid(Object))
 		return nullptr;
 
-	auto AsHUD = Cast<AHUD>(Object);
-	if (AsHUD)
+	if (auto AsActor = Cast<AActor>(Object))
 	{
-		return const_cast<AHUD*>(AsHUD);
+		if (auto Result = Function(AsActor))
+			return Result;
+
+		if (auto ParentActor = Valid(AsActor->GetParentActor()))
+		{
+			return ForEachOwningActor(ParentActor, Function);
+		}
+
+		if (auto ActorOwner = AsActor->GetOwner())
+		{
+			return ForEachOwningActor(ActorOwner, Function);
+		}
 	}
-	if (auto PlayerController = Cast<APlayerController>(GetController(Object)))
+	else
 	{
-		return PlayerController->GetHUD();
+		if (auto AsActorComponent = Cast<UActorComponent>(Object))
+		{
+			return ForEachOwningActor(AsActorComponent->GetOwner(), Function);
+		}
+
+		if (auto AsUserWidget = Cast<UUserWidget>(Object))
+		{
+			return ForEachOwningActor(AsUserWidget->GetOwningPlayer(), Function);
+		}
+	}
+
+	return ForEachOwningActor(Object->GetOuter(), Function);
+}
+
+AActor* UUnrealEngineExStatics::GetOwningActor(const UObject* Object)
+{
+	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("UUnrealEngineExStatics::GetOwningActor"), STAT_UnrealEngineExStaticsGetOwningActor, STATGROUP_UnrealEngineEx);
+
+	return ForEachOwningActor<AActor>(const_cast<UObject*>(Object), [](auto Actor) { return Actor; });
+}
+
+AActor* UUnrealEngineExStatics::GetOwningActorByClass(const UObject* Object, TSubclassOf<AActor> ActorClass)
+{
+	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("UUnrealEngineExStatics::GetOwningActorByClass"), STAT_UnrealEngineExStaticsGetOwningActorByClass, STATGROUP_UnrealEngineEx);
+
+	if (!IsValid(ActorClass))
+		return nullptr;
+
+	return ForEachOwningActor<AActor>(const_cast<UObject*>(Object)
+		, [&ActorClass](auto Actor) {
+			return Actor->IsA(ActorClass) ? Actor : nullptr;
+		});
+}
+
+AHUD* UUnrealEngineExStatics::GetPlayerHUD(const UObject* Object)
+{
+	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("UUnrealEngineExStatics::GetPlayerHUD"), STAT_UnrealEngineExStaticsGetPlayerHUD, STATGROUP_UnrealEngineEx);
+
+	if (auto AsHUD = Cast<AHUD>(GetOwningActorByClass(Object, AHUD::StaticClass())))
+	{
+		return AsHUD;
+	}
+	if (auto AsPlayerController = Cast<APlayerController>(GetController(Object)))
+	{
+		return AsPlayerController->GetHUD();
 	}
 
 	return nullptr;
@@ -188,59 +244,28 @@ AHUD* UUnrealEngineExStatics::GetPlayerHUD(const UObject* Object)
 
 APlayerState* UUnrealEngineExStatics::GetPlayerState(const UObject* Object)
 {
-	if (!IsValid(Object))
-		return nullptr;
+	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("UUnrealEngineExStatics::GetPlayerState"), STAT_UnrealEngineExStaticsGetPlayerState, STATGROUP_UnrealEngineEx);
 
+	return ForEachOwningActor<APlayerState>(const_cast<UObject*>(Object)
+		, [](auto Actor) -> APlayerState* {
+			if (auto AsPlayerState = Cast<APlayerState>(Actor))
+			{
+				return AsPlayerState;
+			}
 
-	auto AsActor = Cast<AActor>(Object);
-	if (AsActor)
-	{
-		auto AsPlayerState = Cast<APlayerState>(AsActor);
-		if (AsPlayerState)
-		{
-			return const_cast<APlayerState*>(AsPlayerState);
-		}
+			if (auto AsPawn = Cast<APawn>(Actor))
+			{
+				return AsPawn->GetPlayerState();
+			}
 
-		auto AsPawn = Cast<APawn>(AsActor);
-		if (AsPawn)
-		{
-			return AsPawn->GetPlayerState();
-		}
+			if (auto AsController = Cast<AController>(Actor))
+			{
+				return AsController->PlayerState;
+			}
 
-		auto AsController = Cast<AController>(AsActor);
-		if (AsController)
-		{
-			return AsController->PlayerState;
-		}
+			return nullptr;
+		});
 
-		auto AsHUD = Cast<AHUD>(AsActor);
-		if (AsHUD)
-		{
-			return GetPlayerState(AsHUD->GetOwningPlayerController());
-		}
-
-		auto AsChildActorComponent = Cast<UChildActorComponent>(AsActor->GetParentComponent());
-		if (AsChildActorComponent)
-		{
-			return GetPlayerState(AsChildActorComponent->GetOwner());
-		}
-
-		return GetPlayerState(AsActor->GetOwner());
-	}
-	else
-	{
-		auto AsActorComponent = Cast<UActorComponent>(Object);
-		if (AsActorComponent)
-		{
-			return GetPlayerState(AsActorComponent->GetOwner());
-		}
-
-		auto AsUserWidget = Cast<UUserWidget>(Object);
-		if (AsUserWidget)
-		{
-			return GetPlayerState(AsUserWidget->GetOwningPlayer());
-		}
-	}
 
 	return GetPlayerState(Object->GetOuter());
 }
@@ -267,6 +292,16 @@ APawn* UUnrealEngineExStatics::GetPawnOrSpectator(const UObject* Object)
 
 APawn* UUnrealEngineExStatics::GetPlayerPawn(const UObject* Object)
 {
+	if (auto AsPawn = Cast<APawn>(GetOwningActorByClass(Object, APawn::StaticClass())))
+	{
+		return AsPawn;
+	}
+
+	if (auto Controller = GetController(Object))
+	{
+		return Controller->GetPawn();
+	}
+
 	if (auto PlayerState = GetPlayerState(Object))
 	{
 		return PlayerState->GetPawn();
@@ -277,6 +312,11 @@ APawn* UUnrealEngineExStatics::GetPlayerPawn(const UObject* Object)
 
 ASpectatorPawn* UUnrealEngineExStatics::GetSpectatorPawn(const UObject* Object)
 {
+	if (auto AsSpectatorPawn = Cast<ASpectatorPawn>(GetOwningActorByClass(Object, ASpectatorPawn::StaticClass())))
+	{
+		return AsSpectatorPawn;
+	}
+
 	if (auto Controller = Cast<APlayerController>(GetController(Object)))
 	{
 		return Controller->GetSpectatorPawn();
@@ -287,55 +327,27 @@ ASpectatorPawn* UUnrealEngineExStatics::GetSpectatorPawn(const UObject* Object)
 
 AController* UUnrealEngineExStatics::GetController(const UObject* Object)
 {
-	if (!IsValid(Object))
-		return nullptr;
+	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("UUnrealEngineExStatics::GetController"), STAT_UnrealEngineExStaticsGetController, STATGROUP_UnrealEngineEx);
 
-
-	auto AsActor = Cast<AActor>(Object);
-	if (AsActor)
+	if (auto AsGameInstance = Cast<UGameInstance>(Object))
 	{
-		auto AsController = Cast<AController>(Object);
-		if (AsController)
-		{
-			return const_cast<AController*>(AsController);
-		}
-
-		auto AsPawn = Cast<APawn>(Object);
-		if (AsPawn)
-		{
-			return AsPawn->GetController();
-		}
-
-		auto AsHUD = Cast<AHUD>(Object);
-		if (AsHUD)
-		{
-			return AsHUD->GetOwningPlayerController();
-		}
-
-		return GetController(AsActor->GetOwner());
-	}
-	else
-	{
-		auto AsActorComponent = Cast<UActorComponent>(Object);
-		if (AsActorComponent)
-		{
-			return GetController(AsActorComponent->GetOwner());
-		}
-
-		auto AsUserWidget = Cast<UUserWidget>(Object);
-		if (AsUserWidget)
-		{
-			return AsUserWidget->GetOwningPlayer();
-		}
-
-		auto AsGameInstance = Cast<UGameInstance>(Object);
-		if (AsGameInstance)
-		{
-			return GetLocalPlayerController(AsGameInstance);
-		}
+		return GetLocalPlayerController(AsGameInstance);
 	}
 
-	return GetController(Object->GetOuter());
+	return ForEachOwningActor<AController>(const_cast<UObject*>(Object)
+		, [](auto Actor) -> AController* {
+			if (auto AsController = Cast<AController>(Actor))
+			{
+				return const_cast<AController*>(AsController);
+			}
+
+			if (auto AsPawn = Cast<APawn>(Actor))
+			{
+				return AsPawn->GetController();
+			}
+
+			return nullptr;
+		});
 }
 
 APlayerController* UUnrealEngineExStatics::GetPlayerController(const UObject* Object)
@@ -1318,7 +1330,7 @@ bool UUnrealEngineExStatics::ReplaceWidget(UWidget* OldWidget, UWidget* NewWidge
 	return true;
 }
 
-void ForeachChildWidget(UWidget* ParentWidget, std::function<bool(UWidget*)> Predicate, bool TopLevelOnly)
+void ForeachChildWidget(UWidget* ParentWidget, TFunction<bool(UWidget*)> Predicate, bool TopLevelOnly)
 {
 	if (!IsValid(ParentWidget))
 		return;

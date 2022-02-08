@@ -8,12 +8,9 @@ public class UnrealDeveloperEx : ModuleRules
 	public UnrealDeveloperEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
-#if UE_4_21_OR_LATER
-#if UE_4_24_OR_LATER
+		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
-#endif
-		PrivatePCHHeaderFile = "Private/UnrealDeveloperExPrivatePCH.h";
-#endif
+
 
 		PublicIncludePaths.AddRange(new string[] {
 				Path.Combine(ModuleDirectory, "Public"),
@@ -40,6 +37,7 @@ public class UnrealDeveloperEx : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
 				"KismetCompiler",
+				"SlateCore",
 			});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {

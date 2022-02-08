@@ -4,16 +4,16 @@
 
 
 
-USTRUCT(Atomic, BlueprintType, Immutable)
+USTRUCT(Atomic, BlueprintType)
 struct FAttachmentDescription
 {
 	GENERATED_BODY()
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "Attachment", EditAnywhere, BlueprintReadWrite)
 	class USceneComponent* Component = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "Attachment", EditAnywhere, BlueprintReadWrite)
 	FName SocketName = NAME_None;
 
 
@@ -27,4 +27,3 @@ struct FAttachmentDescription
 	{
 	}
 };
-

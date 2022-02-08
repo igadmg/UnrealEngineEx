@@ -1,5 +1,18 @@
 #include "IsValidEx.h"
 
+/**
+ Functions to do Casts with Valid checks of different objects of different UE types.
+
+ Smart pointers vill be cast to types of their objects.
+ TSmartPtr<AActor> ptrA;
+ AActor* A = Valid(ptrA);
+ AMyActor* mA = Valid<AMyActor>(ptrA);
+
+ Objects references can be cast to theit types as well.
+ TSoftObjectPtr<AActor> ptrA;
+ AActor* A = Valid(ptrA);
+ AMyActor* mA = Valid<AMyActor>(ptrA);
+*/
 
 #ifndef IsValid_Templates
 #define IsValid_Templates
@@ -94,6 +107,9 @@ T* Valid(const TWeakObjectPtr<U>& v) { return IsValid(v) ? Cast<T>(v.Get()) : nu
 
 template <typename T, typename U>
 const T* Valid(const TWeakObjectPtr<const U>& v) { return IsValid(v) ? Cast<T>(v.Get()) : nullptr; }
+
+template <typename T>
+T* Valid(const TScriptInterface<T>& v) { return IsValid(v) ? (T*)(v.GetInterface()) : nullptr; }
 
 template <typename T>
 T* Valid(const TSoftObjectPtr<T>& v) { return IsValid(v) ? v.LoadSynchronous() : nullptr; }

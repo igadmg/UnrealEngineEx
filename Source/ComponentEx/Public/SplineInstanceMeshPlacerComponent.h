@@ -15,15 +15,15 @@ class COMPONENTEX_API USplineInstanceMeshPlacerComponent
 
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "SplineInstanceMeshPlacerComponent", VisibleAnywhere, BlueprintReadWrite)
 	class USplineComponent* SplineComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "SplineInstanceMeshPlacerComponent", EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<ECollisionEnabled::Type> CollisionEnabled;
 
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(Category = "UnrealEngineEx: SplineInstanceMeshPlacerComponent", BlueprintCallable)
 	void FillSplineMesh(float Interval, FVector InstanceOffset);
 
 

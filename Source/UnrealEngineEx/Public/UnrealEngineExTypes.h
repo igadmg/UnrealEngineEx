@@ -13,7 +13,61 @@ enum class EAsyncTaskResult : uint8
 	Timeout,
 };
 
+UENUM(BlueprintType)
+enum class EBPWorldType : uint8
+{
+	None = 0,
+	Game = EWorldType::Game,
+	Editor = EWorldType::Editor,
+	PIE = EWorldType::PIE,
+	EditorPreview = EWorldType::EditorPreview,
+	GamePreview = EWorldType::GamePreview,
+	GameRPC = EWorldType::GameRPC,
+	Inactive = EWorldType::Inactive
+};
 
+UENUM(BlueprintType)
+enum class EInputMode : uint8
+{
+	None = 0,
+	UIOnly,
+	GameAndUI,
+	GameOnly,
+};
+
+#if !CPP
+UENUM(BlueprintType)
+enum ENetMode
+{
+	/** Standalone: a game without networking, with one or more local players. Still considered a server because it has all server functionality. */
+	NM_Standalone,
+
+	/** Dedicated server: server with no local players. */
+	NM_DedicatedServer,
+
+	/** Listen server: a server that also has a local player who is hosting the game, available to other players on the network. */
+	NM_ListenServer,
+
+	/**
+	 * Network client: client connected to a remote server.
+	 * Note that every mode less than this value is a kind of server, so checking NetMode < NM_Client is always some variety of server.
+	 */
+	 NM_Client
+};
+#endif
+
+USTRUCT(BlueprintType)
+struct UNREALENGINEEX_API FNetworkStatus
+{
+	GENERATED_BODY()
+
+
+	UPROPERTY(Category = "UnrealEditorEx", BlueprintReadOnly)
+	float Latency = 0;
+
+	UPROPERTY(Category = "UnrealEditorEx", BlueprintReadOnly)
+	float ServerTime = 0;
+};
 
 USTRUCT(BlueprintType)
 struct FViewSpaceDescriptor

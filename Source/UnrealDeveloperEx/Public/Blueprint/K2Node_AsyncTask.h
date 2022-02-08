@@ -1,10 +1,20 @@
 #pragma once
 
 #include "K2Node_BaseAsyncTask.h"
+#include "Blueprint/K2NodeHelpers.h"
 
 #include "K2Node_AsyncTask.generated.h"
 
 
+/**
+ Async Task node. Something sismilar to UE Task nodes.
+ Runs some task defined in Blueprint class and delays blueprint node until it is finished.
+
+ Blueprint should be a UAsyncTask class.
+ Also UAsyncTaskManager should be created in GameInstance::Init().
+
+ AsyncManager = NewObject<UAsyncTaskManager>(this);
+*/
 UCLASS()
 class UNREALDEVELOPEREX_API UK2Node_AsyncTask : public UK2Node_BaseAsyncTask
 {
@@ -13,9 +23,9 @@ class UNREALDEVELOPEREX_API UK2Node_AsyncTask : public UK2Node_BaseAsyncTask
 
 	struct UNREALDEVELOPEREX_API FAsyncTaskHelper : public FBaseAsyncTaskHelper
 	{
-		static bool HandleDelegateImplementation(
+		static void HandleDelegateImplementation(
 			FMulticastDelegateProperty* CurrentProperty, const TArray<FAsyncTaskHelper::FOutputPinAndLocalVariable>& VariableOutputs,
-			UEdGraphPin* ProxyObjectPin, UClass* ProxyClass, UEdGraphPin*& InOutLastThenPin,
+			UEdGraphPin* ProxyObjectPin, UClass* ProxyClass,
 			class FK2NodeCompilerHelper& Compiler);
 	};
 
@@ -29,7 +39,7 @@ public:
 	UK2Node_AsyncTask(const FObjectInitializer& ObjectInitializer);
 
 
-protected:
+public:
 	virtual bool ShouldShowNodeProperties() const override { return true; }
 
 	class UEdGraphPin* GetAsyncTaskClassPin();

@@ -186,7 +186,7 @@ FPostProcessSettings UInterpolatorPostProcessSettings::Interpolate(float Alpha)
 	INTERPOLATE_POSTPROCESS_FIELD(float, Result, DepthOfFieldNearTransitionRegion);
 	INTERPOLATE_POSTPROCESS_FIELD(float, Result, DepthOfFieldFarTransitionRegion);
 	INTERPOLATE_POSTPROCESS_FIELD(float, Result, DepthOfFieldScale);
-#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 21
+#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 21 || ENGINE_MAJOR_VERSION >= 5
 #else
 	INTERPOLATE_POSTPROCESS_FIELD(float, Result, DepthOfFieldMaxBokehSize);
 #endif
@@ -198,7 +198,7 @@ FPostProcessSettings UInterpolatorPostProcessSettings::Interpolate(float Alpha)
 	// bOverride_DepthOfFieldBokehShape : 1;
 
 	INTERPOLATE_POSTPROCESS_FIELD(float, Result, DepthOfFieldOcclusion);
-#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 21
+#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 21 || ENGINE_MAJOR_VERSION >= 5
 #else
 	INTERPOLATE_POSTPROCESS_FIELD(float, Result, DepthOfFieldColorThreshold);
 	INTERPOLATE_POSTPROCESS_FIELD(float, Result, DepthOfFieldSizeThreshold);

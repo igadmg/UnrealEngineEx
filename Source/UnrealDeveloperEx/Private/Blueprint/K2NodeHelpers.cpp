@@ -2,18 +2,23 @@
 
 #include "EdGraph/EdGraphNode.h"
 #include "Kismet2/BlueprintEditorUtils.h"
-#include "Runtime/Launch/Resources/Version.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Misc/EngineVersionComparison.h"
+#include "Engine/Engine.h"
 #include "EdGraphSchema_K2.h"
 
 #include "CoreEx.h"
 
+
+#define LOCTEXT_NAMESPACE "UnrealDeveloperEx"
 
 bool FK2NodeHelpers::CreateInputPins(UEdGraphNode* Node, UFunction* Function)
 {
 	auto K2Schema = GetDefault<UEdGraphSchema_K2>();
 	bool bAllPinsGood = true;
 
-#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 19
+#if UE_VERSION_NEWER_THAN(4, 19, -1)
 	TSet<FName> PinsToHide;
 #else
 	TSet<FString> PinsToHide;
@@ -30,7 +35,7 @@ bool FK2NodeHelpers::CreateInputPins(UEdGraphNode* Node, UFunction* Function)
 		}
 
 		const bool bIsRefParam = Param->HasAnyPropertyFlags(CPF_ReferenceParm) && bIsFunctionInput;
-#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 19
+#if UE_VERSION_NEWER_THAN(4, 19, -1)
 		UEdGraphNode::FCreatePinParams PinParams;
 		PinParams.bIsReference = bIsRefParam;
 		UEdGraphPin* Pin = Node->CreatePin(EGPD_Input, FName(), FName(), nullptr, Param->GetFName(), PinParams);
@@ -75,13 +80,23 @@ bool FK2NodeHelpers::CreateInputPins(UEdGraphNode* Node, UFunction* Function)
 
 void FK2NodeHelpers::CreateOutputPins(UEdGraphNode* Node, FMulticastDelegateProperty* Property)
 {
-	auto K2Schema = GetDefault<UEdGraphSchema_K2>();
+	UEdGraphPin* ExecPin;
+	TArray<UEdGraphPin*> ParameterPins;
+	CreateOutputPins(Node, Property, ExecPin, ParameterPins);
+}
 
-#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 19
-	Node->CreatePin(EGPD_Output, K2Schema->PC_Exec, FName(), nullptr, *Property->GetName());
+void FK2NodeHelpers::CreateOutputPins(UEdGraphNode* Node, FMulticastDelegateProperty* Property, UEdGraphPin*& ExecPin, TArray<UEdGraphPin*>& ParameterPins)
+{
+	auto Schema = GetDefault<UEdGraphSchema_K2>();
+
+#if UE_VERSION_NEWER_THAN(4, 19, -1)
+	ExecPin = Node->CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, *Property->GetName());
 #else
-	Node->CreatePin(EGPD_Output, K2Schema->PC_Exec, FString(), nullptr, *Property->GetName());
+	ExecPin = Node->CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, *Property->GetName());
 #endif
+
+	ExecPin->DefaultObject = Property->SignatureFunction;
+
 	if (auto DelegateSignatureFunction = Valid(Property->SignatureFunction))
 	{
 		for (TFieldIterator<FProperty> PropIt(DelegateSignatureFunction); PropIt && (PropIt->PropertyFlags & CPF_Parm); ++PropIt)
@@ -90,12 +105,15 @@ void FK2NodeHelpers::CreateOutputPins(UEdGraphNode* Node, FMulticastDelegateProp
 			const bool bIsFunctionInput = !Param->HasAnyPropertyFlags(CPF_OutParm) || Param->HasAnyPropertyFlags(CPF_ReferenceParm);
 			if (bIsFunctionInput)
 			{
-#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 19
-				UEdGraphPin* Pin = Node->CreatePin(EGPD_Output, FName(), FName(), nullptr, Param->GetFName());
+#if UE_VERSION_NEWER_THAN(4, 19, -1)
+				UEdGraphPin* Pin = Node->CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Wildcard, Param->GetFName());
 #else
-				UEdGraphPin* Pin = Node->CreatePin(EGPD_Output, FString(), FString(), nullptr, Param->GetName());
+				UEdGraphPin* Pin = Node->CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Wildcard, Param->GetName());
 #endif
-				K2Schema->ConvertPropertyToPinType(Param, /*out*/ Pin->PinType);
+				Schema->ConvertPropertyToPinType(Param, /*out*/ Pin->PinType);
+				Pin->DefaultObject = Property->SignatureFunction; // HACK: Store Delegate here to later Find it in FindDelegatePins
+
+				ParameterPins.Add(Pin);
 			}
 		}
 	}
@@ -120,7 +138,7 @@ void FK2NodeHelpers::CreateOutputPins(UEdGraphNode* Node, UClass* Class)
 			Property->HasAllPropertyFlags(CPF_BlueprintVisible) &&
 			!bIsDelegate)
 		{
-#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 19
+#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 19 || ENGINE_MAJOR_VERSION >= 5
 			UEdGraphPin* Pin = Node->CreatePin(EGPD_Input, FName(), FName(), nullptr, Property->GetFName());
 #else
 			UEdGraphPin* Pin = Node->CreatePin(EGPD_Input, FString(), FString(), nullptr, Property->GetName());
@@ -136,188 +154,65 @@ void FK2NodeHelpers::CreateOutputPins(UEdGraphNode* Node, UClass* Class)
 	}
 }
 
-UK2Node_TemporaryVariable* FK2NodeCompilerHelper::SpawnInternalVariable(const FEdGraphPinType& PinType)
+FEdGraphPinType FK2NodeHelpers::GetWildcardPinType(UEdGraphPin* Pin)
 {
-	return CompilerContext.SpawnInternalVariable(Node
-		, PinType.PinCategory, PinType.PinSubCategory, PinType.PinSubCategoryObject.Get()
-		, PinType.ContainerType, PinType.PinValueType);
+	if (IsValid(Pin) && Pin->LinkedTo.Num() > 0)
+	{
+		if (IsValid(Pin->LinkedTo[0]))
+			return Pin->LinkedTo[0]->PinType;
+	}
+
+	return FEdGraphPinType(UEdGraphSchema_K2::PC_Wildcard, NAME_None, nullptr, EPinContainerType::None, false, FEdGraphTerminalType());
 }
 
-UK2Node_CallFunction* FK2NodeCompilerHelper::SpawnIsValidNode(UEdGraphPin* ObjectPin)
+UClass* FK2NodeHelpers::GetWildcardPinClassType(UEdGraphPin* Pin)
 {
-	auto Result = SpawnIntermediateNode<UK2Node_CallFunction>(UKismetSystemLibrary::StaticClass(), GET_FUNCTION_NAME_CHECKED(UKismetSystemLibrary, IsValid));
+	auto PinType = GetWildcardPinType(Pin);
 
-	UEdGraphPin* IsValidInputPin = Result->FindPinChecked(TEXT("Object"));
-	CompilerContext.GetSchema()->TryCreateConnection(ObjectPin, IsValidInputPin);
+	if (auto SourceClass = Cast<UClass>(PinType.PinSubCategoryObject.Get()))
+	{
+		if (PinType.PinSubCategory == UEdGraphSchema_K2::PSC_Self)
+		{
+			if (auto K2Node = Cast<UK2Node>(Pin->GetOwningNode()))
+			{
+				return K2Node->GetBlueprint()->GeneratedClass;
+			}
+		}
+
+		return SourceClass;
+	}
+
+	return nullptr;
+}
+
+UEdGraphNode* FK2NodeHelpers::GetLinkedPinNode(UEdGraphPin* Pin)
+{
+	if (IsValid(Pin) && Pin->LinkedTo.Num() > 0)
+	{
+		if (IsValid(Pin->LinkedTo[0]))
+			return Pin->LinkedTo[0]->GetOwningNode();
+	}
+
+	return nullptr;
+}
+
+FDelegateAndPins
+FDelegateAndPins::FindDelegatePins(UEdGraphNode* Node, FMulticastDelegateProperty* Delegate)
+{
+	FDelegateAndPins Result{ Delegate };
+
+	for (auto Pin : Node->Pins)
+	{
+		if (Pin->DefaultObject != Delegate->SignatureFunction)
+			continue;
+
+		if (Pin->PinType.PinCategory == UEdGraphSchema_K2::PC_Exec)
+			Result.ExecPin = Pin;
+		else
+			Result.ParameterPins.Add(Pin);
+	}
 
 	return Result;
 }
 
-bool FK2NodeCompilerHelper::MovePinLinksToIntermediate(UEdGraphNode* Source, FName SourcePinName, UEdGraphNode* Target, FName TargetPinName, bool bOptional)
-{
-	if (Source == nullptr)
-		return bOptional;
-
-	if (Target == nullptr)
-		return bOptional;
-
-	return MovePinLinksToIntermediate(Source->FindPin(SourcePinName), Target->FindPin(TargetPinName));
-}
-
-bool FK2NodeCompilerHelper::MovePinLinksToIntermediate(UEdGraphNode* Source, FName SourcePinName, UEdGraphPin* TargetPin, bool bOptional)
-{
-	if (Source == nullptr)
-		return bOptional;
-
-	return MovePinLinksToIntermediate(Source->FindPin(SourcePinName), TargetPin);
-}
-
-bool FK2NodeCompilerHelper::MovePinLinksToIntermediate(UEdGraphPin* SourcePin, UEdGraphPin* TargetPin, bool bOptional)
-{
-	if (SourcePin == nullptr)
-		return bOptional;
-
-	if (TargetPin == nullptr)
-		return bOptional;
-
-	return CompilerContext.MovePinLinksToIntermediate(*SourcePin, *TargetPin).CanSafeConnect();
-}
-
-bool FK2NodeCompilerHelper::CreateSetParamByNameNodes(UEdGraphPin* ObjectPin, UEdGraphPin* SpawnVarPin, UEdGraphPin*& LastThenPin)
-{
-	bool bIsErrorFree = true;
-	auto Schema = CompilerContext.GetSchema();
-
-	UFunction* SetByNameFunction = Schema->FindSetVariableByNameFunction(SpawnVarPin->PinType);
-	if (SetByNameFunction)
-	{
-		UK2Node_CallFunction* SetVarNode = NULL;
-		if (SpawnVarPin->PinType.IsArray())
-		{
-			SetVarNode = SpawnIntermediateNode<UK2Node_CallArrayFunction>(SetByNameFunction);
-		}
-		else
-		{
-			SetVarNode = SpawnIntermediateNode<UK2Node_CallFunction>(SetByNameFunction);
-		}
-
-		// Connect this node into the exec chain
-		bIsErrorFree &= Schema->TryCreateConnection(LastThenPin, SetVarNode->GetExecPin());
-		LastThenPin = SetVarNode->GetThenPin();
-
-		// Connect the new actor to the 'object' pin
-		bIsErrorFree &= Schema->TryCreateConnection(ObjectPin, SetVarNode->FindPinChecked(TEXT("Object")));
-
-		// Fill in literal for 'property name' pin - name of pin is property name
-		UEdGraphPin* PropertyNamePin = SetVarNode->FindPinChecked(TEXT("PropertyName"));
-#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 19
-		PropertyNamePin->DefaultValue = SpawnVarPin->PinName.ToString();
-#else
-		PropertyNamePin->DefaultValue = SpawnVarPin->PinName;
-#endif
-
-		// Move connection from the variable pin on the spawn node to the 'value' pin
-		UEdGraphPin* ValuePin = SetVarNode->FindPinChecked(TEXT("Value"));
-		if (SpawnVarPin->LinkedTo.Num() == 0 &&
-			SpawnVarPin->DefaultValue != FString() &&
-			SpawnVarPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Byte &&
-			SpawnVarPin->PinType.PinSubCategoryObject.IsValid() &&
-			SpawnVarPin->PinType.PinSubCategoryObject->IsA<UEnum>())
-		{
-			// Pin is an enum, we need to alias the enum value to an int:
-			SpawnIntermediateNode<UK2Node_EnumLiteral>(SpawnVarPin, ValuePin);
-		}
-		else
-		{
-			// For non-array struct pins that are not linked, transfer the pin type so that the node will expand an auto-ref that will assign the value by-ref.
-			if (SpawnVarPin->PinType.IsArray() == false && SpawnVarPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Struct && SpawnVarPin->LinkedTo.Num() == 0)
-			{
-				ValuePin->PinType.PinCategory = SpawnVarPin->PinType.PinCategory;
-				ValuePin->PinType.PinSubCategory = SpawnVarPin->PinType.PinSubCategory;
-				ValuePin->PinType.PinSubCategoryObject = SpawnVarPin->PinType.PinSubCategoryObject;
-				MovePinLinksToIntermediate(SpawnVarPin, ValuePin);
-			}
-			else
-			{
-				MovePinLinksToIntermediate(SpawnVarPin, ValuePin);
-				SetVarNode->PinConnectionListChanged(ValuePin);
-			}
-		}
-	}
-
-	return bIsErrorFree;
-}
-
-void FK2NodeCompilerHelper::SetupNode(UK2Node_Event* Event, FName CustomFunctionName)
-{
-	Event->CustomFunctionName = CustomFunctionName;
-}
-
-void FK2NodeCompilerHelper::SetupNode(UK2Node_AddDelegate* AddDelegatem, const FProperty* Property, UEdGraphPin* ObjectPin)
-{
-	AddDelegatem->SetFromProperty(Property, false, Property->GetOwnerClass());
-}
-
-void FK2NodeCompilerHelper::ConnectNode(UK2Node_AddDelegate* AddDelegatem, const FProperty* Property, UEdGraphPin* ObjectPin)
-{
-	CompilerContext.GetSchema()->TryCreateConnection(AddDelegatem->FindPinChecked(UEdGraphSchema_K2::PN_Self), ObjectPin);
-}
-
-void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, UFunction* Function)
-{
-	CallFunction->SetFromFunction(Function);
-}
-
-void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, UClass* FunctionClass, FName FunctionName)
-{
-	CallFunction->FunctionReference.SetExternalMember(FunctionName, FunctionClass);
-}
-
-void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, UFunction* Function)
-{
-	SetupNode(CallFunction, Function);
-}
-
-void FK2NodeCompilerHelper::ConnectNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, UFunction* Function)
-{
-	CompilerContext.GetSchema()->TryCreateConnection(SelfPin, CallFunction->FindPinChecked(TEXT("self")));
-}
-
-void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, UClass* FunctionClass, FName FunctionName)
-{
-	SetupNode(CallFunction, FunctionClass, FunctionName);
-}
-
-void FK2NodeCompilerHelper::ConnectNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, UClass* FunctionClass, FName FunctionName)
-{
-	CompilerContext.GetSchema()->TryCreateConnection(SelfPin, CallFunction->FindPinChecked(TEXT("self")));
-}
-
-void FK2NodeCompilerHelper::SetupNode(UK2Node_DynamicCast* DynamicCast, UClass* CastClass, UEdGraphPin* ObjectPin)
-{
-	DynamicCast->TargetType = CastClass;
-}
-
-void FK2NodeCompilerHelper::SetupNode(UK2Node_EnumLiteral* EnumLiteral, UEdGraphPin* ValuePin, UEdGraphPin* ResultPin)
-{
-	EnumLiteral->Enum = CastChecked<UEnum>(ValuePin->PinType.PinSubCategoryObject.Get());
-}
-
-void FK2NodeCompilerHelper::ConnectNode(UK2Node_EnumLiteral* EnumLiteral, UEdGraphPin* ValuePin, UEdGraphPin* ResultPin)
-{
-	CompilerContext.GetSchema()->TryCreateConnection(EnumLiteral->FindPinChecked(UEdGraphSchema_K2::PN_ReturnValue), ResultPin);
-
-	UEdGraphPin* InPin = EnumLiteral->FindPinChecked(UK2Node_EnumLiteral::GetEnumInputPinName());
-	check(InPin);
-	InPin->DefaultValue = ValuePin->DefaultValue;
-}
-
-void FK2NodeCompilerHelper::ConnectNode(UK2Node_DynamicCast* DynamicCast, UClass* CastClass, UEdGraphPin* ObjectPin)
-{
-	CompilerContext.GetSchema()->TryCreateConnection(ObjectPin, DynamicCast->GetCastSourcePin());
-}
-
-void FK2NodeCompilerHelper::ConnectNode(UK2Node_IfThenElse* IfThenElse, UEdGraphPin* ConditionPin)
-{
-	CompilerContext.GetSchema()->TryCreateConnection(ConditionPin, IfThenElse->GetConditionPin());
-}
+#undef LOCTEXT_NAMESPACE

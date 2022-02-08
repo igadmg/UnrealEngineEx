@@ -170,7 +170,7 @@ public:
 protected:
 	virtual void DrawVisualizationHUD(const UActorComponent* Component, const class FViewport* Viewport, const class FSceneView* View, class FCanvas* Canvas) override
 	{
-		if (IsCallable(GetComponentVisualizer()) && IsCallable(uCanvas))
+		if (IsCallable(GetComponentVisualizer()))
 		{
 			uCanvas->Init(Viewport->GetSizeXY().X, Viewport->GetSizeXY().Y, const_cast<FSceneView*>(View), Canvas);
 			if (ComponentVisualizer->Init(this)->DrawVisualizationHUD(Component, uCanvas))
