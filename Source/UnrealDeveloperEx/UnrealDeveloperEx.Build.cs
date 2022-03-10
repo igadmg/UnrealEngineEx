@@ -38,6 +38,8 @@ public class UnrealDeveloperEx : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[] {
 				"KismetCompiler",
 				"SlateCore",
+				"Slate",
+				"ToolMenus",
 			});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {

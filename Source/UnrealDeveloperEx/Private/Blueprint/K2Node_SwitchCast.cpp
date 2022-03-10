@@ -73,26 +73,6 @@ UEdGraphPin* UK2Node_SwitchCast::GetInvalidCastPin() const
 	return FindPin(UEdGraphSchema_K2::PN_CastFailed);
 }
 
-UClass* UK2Node_SwitchCast::GetObjectPinType() const
-{
-	if (auto ObjectPin = GetObjectPin())
-	{
-		auto ObjectPinType = ObjectPin->PinType;
-		UClass* SourceClass = Cast<UClass>(ObjectPinType.PinSubCategoryObject.Get());
-		if ((SourceClass == nullptr) && (ObjectPinType.PinSubCategory == UEdGraphSchema_K2::PSC_Self))
-		{
-			if (UK2Node* K2Node = Cast<UK2Node>(ObjectPin->GetOwningNode()))
-			{
-				SourceClass = K2Node->GetBlueprint()->GeneratedClass;
-			}
-		}
-
-		return SourceClass;
-	}
-
-	return nullptr;
-}
-
 void UK2Node_SwitchCast::AllocateDefaultPins()
 {
 	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Execute);
@@ -128,7 +108,7 @@ void UK2Node_SwitchCast::ExpandNode(class FKismetCompilerContext& CompilerContex
 
 	FK2NodeCompilerHelper Compiler(this, CompilerContext, SourceGraph, GetExecPin());
 
-	auto ObjectPinType = GetObjectPinType();
+	auto ObjectPinType = FK2NodeHelpers::GetWildcardPinObjectType(GetObjectPin(), UObject::StaticClass());
 	auto ObjectPin = Compiler.SpawnIntermediateNode<UK2Node_Cache>(GetObjectPin())->GetOutputObjectPin();
 
 	auto IsValidBranchNode = Compiler.SpawnIntermediateNode<UK2Node_IfThenElse>(
@@ -145,7 +125,7 @@ void UK2Node_SwitchCast::ExpandNode(class FKismetCompilerContext& CompilerContex
 		auto ExecuteTargetTypePin = FindPin(*CastExecutePinName);
 		auto ResultTargetTypePin = FindPin(*CastResultPinName);
 
-		if (!ObjectPinType || !ObjectPinType->IsChildOf(TargetType))
+		if (!IsValid(ObjectPinType) || !Valid<UClass>(ObjectPinType.PinSubCategoryObject)->IsChildOf(TargetType))
 		{
 			auto UpCastNode = Compiler.SpawnIntermediateNode<UK2Node_DynamicCast>(TargetType, ObjectPin);
 			Compiler.LastThenPin = UpCastNode->GetInvalidCastPin();

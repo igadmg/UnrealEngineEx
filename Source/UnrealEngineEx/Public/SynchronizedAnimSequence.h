@@ -59,7 +59,7 @@ class UNREALENGINEEX_API USynchronizedAnimSequenceStatics : public UBlueprintFun
 
 
 public:
-	UFUNCTION(Category = "UnrealEditorEx: SynchronizedAnimSequence", BlueprintCallable)
+	UFUNCTION(Category = "UnrealEditorEx|SynchronizedAnimSequence", BlueprintCallable)
 	static void Play(class USkeletalMeshComponent* SkeletalMeshComponent, struct FSynchronizedAnimSequence& SynchronizedAnimSequence);
 };
 

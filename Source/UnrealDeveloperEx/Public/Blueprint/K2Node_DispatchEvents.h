@@ -6,6 +6,15 @@
 #include "K2Node_DispatchEvents.generated.h"
 
 
+UENUM(BlueprintType)
+enum class EEventDispatchType : uint8
+{
+	Disabled,
+	Once,
+	Permanent
+};
+
+
 UCLASS()
 class UNREALDEVELOPEREX_API UK2Node_DispatchEvents : public UK2Node
 {
@@ -14,7 +23,7 @@ class UNREALDEVELOPEREX_API UK2Node_DispatchEvents : public UK2Node
 
 public:
 	UPROPERTY(EditAnywhere)
-	TMap<FName, bool> ExposedEvents;
+	TMap<FName, EEventDispatchType> ExposedEvents;
 	TMap<FName, class FMulticastDelegateProperty*> EventsByName;
 
 	UPROPERTY(EditAnywhere)

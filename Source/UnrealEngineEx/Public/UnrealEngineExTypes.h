@@ -14,19 +14,6 @@ enum class EAsyncTaskResult : uint8
 };
 
 UENUM(BlueprintType)
-enum class EBPWorldType : uint8
-{
-	None = 0,
-	Game = EWorldType::Game,
-	Editor = EWorldType::Editor,
-	PIE = EWorldType::PIE,
-	EditorPreview = EWorldType::EditorPreview,
-	GamePreview = EWorldType::GamePreview,
-	GameRPC = EWorldType::GameRPC,
-	Inactive = EWorldType::Inactive
-};
-
-UENUM(BlueprintType)
 enum class EInputMode : uint8
 {
 	None = 0,
@@ -36,6 +23,37 @@ enum class EInputMode : uint8
 };
 
 #if !CPP
+UENUM(BlueprintType)
+namespace EWorldType
+{
+	enum Type
+	{
+		/** An untyped world, in most cases this will be the vestigial worlds of streamed in sub-levels */
+		None,
+
+		/** The game world */
+		Game,
+
+		/** A world being edited in the editor */
+		Editor,
+
+		/** A Play In Editor world */
+		PIE,
+
+		/** A preview world for an editor tool */
+		EditorPreview,
+
+		/** A preview world for a game */
+		GamePreview,
+
+		/** A minimal RPC world for a game */
+		GameRPC,
+
+		/** An editor world that was loaded but not currently being edited in the level editor */
+		Inactive
+	};
+}
+
 UENUM(BlueprintType)
 enum ENetMode
 {

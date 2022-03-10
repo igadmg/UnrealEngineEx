@@ -107,10 +107,14 @@ void UK2Node_DispatchEvents::AllocateDefaultPins()
 
 	for (const auto& ExposedEvent : ExposedEvents)
 	{
-		if (!ExposedEvent.Value)
+		if (ExposedEvent.Value == EEventDispatchType::Disabled)
 			continue;
 
-		FK2NodeHelpers::CreateOutputPins(this, EventsByName.FindChecked(ExposedEvent.Key));
+		auto EventProperty = EventsByName.FindChecked(ExposedEvent.Key);
+		auto PropertyName = EventProperty->GetFName();
+		if (ExposedEvent.Value == EEventDispatchType::Once)
+			PropertyName = FName(*FString::Printf(TEXT("Once %s"), *EventProperty->GetName()));
+		FK2NodeHelpers::CreateOutputPins(this, EventProperty, PropertyName);
 	}
 
 	Super::AllocateDefaultPins();
@@ -137,10 +141,14 @@ void UK2Node_DispatchEvents::ExpandNode(class FKismetCompilerContext& CompilerCo
 
 	for (auto ExposedEvent : ExposedEvents)
 	{
-		if (!ExposedEvent.Value)
+		if (ExposedEvent.Value == EEventDispatchType::Disabled)
 			continue;
 
-		auto Delegate = EventsByName.FindChecked(ExposedEvent.Key);
+		auto DelegateName = ExposedEvent.Key;
+		//if (ExposedEvent.Value == EEventDispatchType::Once)
+		//	DelegateName = FName(*FString::Printf(TEXT("Once %s"), *ExposedEvent.Key.ToString()));
+
+		auto Delegate = EventsByName.FindChecked(DelegateName);
 		auto DelegateAndPins = FDelegateAndPins::FindDelegatePins(this, Delegate);
 
 		auto CustomDelegateName = FName(*FString::Printf(TEXT("%s_%s"), *DelegateAndPins.Delegate->GetName(), *Compiler.GetGuid()));
@@ -154,6 +162,16 @@ void UK2Node_DispatchEvents::ExpandNode(class FKismetCompilerContext& CompilerCo
 				{
 					CustomEventCompiler.ConnectPins(EventDataPin, OutputPin);
 				}
+			}
+
+			if (ExposedEvent.Value == EEventDispatchType::Once)
+			{
+				CustomEventCompiler.FinishPin = nullptr;
+				auto Sequence = CustomEventCompiler.SpawnIntermediateNode<UK2Node_ExecutionSequence>();
+				CustomEventCompiler.ConnectPins(Sequence->GetThenPinGivenIndex(0), DelegateAndPins.ExecPin);
+
+				CustomEventCompiler.LastThenPin = Sequence->GetThenPinGivenIndex(1);
+				auto RemoveDelegate = CustomEventCompiler.SpawnIntermediateNode<UK2Node_RemoveDelegate>(DelegateAndPins.Delegate, InputObjectPin, CustomEventNode->FindPin(UK2Node_Event::DelegateOutputName));
 			}
 		}
 
@@ -177,7 +195,7 @@ void UK2Node_DispatchEvents::ReconstructNode()
 				return;
 
 			auto DelegateName = Delegate->GetFName();
-			ExposedEvents.Add(DelegateName, FTMapEx(PrevExposedEvents).FindRef(DelegateName, true));
+			ExposedEvents.Add(DelegateName, FTMapEx(PrevExposedEvents).FindRef(DelegateName, EEventDispatchType::Permanent));
 			EventsByName.Add(DelegateName, Delegate);
 		});
 	}

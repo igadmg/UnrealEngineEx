@@ -47,5 +47,5 @@ void USplineInstanceMeshPlacerComponent::OnHiddenInGameChanged()
 {
 	Super::OnHiddenInGameChanged();
 
-	SetCollisionEnabled(bHiddenInGame ? ECollisionEnabled::NoCollision : CollisionEnabled);
+	SetCollisionEnabled(bHiddenInGame ? ECollisionEnabled::NoCollision : (ECollisionEnabled::Type)CollisionEnabled);
 }

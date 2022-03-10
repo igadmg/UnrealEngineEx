@@ -78,21 +78,21 @@ bool FK2NodeHelpers::CreateInputPins(UEdGraphNode* Node, UFunction* Function)
 	return bAllPinsGood;
 }
 
-void FK2NodeHelpers::CreateOutputPins(UEdGraphNode* Node, FMulticastDelegateProperty* Property)
+void FK2NodeHelpers::CreateOutputPins(UEdGraphNode* Node, FMulticastDelegateProperty* Property, FName PropertyName)
 {
 	UEdGraphPin* ExecPin;
 	TArray<UEdGraphPin*> ParameterPins;
-	CreateOutputPins(Node, Property, ExecPin, ParameterPins);
+	CreateOutputPins(Node, Property, ExecPin, ParameterPins, PropertyName);
 }
 
-void FK2NodeHelpers::CreateOutputPins(UEdGraphNode* Node, FMulticastDelegateProperty* Property, UEdGraphPin*& ExecPin, TArray<UEdGraphPin*>& ParameterPins)
+void FK2NodeHelpers::CreateOutputPins(UEdGraphNode* Node, FMulticastDelegateProperty* Property, UEdGraphPin*& ExecPin, TArray<UEdGraphPin*>& ParameterPins, FName PropertyName)
 {
 	auto Schema = GetDefault<UEdGraphSchema_K2>();
 
 #if UE_VERSION_NEWER_THAN(4, 19, -1)
-	ExecPin = Node->CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, *Property->GetName());
+	ExecPin = Node->CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, IsValid(PropertyName) ? PropertyName : Property->GetFName());
 #else
-	ExecPin = Node->CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, *Property->GetName());
+	ExecPin = Node->CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, IsValid(PropertyName) ? PropertyName : *Property->GetName());
 #endif
 
 	ExecPin->DefaultObject = Property->SignatureFunction;
@@ -154,7 +154,7 @@ void FK2NodeHelpers::CreateOutputPins(UEdGraphNode* Node, UClass* Class)
 	}
 }
 
-FEdGraphPinType FK2NodeHelpers::GetWildcardPinType(UEdGraphPin* Pin)
+FEdGraphPinType FK2NodeHelpers::GetWildcardPinType(UEdGraphPin* Pin, EPinContainerType PinContainerType)
 {
 	if (IsValid(Pin) && Pin->LinkedTo.Num() > 0)
 	{
@@ -162,13 +162,23 @@ FEdGraphPinType FK2NodeHelpers::GetWildcardPinType(UEdGraphPin* Pin)
 			return Pin->LinkedTo[0]->PinType;
 	}
 
-	return FEdGraphPinType(UEdGraphSchema_K2::PC_Wildcard, NAME_None, nullptr, EPinContainerType::None, false, FEdGraphTerminalType());
+	return MakePinType(UEdGraphSchema_K2::PC_Wildcard, PinContainerType);
 }
 
-UClass* FK2NodeHelpers::GetWildcardPinClassType(UEdGraphPin* Pin)
+FEdGraphPinType FK2NodeHelpers::GetWildcardPinObjectType(UEdGraphPin* Pin, UClass* ObjectClass, EPinContainerType PinContainerType)
 {
-	auto PinType = GetWildcardPinType(Pin);
+	auto PinType = GetWildcardPinType(Pin, PinContainerType);
+	if (PinType.PinCategory == UEdGraphSchema_K2::PC_Object
+		|| PinType.PinCategory == UEdGraphSchema_K2::PC_Interface)
+	{
+		return PinType;
+	}
 
+	return MakePinType(UEdGraphSchema_K2::PC_Wildcard, ObjectClass, PinContainerType);
+}
+
+UClass* FK2NodeHelpers::GetPinTypeClass(UEdGraphPin* Pin, const FEdGraphPinType& PinType)
+{
 	if (auto SourceClass = Cast<UClass>(PinType.PinSubCategoryObject.Get()))
 	{
 		if (PinType.PinSubCategory == UEdGraphSchema_K2::PSC_Self)

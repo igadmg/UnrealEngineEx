@@ -96,6 +96,11 @@ DO_VALID_PTR_CAST(HHitProxy)
 	}
 };
 
+#if !UE_VERSION_OLDER_THAN(5, 0, 0)
+template <typename T>
+T* Valid(const TObjectPtr<T>& v) { return IsValid(v) ? v.Get() : nullptr; }
+#endif
+
 template <typename T>
 T* Valid(const TWeakObjectPtr<T>& v) { return IsValid(v) ? v.Get() : nullptr; }
 
@@ -128,5 +133,74 @@ T* Valid(const FSoftObjectPath& v) { return Cast<T>(v.TryLoad()); }
 
 template <typename T>
 typename TSubclassOf<T>::TClassType* Valid(const TSubclassOf<T>& v) { return IsValid(v) ? v.Get() : nullptr; }
+
+
+template <typename T, typename U, typename Enable = void>
+struct TValid
+{
+	static T* Valid(U* Object)
+	{
+		return ::Valid<T, U>(Object);
+	}
+};
+
+template <typename T, typename U>
+struct TValid<T, U, typename std::enable_if<std::is_same<T, U>::value>::type>
+{
+	static T* Valid(U* Object)
+	{
+		return ::Valid(Object);
+	}
+};
+
+
+#define if_Valid(Expression) if (auto if_Valid_Expression = (Expression)) if_Valid_Expression
+
+
+#define EXPAND(x) x
+#define GET_MACRO_1_2(_1,_2,NAME,...) NAME
+#define GET_MACRO_2_3(_1,_2,_3,NAME,...) NAME
+
+
+struct FCoreEx
+{
+	template <typename UI>
+	static bool DoesImplementInterface(const UObject* Object)
+	{
+		checkf(UI::StaticClass()->IsChildOf(UInterface::StaticClass()), TEXT("Interface parameter %s is not actually an interface."), *UI::StaticClass()->GetName());
+
+		if (!IsValid(Object))
+			return false;
+
+		return Object->GetClass()->ImplementsInterface(UI::StaticClass());
+	}
+
+	static bool DoesImplementInterface(const UObject* Object, UClass* SomeInterface)
+	{
+		if (!IsValid(Object))
+			return false;
+
+		return Object->GetClass()->ImplementsInterface(SomeInterface);
+	}
+
+	static COREEX_API bool IsObjectReinst(UObject* Object);
+};
+
+template <typename UT, typename T>
+const T* ValidInterface(const T* v) { return IsValid(v) && FCoreEx::DoesImplementInterface<UT>(v) ? v : nullptr; }
+
+template <typename UT, typename T>
+T* ValidInterface(T* v) { return IsValid(v) && FCoreEx::DoesImplementInterface<UT>(v) ? v : nullptr; }
+
+#define if_Implements(...) EXPAND(GET_MACRO_2_3(__VA_ARGS__, if_Implements3, if_Implements2)(__VA_ARGS__))
+
+#define if_Implements2(TypeAndName, Expression) \
+if (auto TypeAndName = ValidInterface<U ## TypeAndName>(Expression))
+
+#define if_Implements3(Type, Name, Expression) \
+if (auto Name = ValidInterface<U ## Type>(Expression))
+
+#define if_ImplementsT(UType, Name, Expression) \
+if (auto Name = ValidInterface<UType>(Expression))
 
 #endif

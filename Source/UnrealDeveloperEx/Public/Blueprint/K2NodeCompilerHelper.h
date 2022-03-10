@@ -8,8 +8,10 @@
 #include "K2Node_CustomEvent.h"
 #include "K2Node_DynamicCast.h"
 #include "K2Node_EnumLiteral.h"
+#include "K2Node_ExecutionSequence.h"
 #include "K2Node_IfThenElse.h"
 #include "K2Node_Knot.h"
+#include "K2Node_RemoveDelegate.h"
 #include "K2Node_TemporaryVariable.h"
 
 #include "Blueprint/K2Node_Cache.h"
@@ -101,39 +103,41 @@ public:
 
 public:
 	template <typename NodeType>
-	UEdGraphPin* GetExecPin(NodeType* Node)
+	UEdGraphPin* GetExecPin(NodeType* InNode)
 	{
-		return Node->FindPin(UEdGraphSchema_K2::PN_Execute);
+		return InNode->FindPin(UEdGraphSchema_K2::PN_Execute);
 	}
 
 	template <typename NodeType>
-	UEdGraphPin* GetThenPin(NodeType* Node)
+	UEdGraphPin* GetThenPin(NodeType* InNode)
 	{
-		return Node->FindPin(UEdGraphSchema_K2::PN_Then);
+		return InNode->FindPin(UEdGraphSchema_K2::PN_Then);
 	}
 
 
 protected:
 	template <typename NodeType>
-	void ConnectToExecChain(NodeType* Node)
+	void ConnectToExecChain(NodeType* InNode)
 	{
-		auto ExecPin = GetExecPin(Node);
-		if (LastThenPin && !Node->IsNodePure() && ExecPin)
+		auto ExecPin = GetExecPin(InNode);
+		if (LastThenPin && !InNode->IsNodePure() && ExecPin)
 		{
 			ConnectPins(LastThenPin, ExecPin);
-			LastThenPin = GetThenPin(Node);
+			LastThenPin = GetThenPin(InNode);
 		}
 	}
 
 
 public:
+	UEdGraphPin* CacheInLocalVariable(bool Value);
+	UEdGraphPin* CacheInLocalVariable(int32 Value);
 	UEdGraphPin* CacheInLocalVariable(UEdGraphPin* ObjectPin);
 	UK2Node_CallFunction* SpawnIsValidNode(UEdGraphPin* ObjectPin);
-
 
 	bool ConnectPins(UEdGraphPin* SourcePin, UEdGraphPin* TargetPin, bool bOptional = false);
 
 	bool CreateSetParamByNameNodes(UEdGraphPin* ObjectPin, UEdGraphPin* SpawnVarPin);
+
 
 protected:
 	void SetupNode(UK2Node_Event* Event, FName CustomFunctionName);
@@ -144,6 +148,13 @@ protected:
 	void SetupNode(UK2Node_AddDelegate* AddDelegate, const FProperty* Property, UEdGraphPin* SelfPin, UEdGraphPin* DelegatePin);
 	void ConnectNode(UK2Node_AddDelegate* AddDelegate, const FProperty* Property, UEdGraphPin* SelfPin, UEdGraphPin* DelegatePin);
 
+	void SetupNode(UK2Node_RemoveDelegate* RemoveDelegate, const FProperty* Property, UEdGraphPin* SelfPin, UEdGraphPin* DelegatePin);
+	void ConnectNode(UK2Node_RemoveDelegate* RemoveDelegate, const FProperty* Property, UEdGraphPin* SelfPin, UEdGraphPin* DelegatePin);
+
+	void SetupNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin, bool Value) {}
+	void ConnectNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin, bool Value);
+	void SetupNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin, int32 Value) {}
+	void ConnectNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin, int32 Value);
 	void SetupNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin, UEdGraphPin* ValuePin) {}
 	void ConnectNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin, UEdGraphPin* ValuePin);
 
@@ -154,6 +165,8 @@ protected:
 	void ConnectNode(UK2Node_CallFunction* CallFunction, class UFunction* Function) {}
 	void SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName);
 	void ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName) {}
+	void SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params);
+	void ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params);
 
 	void SetupNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UFunction* Function);
 	void ConnectNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UFunction* Function);

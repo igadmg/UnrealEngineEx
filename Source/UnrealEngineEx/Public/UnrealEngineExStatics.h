@@ -3,6 +3,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "UnrealEngineExTypes.h"
 #include "CoreEx.h"
+#include "Kismet/GameplayStatics.h"
 #include "UnrealEngineExStatics.generated.h"
 
 
@@ -16,10 +17,10 @@ class UNREALENGINEEX_API UUnrealEngineExStatics : public UBlueprintFunctionLibra
 
 public:
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
-	static EBPWorldType GetWorldType(const UObject* WorldContextObject);
+	static TEnumAsByte<EWorldType::Type> GetWorldType(const UObject* WorldContextObject);
 
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable, meta = (ExpandEnumAsExecs = "OutWorldType", HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
-	static void WorldType(const UObject* WorldContextObject, EBPWorldType& OutWorldType);
+	static void WorldType(const UObject* WorldContextObject, TEnumAsByte<EWorldType::Type>& OutWorldType);
 
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable, meta = (ExpandEnumAsExecs = "OutNetMode", HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static void NetMode(const UObject* WorldContextObject, TEnumAsByte<ENetMode>& OutNetMode);
@@ -63,6 +64,13 @@ public:
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, meta = (DefaultToSelf = "Object", DeterminesOutputType = "ActorClass"))
 	static class AActor* GetOwningActorByClass(const UObject* Object, TSubclassOf<class AActor> ActorClass);
 
+	/** Return and actor being controlled by Object (if it is owned by Controller, HUD etc.)
+		Or retrun Actor itself.
+		Some form of GetOwnerActor but it prefer to fallback to GetPawnOrSpectator and skip Controllers and Huds.
+	*/
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, meta = (DefaultToSelf = "Object"))
+	static class AActor* GetControlledActor(const UObject* Object);
+
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, BlueprintCosmetic, meta = (DefaultToSelf = "Object"))
 	static class AHUD* GetPlayerHUD(const UObject* Object);
 
@@ -104,55 +112,55 @@ public:
 	static FViewFrustum GetViewFrustum(class ULocalPlayer* Player);
 
 
-	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static TSoftObjectPtr<UWorld> GetCurrentLevelAssetPtr(const UObject* WorldContextObject);
 
-	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintPure)
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintPure)
 	static FString GetLevelName(const TSoftObjectPtr<UWorld>& Level);
 
-	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
-	static AActor* GetLevelScriptActor(const UObject* WorldContextObject);
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
+	static AActor* GetLevelScriptActor(const UObject* WorldContextObject, int32 LevelIndex = 0);
 
-	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static AActor* GetLevelScriptActorFromStreamingLevel(const UObject* WorldContextObject, class ULevelStreaming* StreamingLevel);
 
-	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static UObject* FindLevelScriptObject(const UObject* WorldContextObject, UClass* ObjectClass);
 
-	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static bool FindLevelScriptObjects(const UObject* WorldContextObject, UClass* ObjectClass, TArray<UObject*>& Objects);
 
 	/** Add level as a sublevel. */
-	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintCallable, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static class ULevelStreaming* AddStreamingLevel(UObject* WorldContextObject, TSoftObjectPtr<UWorld> Level);
 
 	/** Load a list of streamed in level. */
-	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject", Latent = "", LatentInfo = "LatentInfo"))
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject", Latent = "", LatentInfo = "LatentInfo"))
 	static void LoadStreamLevelList(const UObject* WorldContextObject, TArray<TSoftObjectPtr<UWorld>> LevelList
 		, const FUnrealEngineExOnLevelStreamedDelegate& OnLevelStreamedCallback, bool bMakeVisibleAfterLoad, bool bShouldBlockOnLoad, FLatentActionInfo LatentInfo);
 
 	/** Load a list of streamed in level. */
-	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject", Latent = "", LatentInfo = "LatentInfo"))
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject", Latent = "", LatentInfo = "LatentInfo"))
 	static void LoadStreamLevelStreamingList(const UObject* WorldContextObject, TArray<ULevelStreaming*> LevelStreamingList
 		, const FUnrealEngineExOnLevelStreamedDelegate& OnLevelStreamedCallback, bool bMakeVisibleAfterLoad, bool bShouldBlockOnLoad, FLatentActionInfo LatentInfo);
 
 	/** Unload a list of streamed in level. */
-	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject", Latent = "", LatentInfo = "LatentInfo"))
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject", Latent = "", LatentInfo = "LatentInfo"))
 	static void UnloadStreamLevelList(const UObject* WorldContextObject, TArray<TSoftObjectPtr<UWorld>> LevelList
 		, const FUnrealEngineExOnLevelStreamedDelegate& OnLevelStreamedCallback, FLatentActionInfo LatentInfo);
 
 	/** Unload a list of streamed in level. */
-	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject", Latent = "", LatentInfo = "LatentInfo"))
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject", Latent = "", LatentInfo = "LatentInfo"))
 	static void UnloadStreamLevelStreamingList(const UObject* WorldContextObject, TArray<ULevelStreaming*> LevelList
 		, const FUnrealEngineExOnLevelStreamedDelegate& OnLevelStreamedCallback, FLatentActionInfo LatentInfo);
 
-	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	static void UnloadStreamLevelListBlocking(const UObject* WorldContextObject, TArray<TSoftObjectPtr<UWorld>> LevelList);
 
-	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	static void UnloadStreamLevelStreamingListBlocking(const UObject* WorldContextObject, TArray<ULevelStreaming*> LevelList);
 
-	UFUNCTION(Category = "UnrealEngineEx: Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	static void ShowAllStreamingLevels(const UObject* WorldContextObject);
 
 
@@ -202,14 +210,20 @@ public:
 	UFUNCTION(Category = "UnrealEngineEx|User Interface", BlueprintCallable)
 	static bool ReplaceWidget(class UWidget* OldWidget, class UWidget* NewWidget);
 
+	UFUNCTION(Category = "UnrealEngineEx|User Interface", BlueprintCallable, meta = (DeterminesOutputType = "WidgetClass"))
+	static UUserWidget* GetFirstChildWidgetsOfClass(class UWidget* ParentWidget, TSubclassOf<UUserWidget> WidgetClass, bool TopLevelOnly = true);
+
 	UFUNCTION(Category = "UnrealEngineEx|User Interface", BlueprintCallable)
 	static void GetAllChildWidgetsOfClass(class UWidget* ParentWidget, TArray<UUserWidget*>& FoundWidgets, TSubclassOf<UUserWidget> WidgetClass, bool TopLevelOnly = true);
 
 	UFUNCTION(Category = "UnrealEngineEx|User Interface", BlueprintCallable)
 	static void GetAllChildWidgetsOfInterface(class UWidget* ParentWidget, TArray<UUserWidget*>& FoundWidgets, TSubclassOf<UInterface> WidgetInterface, bool TopLevelOnly = true);
 
-	UFUNCTION(Category = "UnrealEngineEx|User Interface", BlueprintCallable)
+	UFUNCTION(Category = "UnrealEngineEx|User Interface", BlueprintPure)
 	static class UWidget* GetParentEx(class UWidget* Widget);
+
+	UFUNCTION(Category = "UnrealEngineEx|User Interface", BlueprintPure)
+	static FVector2D GetWidgetPositionOnViewport(class UWidget* Widget);
 
 
 	UFUNCTION(Category = "UnrealEngineEx|Debug", BlueprintCallable, meta = (WorldContext = "WorldContextObject", DevelopmentOnly))
@@ -254,25 +268,7 @@ class APlayerState;
 class ASpectatorPawn;
 
 namespace XX
-{
-	template <typename T, typename U, typename Enable = void>
-	struct TValid
-	{
-		static T* Valid(U* Object)
-		{
-			return ::Valid<T, U>(Object);
-		}
-	};
-
-	template <typename T, typename U>
-	struct TValid<T, U, typename std::enable_if<std::is_same<T, U>::value>::type>
-	{
-		static T* Valid(U* Object)
-		{
-			return ::Valid(Object);
-		}
-	};
-
+{	
 	template <typename TActor = AActor>
 	TActor* GetOwningActor(const UObject* Object)
 	{
@@ -331,5 +327,14 @@ namespace XX
 	TController* GetController(const UObject* Object)
 	{
 		return TValid<TController, AController>::Valid(UUnrealEngineExStatics::GetController(Object));
+	}
+}
+
+namespace XX
+{
+	template <typename TActor = AActor>
+	TActor* GetLevelScriptActor(const UObject* Object, int32 LevelIndex = 0)
+	{
+		return TValid<TActor, AActor>::Valid(UUnrealEngineExStatics::GetLevelScriptActor(Object, LevelIndex));
 	}
 }

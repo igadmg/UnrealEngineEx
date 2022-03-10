@@ -5,7 +5,7 @@
 
 
 DECLARE_CONST_EXTENSION_TEMPLATE_REF(TMap, KeyType, ValueType, SetAllocator, KeyFuncs)
-	typename ThisType::ValueType FindRef(typename ThisType::KeyConstPointerType Key, const ValueType& DefualtValue)
+	typename ValueType FindRef(typename ThisType::KeyConstPointerType Key, const ValueType& DefualtValue)
 	{
 		if (auto ValuePtr = This().Find(Key))
 		{

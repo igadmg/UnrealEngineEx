@@ -13,7 +13,7 @@ class UNREALDEVELOPEREX_API UK2Node_SwitchCast : public UK2Node
 
 
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (AllowAbstract))
 	TArray<TSubclassOf<class UObject>> TargetTypes;
 
 
@@ -24,8 +24,6 @@ public:
 public:
 	class UEdGraphPin* GetObjectPin() const;
 	class UEdGraphPin* GetInvalidCastPin() const;
-
-	class UClass* GetObjectPinType() const;
 
 
 public:

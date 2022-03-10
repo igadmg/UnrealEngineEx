@@ -21,7 +21,7 @@ IMPLEMENT_SCHEMA_PIN(UK2Node_Cache, Then, UEdGraphSchema_K2::PN_Then);
 
 UK2Node_Cache::UK2Node_Cache(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, InputObjectType(UEdGraphSchema_K2::PC_Wildcard, NAME_None, nullptr, EPinContainerType::None, false, FEdGraphTerminalType())
+	, InputObjectType(FK2NodeHelpers::MakePinType(UEdGraphSchema_K2::PC_Wildcard))
 {
 }
 
@@ -115,6 +115,10 @@ void UK2Node_Cache::ExpandNode(class FKismetCompilerContext& CompilerContext, UE
 	if (ShouldCacheValue())
 	{
 		ObjectPin = Compiler.CacheInLocalVariable(ObjectPin);
+	}
+	else
+	{
+		ObjectPin = Compiler.SpawnIntermediateNode<UK2Node_Knot>(ObjectPin)->GetOutputPin();
 	}
 
 	Compiler.ConnectPins(ObjectPin, GetOutputObjectPin());

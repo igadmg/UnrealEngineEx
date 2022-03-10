@@ -1,3 +1,4 @@
+#include "Misc/EngineVersionComparison.h"
 #include "UObject/Object.h"
 #include "UObject/ScriptInterface.h"
 #include "HitProxies.h"
@@ -40,6 +41,14 @@ static bool IsValid(const TSharedPtr<T>& SharedPtr)
 {
 	return SharedPtr.IsValid();
 }
+
+#if !UE_VERSION_OLDER_THAN(5, 0, 0)
+template <typename T>
+static bool IsValid(const TObjectPtr<T>& ObjectPtr)
+{
+	return IsValid(ObjectPtr.Get());
+}
+#endif
 
 template <typename T>
 static bool IsValid(const TWeakObjectPtr<T>& WeakObjectPtr)

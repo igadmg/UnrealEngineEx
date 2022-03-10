@@ -1,9 +1,11 @@
 #include "UnrealEngineExStatics.h"
 #include "UnrealEngineExPrivatePCH.h"
 
+#include "Blueprint/SlateBlueprintLibrary.h"
 #include "Blueprint/WidgetTree.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CanvasPanelSlot.h"
 #include "Components/PanelSlot.h"
 #include "Components/PanelWidget.h"
 #include "Components/Widget.h"
@@ -47,13 +49,13 @@ struct FFindStreamingLevelBy {
 };
 
 
-EBPWorldType UUnrealEngineExStatics::GetWorldType(const UObject* WorldContextObject)
+TEnumAsByte<EWorldType::Type> UUnrealEngineExStatics::GetWorldType(const UObject* WorldContextObject)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
-	return (EBPWorldType)(IsValid(World) ? (EWorldType::Type)World->WorldType : EWorldType::None);
+	return IsValid(World) ? (EWorldType::Type)World->WorldType : EWorldType::None;
 }
 
-void UUnrealEngineExStatics::WorldType(const UObject* WorldContextObject, EBPWorldType& OutWorldType)
+void UUnrealEngineExStatics::WorldType(const UObject* WorldContextObject, TEnumAsByte<EWorldType::Type>& OutWorldType)
 {
 	OutWorldType = GetWorldType(WorldContextObject);
 }
@@ -224,6 +226,29 @@ AActor* UUnrealEngineExStatics::GetOwningActorByClass(const UObject* Object, TSu
 		, [&ActorClass](auto Actor) {
 			return Actor->IsA(ActorClass) ? Actor : nullptr;
 		});
+}
+
+AActor* UUnrealEngineExStatics::GetControlledActor(const UObject* Object)
+{
+	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("UUnrealEngineExStatics::GetControlledActor"), STAT_UnrealEngineExStaticsGetControlledActor, STATGROUP_UnrealEngineEx);
+
+	if (!IsValid(Object))
+		return nullptr;
+
+	return ForEachOwningActor<AActor>(const_cast<UObject*>(Object)
+		, [](auto Actor) -> AActor* {
+		if (auto AsController = Cast<AController>(Actor))
+		{
+			return XX::GetPawnOrSpectator(AsController);
+		}
+
+		if (auto AsHud = Cast<AHUD>(Actor))
+		{
+			return XX::GetPawnOrSpectator(AsHud);
+		}
+		
+		return Actor;
+	});
 }
 
 AHUD* UUnrealEngineExStatics::GetPlayerHUD(const UObject* Object)
@@ -458,13 +483,13 @@ FString UUnrealEngineExStatics::GetLevelName(const TSoftObjectPtr<UWorld>& Level
 	return FUnrealEngineEx::GetLevelName(Level);
 }
 
-AActor* UUnrealEngineExStatics::GetLevelScriptActor(const UObject* WorldContextObject)
+AActor* UUnrealEngineExStatics::GetLevelScriptActor(const UObject* WorldContextObject, int32 LevelIndex)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
 	if (!IsValid(World))
 		return nullptr;
 
-	ULevel* Level = World->GetLevel(0);
+	ULevel* Level = World->GetLevel(LevelIndex);
 	if (!IsValid(Level))
 		return nullptr;
 
@@ -1381,6 +1406,23 @@ void ForeachChildWidget(UWidget* ParentWidget, TFunction<bool(UWidget*)> Predica
 	}
 }
 
+UUserWidget* UUnrealEngineExStatics::GetFirstChildWidgetsOfClass(UWidget* ParentWidget, TSubclassOf<UUserWidget> WidgetClass, bool TopLevelOnly)
+{
+	UUserWidget* Result = nullptr;
+	ForeachChildWidget(ParentWidget, [&Result, &WidgetClass](UWidget* Widget) {
+		if (Widget->GetClass()->IsChildOf(WidgetClass))
+		{
+			Result = Cast<UUserWidget>(Widget);
+
+			return false;
+		}
+
+		return true;
+	}, TopLevelOnly);
+
+	return Result;
+}
+
 void UUnrealEngineExStatics::GetAllChildWidgetsOfClass(UWidget* ParentWidget, TArray<UUserWidget*>& FoundWidgets, TSubclassOf<UUserWidget> WidgetClass, bool TopLevelOnly)
 {
 	FoundWidgets.Empty();
@@ -1421,6 +1463,23 @@ UWidget* UUnrealEngineExStatics::GetParentEx(UWidget* Widget)
 		return Parent;
 
 	return Widget->GetTypedOuter<UWidget>();
+}
+
+FVector2D UUnrealEngineExStatics::GetWidgetPositionOnViewport(UWidget* Widget)
+{
+	auto WidgetGeometry = Widget->GetPaintSpaceGeometry();
+	auto AnchorPosition = FVector2D::ZeroVector;
+
+	if (auto CanvasSlot = Valid<UCanvasPanelSlot>(Widget->Slot))
+	{
+		auto SlotSize = CanvasSlot->GetSize();
+		auto SlotAlignement = CanvasSlot->GetAlignment();
+		AnchorPosition = SlotSize * SlotAlignement;
+	}
+
+	FVector2D PixelPosition, ViewportPosition;
+	USlateBlueprintLibrary::LocalToViewport(Widget, WidgetGeometry, AnchorPosition, PixelPosition, ViewportPosition);
+	return ViewportPosition;
 }
 
 FString UUnrealEngineExStatics::GetInstanceStringID(UObject* WorldContextObject)

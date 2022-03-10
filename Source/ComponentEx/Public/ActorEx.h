@@ -1,6 +1,8 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "ValidEx.h"
+
 
 struct FActorConstEx
 {

@@ -6,52 +6,6 @@
 #include "Engine/Engine.h"
 
 
-#define EXPAND(x) x
-#define GET_MACRO_1_2(_1,_2,NAME,...) NAME
-#define GET_MACRO_2_3(_1,_2,_3,NAME,...) NAME
-
-
-struct FCoreEx
-{
-	template <typename UI>
-	static bool DoesImplementInterface(const UObject* Object)
-	{
-		checkf(UI::StaticClass()->IsChildOf(UInterface::StaticClass()), TEXT("Interface parameter %s is not actually an interface."), *UI::StaticClass()->GetName());
-
-		if (!IsValid(Object))
-			return false;
-
-		return Object->GetClass()->ImplementsInterface(UI::StaticClass());
-	}
-
-	static bool DoesImplementInterface(const UObject* Object, UClass* SomeInterface)
-	{
-		if (!IsValid(Object))
-			return false;
-
-		return Object->GetClass()->ImplementsInterface(SomeInterface);
-	}
-
-	static COREEX_API bool IsObjectReinst(UObject* Object);
-};
-
-template <typename UT, typename T>
-const T* ValidInterface(const T* v) { return IsValid(v) && FCoreEx::DoesImplementInterface<UT>(v) ? v : nullptr; }
-
-template <typename UT, typename T>
-T* ValidInterface(T* v) { return IsValid(v) && FCoreEx::DoesImplementInterface<UT>(v) ? v : nullptr; }
-
-#define if_Implements(...) EXPAND(GET_MACRO_2_3(__VA_ARGS__, if_Implements3, if_Implements2)(__VA_ARGS__))
-
-#define if_Implements2(TypeAndName, Expression) \
-if (auto TypeAndName = ValidInterface<U ## TypeAndName>(Expression))
-
-#define if_Implements3(Type, Name, Expression) \
-if (auto Name = ValidInterface<U ## Type>(Expression))
-
-#define if_ImplementsT(UType, Name, Expression) \
-if (auto Name = ValidInterface<UType>(Expression))
-
 #define if_CanExecuteCosmeticEvents(WorldContextObject) \
 if (!UKismetSystemLibrary::IsDedicatedServer(WorldContextObject))
 
@@ -77,20 +31,36 @@ static ENetRole GetNetRole(const UObject* WorldContextObject)
 	return ROLE_None;
 }
 
-static ENetMode GetNetMode(const UObject* WorldContextObject)
-{
-	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
-	return World ? World->GetNetMode() : NM_Standalone;
-}
-
 #define if_HasAuthority(WorldContextObject) \
 if (GetNetRole(WorldContextObject) == ROLE_Authority)
 
 #define if_HasNoAuthority(WorldContextObject) \
 if (GetNetRole(WorldContextObject) < ROLE_Authority)
 
+static ENetMode GetNetMode(const UObject* WorldContextObject)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	return World ? World->GetNetMode() : NM_Standalone;
+}
+
 #define if_NotClassDefaultObject(WorldContextObject) \
 if ((WorldContextObject->GetFlags() & RF_ClassDefaultObject) == 0)
+
+static TEnumAsByte<EWorldType::Type> GetWorldType(const UObject* WorldContextObject)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	return IsValid(World) ? (EWorldType::Type)World->WorldType : EWorldType::None;
+}
+
+static bool IsInGame(const UObject* WorldContextObject)
+{
+	auto WorldType = GetWorldType(WorldContextObject);
+
+	return WorldType == EWorldType::Game
+		|| WorldType == EWorldType::PIE
+		|| WorldType == EWorldType::GamePreview
+		|| WorldType == EWorldType::GameRPC;
+}
 
 
 #if WITH_EDITOR

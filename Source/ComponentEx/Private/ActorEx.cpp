@@ -2,6 +2,8 @@
 
 #include "Camera/CameraComponent.h"
 
+#include "ValidEx.h"
+
 
 UCameraComponent* FActorConstEx::GetCameraComponent() const
 {

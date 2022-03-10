@@ -5,6 +5,7 @@
 #include "BlueprintActionDatabaseRegistrar.h"
 #include "BlueprintNodeSpawner.h"
 #include "EditorCategoryUtils.h"
+#include "ToolMenu.h"
 
 #include "ValidEx.h"
 
@@ -20,6 +21,8 @@ IMPLEMENT_PIN(UK2Node_IsValidEx, IsNotValid, "Is Not Valid");
 UK2Node_IsValidEx::UK2Node_IsValidEx(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	UpcastType.Add(nullptr);
+	InputObjectType.Add(FK2NodeHelpers::MakePinType(UEdGraphSchema_K2::PC_Wildcard, UObject::StaticClass()));
 }
 
 FText UK2Node_IsValidEx::GetTooltipText() const
@@ -29,8 +32,8 @@ FText UK2Node_IsValidEx::GetTooltipText() const
 
 FText UK2Node_IsValidEx::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
-	return IsValid(UpcastType)
-		? FText::Format(LOCTEXT("K2Node_IsValidEx_TitleFmt", "IsValid {0}"), FText::FromString(UpcastType->GetName()))
+	return UpcastType.Num() == 1 && IsValid(UpcastType[0])
+		? FText::Format(LOCTEXT("K2Node_IsValidEx_TitleFmt", "IsValid {0}"), FText::FromString(UpcastType[0]->GetName()))
 		: LOCTEXT("K2Node_IsValidEx_Title", "IsValidEx");
 }
 
@@ -71,30 +74,125 @@ void UK2Node_IsValidEx::GetMenuActions(FBlueprintActionDatabaseRegistrar& Action
 	}
 }
 
+void UK2Node_IsValidEx::GetNodeContextMenuActions(UToolMenu* Menu, UGraphNodeContextMenuContext* Context) const
+{
+	Super::GetNodeContextMenuActions(Menu, Context);
+
+	if (!Context->bIsDebugging)
+	{
+		FToolMenuSection& Section = Menu->AddSection("K2NodeMakeArray", NSLOCTEXT("K2Nodes", "MakeArrayHeader", "MakeArray"));
+
+		if (Context->Pin != NULL)
+		{
+			if (Context->Pin->PinType.PinCategory != UEdGraphSchema_K2::PC_Exec)
+			{
+				Section.AddMenuEntry(
+					"RemovePin",
+					LOCTEXT("RemovePin", "Remove array element pin"),
+					LOCTEXT("RemovePinTooltip", "Remove this array element pin"),
+					FSlateIcon(),
+					FUIAction(
+						FExecuteAction::CreateUObject(const_cast<UK2Node_IsValidEx*>(this), &UK2Node_IsValidEx::RemoveInputPin, const_cast<UEdGraphPin*>(Context->Pin))
+					)
+				);
+			}
+		}
+		else
+		{
+			Section.AddMenuEntry(
+				"AddPin",
+				LOCTEXT("AddPin", "Add array element pin"),
+				LOCTEXT("AddPinTooltip", "Add another array element pin"),
+				FSlateIcon(),
+				FUIAction(
+					FExecuteAction::CreateUObject(const_cast<UK2Node_IsValidEx*>(this), &UK2Node_IsValidEx::InteractiveAddInputPin)
+				)
+			);
+		}
+
+		Section.AddMenuEntry(
+			"ResetToWildcard",
+			LOCTEXT("ResetToWildcard", "Reset to wildcard"),
+			LOCTEXT("ResetToWildcardTooltip", "Reset the node to have wildcard input/outputs. Requires no pins are connected."),
+			FSlateIcon(),
+			FUIAction(
+				//FExecuteAction::CreateUObject(const_cast<UK2Node_MakeArray*>(this), &UK2Node_MakeArray::ClearPinTypeToWildcard),
+				//FCanExecuteAction::CreateUObject(this, &UK2Node_MakeArray::CanResetToWildcard)
+			)
+		);
+	}
+}
+
+UEdGraphPin* UK2Node_IsValidEx::GetInputObjectPin(int Index) const
+{
+	if (Index == 0)
+		return GetInputObjectPin();
+
+	int InputObjectPinIndex = Pins.IndexOfByKey(GetInputObjectPin()) + Index;
+	return Pins[InputObjectPinIndex];
+}
+
+UEdGraphPin* UK2Node_IsValidEx::GetValidObjectPin(int Index) const
+{
+	if (Index == 0)
+		return GetValidObjectPin();
+
+	int ValidObjectPinIndex = Pins.IndexOfByKey(GetValidObjectPin()) + Index;
+	return Pins[ValidObjectPinIndex];
+}
+
 void UK2Node_IsValidEx::AllocateDefaultPins()
 {
 	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Execute);
-	if (IsValid(InputObjectType))
-	{
-		CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Object, InputObjectType, PN_InputObject);
-	}
-	else
-	{
-		CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Wildcard, UObject::StaticClass(), PN_InputObject);
-	}
+	AllocateInputObjectPins();
 
 	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, PN_IsValid);
-	if (IsValid(InputObjectType))
-	{
-		CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Object, IsValid(UpcastType) ? *UpcastType : InputObjectType, PN_ValidObject);
-	}
-	else
-	{
-		CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Wildcard, UObject::StaticClass(), PN_ValidObject);
-	}
+	AllocateValidObjectPins();
 	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, PN_IsNotValid);
 
 	Super::AllocateDefaultPins();
+}
+
+void UK2Node_IsValidEx::AllocateInputObjectPins()
+{
+	for (int i = 0; i < GetInputObjectNum(); i++)
+	{
+		auto PinName = i == 0 ? PN_InputObject : FName(FString::Printf(TEXT("%s %d"), *PN_InputObject.ToString(), i));
+		CreatePin(EGPD_Input, InputObjectType[i], PinName);
+	}
+}
+
+void UK2Node_IsValidEx::AllocateValidObjectPins()
+{
+	for (int i = 0; i < GetInputObjectNum(); i++)
+	{
+		auto PinName = i == 0 ? PN_ValidObject : FName(FString::Printf(TEXT("%s %d"), *PN_ValidObject.ToString(), i));
+		auto PinType = InputObjectType[i];
+		if (IsValid(UpcastType[i]))
+		{
+			PinType.PinSubCategoryObject = UpcastType[i];
+			if (UpcastType[i]->IsChildOf(UInterface::StaticClass()))
+				PinType.PinCategory = UEdGraphSchema_K2::PC_Interface;
+			else 
+				PinType.PinCategory = UEdGraphSchema_K2::PC_Object;
+		}
+
+		CreatePin(EGPD_Output, PinType, PinName);
+	}
+}
+
+void UK2Node_IsValidEx::UpdateWildcardPins()
+{
+	for (int i = 0; i < GetInputObjectNum(); i++)
+	{
+		InputObjectType[i] = FK2NodeHelpers::GetWildcardPinObjectType(GetInputObjectPin(i), UObject::StaticClass());
+		auto ValidPinType = InputObjectType[i];
+		if (IsValid(UpcastType[i]))
+			ValidPinType.PinSubCategoryObject = UpcastType[i];
+
+		if_Valid(GetInputObjectPin(i))->PinType = InputObjectType[i];
+		if_Valid(GetValidObjectPin(i))->PinType = ValidPinType;
+	}
 }
 
 void UK2Node_IsValidEx::ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
@@ -103,24 +201,27 @@ void UK2Node_IsValidEx::ExpandNode(class FKismetCompilerContext& CompilerContext
 
 	FK2NodeCompilerHelper Compiler(this, CompilerContext, SourceGraph, GetExecPin(), GetIsValidPin());
 
-	auto ObjectPin = Compiler.SpawnIntermediateNode<UK2Node_Cache>(GetInputObjectPin())->GetOutputObjectPin();
-
-	auto ValidateObjectIfThenElse = Compiler.SpawnIntermediateNode<UK2Node_IfThenElse>(
-		Compiler.SpawnIsValidNode(ObjectPin)->GetReturnValuePin());
-
-	if (UpcastType && UpcastType != InputObjectType)
+	for (int i = 0; i < GetInputObjectNum(); i++)
 	{
-		auto UpCastNode = Compiler.SpawnIntermediateNode<UK2Node_DynamicCast>(UpcastType, ObjectPin);
-		ObjectPin = UpCastNode->GetCastResultPin();
-	}
+		auto ObjectPin = Compiler.SpawnIntermediateNode<UK2Node_Cache>(GetInputObjectPin(i))->GetOutputObjectPin();
 
-	Compiler.ConnectPins(ObjectPin, GetValidObjectPin());
-	Compiler.ConnectPins(ValidateObjectIfThenElse->GetElsePin(), GetIsNotValidPin());
+		auto ValidateObjectIfThenElse = Compiler.SpawnIntermediateNode<UK2Node_IfThenElse>(
+			Compiler.SpawnIsValidNode(ObjectPin)->GetReturnValuePin());
+
+		auto UpcastType_ = UpcastType[i];
+		if (UpcastType_ && UpcastType_ != InputObjectType[i].PinSubCategoryObject)
+		{
+			ObjectPin = Compiler.SpawnIntermediateNode<UK2Node_DynamicCast>(UpcastType_, ObjectPin)->GetCastResultPin();
+		}
+
+		Compiler.ConnectPins(ObjectPin, GetValidObjectPin(i));
+		Compiler.ConnectPins(ValidateObjectIfThenElse->GetElsePin(), GetIsNotValidPin());
+	}
 }
 
 void UK2Node_IsValidEx::ReconstructNode()
 {
-	InputObjectType = FK2NodeHelpers::GetWildcardPinClassType(GetInputObjectPin());
+	UpdateWildcardPins();
 
 	Super::ReconstructNode();
 }
@@ -129,12 +230,7 @@ void UK2Node_IsValidEx::NotifyPinConnectionListChanged(UEdGraphPin* Pin)
 {
 	Super::NotifyPinConnectionListChanged(Pin);
 
-	if (Pin == GetInputObjectPin())
-	{
-		// TODO: Fix this. Node reconstruct here can cause crash.
-
-		ReconstructNode();
-	}
+	UpdateWildcardPins();
 }
 
 #if WITH_EDITOR
@@ -145,5 +241,31 @@ void UK2Node_IsValidEx::PostEditChangeProperty(FPropertyChangedEvent& PropertyCh
 	ReconstructNode();
 }
 #endif // WITH_EDITOR
+
+
+void UK2Node_IsValidEx::InteractiveAddInputPin()
+{
+	FScopedTransaction Transaction(LOCTEXT("AddPinTx", "Add Pin"));
+	AddInputPin();
+}
+
+void UK2Node_IsValidEx::AddInputPin()
+{
+	UpcastType.Add(nullptr);
+	InputObjectType.Add(FK2NodeHelpers::MakePinType(UEdGraphSchema_K2::PC_Wildcard, UObject::StaticClass()));
+
+	ReconstructNode();
+}
+
+bool UK2Node_IsValidEx::CanRemovePin(const UEdGraphPin* Pin) const
+{
+	return InputObjectType.Num() > 1;
+}
+
+void UK2Node_IsValidEx::RemoveInputPin(UEdGraphPin* Pin)
+{
+	//UpcastType.Add(nullptr);
+	//InputObjectType.Add(nullptr);
+}
 
 #undef LOCTEXT_NAMESPACE

@@ -28,13 +28,13 @@ protected:
 
 
 public:
-	UFUNCTION(Category = "UnrealEditorEx: PendingContainer", BlueprintCallable)
+	UFUNCTION(Category = "UnrealEditorEx|PendingContainer", BlueprintCallable)
 	void AddObject(UObject* Object);
 
-	UFUNCTION(Category = "UnrealEditorEx: PendingContainer", BlueprintCallable)
+	UFUNCTION(Category = "UnrealEditorEx|PendingContainer", BlueprintCallable)
 	void RemoveObject(UObject* Object);
 
-	UFUNCTION(Category = "UnrealEditorEx: PendingContainer", BlueprintCallable)
+	UFUNCTION(Category = "UnrealEditorEx|PendingContainer", BlueprintCallable)
 	void Consume(FPendingContainerOnObjectCallback OnObjectAdd, FPendingContainerOnObjectCallback OnObjectRemove);
 
 	template <typename T>

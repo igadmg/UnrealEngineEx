@@ -123,5 +123,5 @@ void USplineMeshBuilderComponent::OnHiddenInGameChanged()
 		SplineMeshComponent->SetHiddenInGame(bHiddenInGame);
 	}
 
-	SetCollisionEnabled(bHiddenInGame ? ECollisionEnabled::NoCollision : CollisionEnabled);
+	SetCollisionEnabled(bHiddenInGame ? ECollisionEnabled::NoCollision : (ECollisionEnabled::Type)CollisionEnabled);
 }

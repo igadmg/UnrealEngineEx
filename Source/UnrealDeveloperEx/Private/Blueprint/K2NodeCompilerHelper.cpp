@@ -1,8 +1,9 @@
-#include "Blueprint/K2NodeCompilerHelper.h "
+#include "Blueprint/K2NodeCompilerHelper.h"
 
 #include "EdGraph/EdGraphNode.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetStringLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Misc/EngineVersionComparison.h"
 #include "Engine/Engine.h"
@@ -40,6 +41,22 @@ UK2Node_TemporaryVariable* FK2NodeCompilerHelper::SpawnInternalVariable(const FE
 	return CompilerContext.SpawnInternalVariable(Node
 		, PinType.PinCategory, PinType.PinSubCategory, PinType.PinSubCategoryObject.Get()
 		, PinType.ContainerType, PinType.PinValueType);
+}
+
+UEdGraphPin* FK2NodeCompilerHelper::CacheInLocalVariable(bool Value)
+{
+	auto LocalObjectVar = SpawnInternalVariable(FK2NodeHelpers::MakePinType(UEdGraphSchema_K2::PC_Boolean));
+	auto LocalObjectVarAssignement = SpawnIntermediateNode<UK2Node_AssignmentStatement>(LocalObjectVar->GetVariablePin(), Value);
+
+	return LocalObjectVar->GetVariablePin();
+}
+
+UEdGraphPin* FK2NodeCompilerHelper::CacheInLocalVariable(int32 Value)
+{
+	auto LocalObjectVar = SpawnInternalVariable(FK2NodeHelpers::MakePinType(UEdGraphSchema_K2::PC_Int));
+	auto LocalObjectVarAssignement = SpawnIntermediateNode<UK2Node_AssignmentStatement>(LocalObjectVar->GetVariablePin(), Value);
+
+	return LocalObjectVar->GetVariablePin();
 }
 
 UEdGraphPin* FK2NodeCompilerHelper::CacheInLocalVariable(UEdGraphPin* ObjectPin)
@@ -214,6 +231,29 @@ void FK2NodeCompilerHelper::ConnectNode(UK2Node_AddDelegate* AddDelegate, const 
 	ConnectPins(AddDelegate->FindPin(TEXT("Delegate")), DelegatePin);
 }
 
+void FK2NodeCompilerHelper::SetupNode(UK2Node_RemoveDelegate* RemoveDelegate, const FProperty* Property, UEdGraphPin* SelfPin, UEdGraphPin* DelegatePin)
+{
+	RemoveDelegate->SetFromProperty(Property, false, Property->GetOwnerClass());
+}
+
+void FK2NodeCompilerHelper::ConnectNode(UK2Node_RemoveDelegate* RemoveDelegate, const FProperty* Property, UEdGraphPin* SelfPin, UEdGraphPin* DelegatePin)
+{
+	ConnectPins(RemoveDelegate->FindPin(UEdGraphSchema_K2::PN_Self), SelfPin);
+	ConnectPins(RemoveDelegate->FindPin(TEXT("Delegate")), DelegatePin);
+}
+
+void FK2NodeCompilerHelper::ConnectNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin, bool Value)
+{
+	ConnectPins(VariablePin, AssignmentStatement->GetVariablePin());
+	AssignmentStatement->GetValuePin()->DefaultValue = UKismetStringLibrary::Conv_BoolToString(Value);
+}
+
+void FK2NodeCompilerHelper::ConnectNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin, int32 Value)
+{
+	ConnectPins(VariablePin, AssignmentStatement->GetVariablePin());
+	AssignmentStatement->GetValuePin()->DefaultValue = UKismetStringLibrary::Conv_IntToString(Value);
+}
+
 void FK2NodeCompilerHelper::ConnectNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin, UEdGraphPin* ValuePin)
 {
 	ConnectPins(VariablePin, AssignmentStatement->GetVariablePin());
@@ -233,6 +273,19 @@ void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, UFunct
 void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, UClass* FunctionClass, FName FunctionName)
 {
 	CallFunction->FunctionReference.SetExternalMember(FunctionName, FunctionClass);
+}
+
+void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params)
+{
+	SetupNode(CallFunction, FunctionClass, FunctionName);
+}
+
+void FK2NodeCompilerHelper::ConnectNode(UK2Node_CallFunction* CallFunction, UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params)
+{
+	for (auto Pair : Params)
+	{
+		ConnectPins(Pair.Value, CallFunction->FindPin(Pair.Key));
+	}
 }
 
 void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, UFunction* Function)

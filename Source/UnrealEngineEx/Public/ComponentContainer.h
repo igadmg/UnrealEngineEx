@@ -2,7 +2,8 @@
 
 #include "Components/ActorComponent.h"
 #include "UnrealEngineEx.h"
-#include <functional>
+#include "ValidEx.h"
+
 #include "ComponentContainer.generated.h"
 
 
@@ -25,13 +26,13 @@ public:
 
 
 public:
-	UFUNCTION(Category = "UnrealEditorEx: ComponentContainer", BlueprintPure, BlueprintAuthorityOnly)
+	UFUNCTION(Category = "UnrealEditorEx|ComponentContainer", BlueprintPure, BlueprintAuthorityOnly)
 	class UContainedComponent* GetComponent(TSubclassOf<class UContainedComponent> Class) const;
 
-	UFUNCTION(Category = "UnrealEditorEx: ComponentContainer", BlueprintCallable, BlueprintAuthorityOnly)
+	UFUNCTION(Category = "UnrealEditorEx|ComponentContainer", BlueprintCallable, BlueprintAuthorityOnly)
 	class UContainedComponent* AddComponent(TSubclassOf<class UContainedComponent> Class);
 
-	UFUNCTION(Category = "UnrealEditorEx: ComponentContainer", BlueprintCallable, BlueprintAuthorityOnly)
+	UFUNCTION(Category = "UnrealEditorEx|ComponentContainer", BlueprintCallable, BlueprintAuthorityOnly)
 	bool RemoveComponent(TSubclassOf<class UContainedComponent> Class);
 
 
@@ -163,7 +164,7 @@ class UNREALENGINEEX_API UContainedComponent : public UActorComponent
 
 
 public:
-	UFUNCTION(Category = "UnrealEditorEx: ComponentContainer", BlueprintPure, BlueprintAuthorityOnly)
+	UFUNCTION(Category = "UnrealEditorEx|ComponentContainer", BlueprintPure, BlueprintAuthorityOnly)
 	int32 GetReplicatedNumberOfPlayers() const { return ReplicatedChannels.Num(); }
 
 

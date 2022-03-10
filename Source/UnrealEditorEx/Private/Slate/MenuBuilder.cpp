@@ -44,7 +44,7 @@ void UMenuBuilder::AddArrayMenuEntries(const TArray<UObject*>& Objects, FAddArra
 void UMenuBuilder::AddSubMenu(FText InMenuLabel, FText InToolTip, FSlateNewMenuDelegate SubMenuDelegate)
 {
 	MenuBuilder->AddSubMenu(InMenuLabel, InToolTip
-		, FNewMenuDelegate::CreateLambda([SubMenuDelegate](FMenuBuilder& MenuBuilder) { SubMenuDelegate.Execute(FromMenuBuilder(&MenuBuilder)); }));
+		, FNewMenuDelegate::CreateLambda([SubMenuDelegate](FMenuBuilder& InMenuBuilder) { SubMenuDelegate.Execute(FromMenuBuilder(&InMenuBuilder)); }));
 }
 
 void UMenuBuilder::AddArraySubMenues(const TArray<UObject*>& Objects, FAddArrayNewMenuDelegate SubMenuDelegate)
@@ -53,6 +53,6 @@ void UMenuBuilder::AddArraySubMenues(const TArray<UObject*>& Objects, FAddArrayN
 	{
 		auto LocalObject = Object;
 		MenuBuilder->AddSubMenu(FText::FromString(LocalObject->GetName()), FText()
-			, FNewMenuDelegate::CreateLambda([SubMenuDelegate, LocalObject](FMenuBuilder& MenuBuilder) { SubMenuDelegate.Execute(FromMenuBuilder(&MenuBuilder), LocalObject); }));
+			, FNewMenuDelegate::CreateLambda([SubMenuDelegate, LocalObject](FMenuBuilder& InMenuBuilder) { SubMenuDelegate.Execute(FromMenuBuilder(&InMenuBuilder), LocalObject); }));
 	}
 }
