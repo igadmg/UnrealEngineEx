@@ -2,6 +2,7 @@
 #include "ComponentExPrivatePCH.h"
 
 #include "Components/SplineComponent.h"
+#include "Misc/EngineVersionComparison.h"
 
 #include "IsValidEx.h"
 
@@ -29,7 +30,11 @@ void USplineInstanceMeshPlacerComponent::FillSplineMesh(float Interval, FVector 
 			auto DistanceTransform = SplineComponent->GetTransformAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
 
 			DistanceTransform.AddToTranslation(DistanceTransform.TransformVector(InstanceOffset));
+#if !UE_VERSION_OLDER_THAN(5, 0, 0)
+			AddInstance(DistanceTransform, true);
+#else
 			AddInstanceWorldSpace(DistanceTransform);
+#endif
 
 			Distance += Interval;
 		}

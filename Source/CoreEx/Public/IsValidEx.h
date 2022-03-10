@@ -27,7 +27,11 @@ static bool IsValid(void* Ptr)
 
 FORCEINLINE static bool IsValid(UObject* Test)
 {
+#if !UE_VERSION_OLDER_THAN(5, 0, 0)
+	return Test && FInternalUObjectBaseUtilityIsValidFlagsChecker::CheckObjectValidBasedOnItsFlags(Test);
+#else
 	return Test && !Test->IsPendingKill();
+#endif
 }
 
 template <typename FuncType>

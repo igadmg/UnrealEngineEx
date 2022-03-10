@@ -1,4 +1,5 @@
 #include "ChildActorPrimitiveComponent.h"
+#include "Misc/EngineVersionComparison.h"
 
 #include "CoreEx.h"
 
@@ -210,7 +211,11 @@ void UChildActorPrimitiveComponent::DestroyChildActor()
 		{
 			if (!GExitPurge)
 			{
+#if !UE_VERSION_OLDER_THAN(5, 0, 0)
+				const bool bIsChildActorPendingKillOrUnreachable = !IsValid(ChildActor);
+#else
 				const bool bIsChildActorPendingKillOrUnreachable = ChildActor->IsPendingKillOrUnreachable();
+#endif
 
 				if (auto World = ChildActor->GetWorld())
 				{
