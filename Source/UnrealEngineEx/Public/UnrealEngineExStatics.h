@@ -164,6 +164,10 @@ public:
 	static void ShowAllStreamingLevels(const UObject* WorldContextObject);
 
 
+	UFUNCTION(Category = "Utilities|Time", BlueprintPure, meta = (DisplayName = "Get Timer Percent by Handle", WorldContext = "WorldContextObject"))
+	static float GetTimerPercentTimeHandle(const UObject* WorldContextObject, FTimerHandle Handle);
+
+
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable, BlueprintInternalUseOnly, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static UAsyncTask* CreateAsyncTask(const UObject* WorldContextObject, TSubclassOf<class UAsyncTask> AsyncTaskClass);
 

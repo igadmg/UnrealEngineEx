@@ -82,6 +82,11 @@ static bool IsValid(const FDelegateHandle& DelegateHandle)
 {
 	return DelegateHandle.IsValid();
 }
+
+static bool IsValid(const FTimerHandle& TimerHandle)
+{
+	return TimerHandle.IsValid();
+}
 #endif
 
 #if defined(UNREALENGINEEX_PropertyAccessor_generated_h) && !defined(IsValid_UNREALENGINEEX_PropertyAccessor_generated_h)

@@ -1083,6 +1083,26 @@ void UUnrealEngineExStatics::ShowAllStreamingLevels(const UObject* WorldContextO
 	}
 }
 
+float UUnrealEngineExStatics::GetTimerPercentTimeHandle(const UObject* WorldContextObject, FTimerHandle Handle)
+{
+	if (!IsValid(Handle))
+		return 0.f;
+
+	if (UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
+	{
+		float ElapsedTime = World->GetTimerManager().GetTimerElapsed(Handle);
+		float RemainigTime = World->GetTimerManager().GetTimerRemaining(Handle);
+
+		float TotalTime = ElapsedTime + RemainigTime;
+		if (TotalTime == 0)
+			return 1.f;
+
+		return ElapsedTime / TotalTime;
+	}
+
+	return 0.f;
+}
+
 UAsyncTask* UUnrealEngineExStatics::CreateAsyncTask(const UObject* WorldContextObject, TSubclassOf<UAsyncTask> AsyncTaskClass)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);

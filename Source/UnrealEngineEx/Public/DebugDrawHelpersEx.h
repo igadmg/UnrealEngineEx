@@ -6,7 +6,9 @@
 class UCanvas;
 
  // Define that controls debug drawing
+#ifndef ENABLE_DRAW_DEBUG
 #define ENABLE_DRAW_DEBUG  !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
+#endif
 
 #if ENABLE_DRAW_DEBUG
 

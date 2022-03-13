@@ -49,4 +49,6 @@ struct FDelegateAndPins
 	TArray<UEdGraphPin*> ParameterPins;
 
 	UNREALDEVELOPEREX_API static FDelegateAndPins FindDelegatePins(UEdGraphNode* Node, FMulticastDelegateProperty* Delegate);
+
+	bool IsValid() const { return Delegate != nullptr && ExecPin != nullptr; }
 };
