@@ -1,8 +1,5 @@
 #include "ComponentExStatics.h"
 
-#include "ComponentEx.h"
-#include "ActorEx.h"
-
 #include "Animation/AnimationAsset.h"
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimSequence.h"
@@ -18,6 +15,7 @@
 #include "Engine/PostProcessVolume.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/Texture.h"
+#include "GameFramework/Controller.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "TimerManager.h"
 

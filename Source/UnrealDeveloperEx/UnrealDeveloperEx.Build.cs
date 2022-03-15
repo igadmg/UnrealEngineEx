@@ -10,6 +10,7 @@ public class UnrealDeveloperEx : ModuleRules
 	{
 		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
+		PrivatePCHHeaderFile = "Private/UnrealDeveloperExPrivatePCH.h";
 
 
 		PublicIncludePaths.AddRange(new string[] {

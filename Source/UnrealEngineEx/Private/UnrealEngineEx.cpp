@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/EngineVersionComparison.h"
 #include "Core.h"
 #include "LatentActions.h"
 
@@ -65,7 +66,11 @@ UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, APawn* Unus
 #if WITH_EDITOR
 TSoftObjectPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrToPIE(const TSoftObjectPtr<UWorld>& Level, UWorld* World)
 {
+#if !UE_VERSION_OLDER_THAN(5, 0, 0)
+	int32 PIEInstanceID = World->GetOutermost()->GetPIEInstanceID();
+#else
 	int32 PIEInstanceID = World->GetOutermost()->PIEInstanceID;
+#endif
 	FString PIELevelPackageName;
 	FString PIELevelObjectName;
 
@@ -81,10 +86,15 @@ TSoftObjectPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrToPIE(const TSoftObjectPt
 
 TSoftObjectPtr<UWorld> FUnrealEngineEx::ConvertLevelPtrFromPIE(const TSoftObjectPtr<UWorld>& Level, UWorld* World)
 {
+#if !UE_VERSION_OLDER_THAN(5, 0, 0)
+	int32 PIEInstanceID = World->GetOutermost()->GetPIEInstanceID();
+#else
+	int32 PIEInstanceID = World->GetOutermost()->PIEInstanceID;
+#endif
+
 	FString PIELevelPackageName = UWorld::StripPIEPrefixFromPackageName(FPackageName::ObjectPathToPackageName(Level.ToString()), World->StreamingLevelsPrefix);
 	FString PIELevelObjectName = UWorld::RemovePIEPrefix(FPackageName::GetLongPackageAssetName(PIELevelPackageName));
 
-	int32 PIEInstanceID = World->GetOutermost()->PIEInstanceID;
 	if (PIEInstanceID < 0) // For Standalone runs.
 		PIELevelPackageName.RemoveFromStart(TEXT("/Temp/Autosaves"));
 

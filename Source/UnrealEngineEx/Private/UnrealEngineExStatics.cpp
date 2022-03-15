@@ -1,5 +1,4 @@
 #include "UnrealEngineExStatics.h"
-#include "UnrealEngineExPrivatePCH.h"
 
 #include "Blueprint/SlateBlueprintLibrary.h"
 #include "Blueprint/WidgetTree.h"
@@ -576,10 +575,14 @@ ULevelStreaming* UUnrealEngineExStatics::AddStreamingLevel(UObject* WorldContext
 	AsyncLevel->LevelTransform = FTransform::Identity;
 
 #if WITH_EDITOR
+#if !UE_VERSION_OLDER_THAN(5, 0, 0)
+	int32 PIEInstanceID = World->GetOutermost()->GetPIEInstanceID();
+#else
 	int32 PIEInstanceID = World->GetOutermost()->PIEInstanceID;
+#endif
 	if (World->WorldType == EWorldType::PIE && PIEInstanceID != -1)
 	{
-		AsyncLevel->RenameForPIE(World->GetOutermost()->PIEInstanceID);
+		AsyncLevel->RenameForPIE(PIEInstanceID);
 	}
 #endif
 

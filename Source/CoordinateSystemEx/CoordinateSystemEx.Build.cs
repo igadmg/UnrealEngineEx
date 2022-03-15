@@ -10,6 +10,7 @@ public class CoordinateSystemEx : ModuleRules
 	{
 		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
+		PrivatePCHHeaderFile = "Private/CoordinateSystemExPrivatePCH.h";
 
 
 		PublicIncludePaths.AddRange(new string[] {

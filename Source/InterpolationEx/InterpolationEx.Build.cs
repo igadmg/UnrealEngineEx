@@ -11,6 +11,7 @@ public class InterpolationEx : ModuleRules
 	{
 		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
+		//PrivatePCHHeaderFile = "Private/InterpolationExPrivatePCH.h";
 
 
 		PublicIncludePaths.AddRange(new string[] {

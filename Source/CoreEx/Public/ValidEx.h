@@ -154,12 +154,7 @@ struct TValid<T, U, typename std::enable_if<std::is_same<T, U>::value>::type>
 };
 
 
-#define if_Valid(Expression) if (auto if_Valid_Expression = (Expression)) if_Valid_Expression
-
-
-#define EXPAND(x) x
-#define GET_MACRO_1_2(_1,_2,NAME,...) NAME
-#define GET_MACRO_2_3(_1,_2,_3,NAME,...) NAME
+#define if_Valid(Expression) if (auto if_Valid_Expression = Valid(Expression)) if_Valid_Expression
 
 
 struct FCoreEx

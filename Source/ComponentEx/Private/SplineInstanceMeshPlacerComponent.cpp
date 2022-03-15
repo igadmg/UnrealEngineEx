@@ -1,5 +1,4 @@
 #include "SplineInstanceMeshPlacerComponent.h"
-#include "ComponentExPrivatePCH.h"
 
 #include "Components/SplineComponent.h"
 #include "Misc/EngineVersionComparison.h"

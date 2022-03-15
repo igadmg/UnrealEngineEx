@@ -10,6 +10,7 @@ public class ComponentEx : ModuleRules
 	{
 		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
+		PrivatePCHHeaderFile = "Private/ComponentExPrivatePCH.h";
 
 
 		PublicIncludePaths.AddRange(new string[] {

@@ -1,5 +1,4 @@
 #include "SplineMeshBuilderComponent.h"
-#include "ComponentExPrivatePCH.h"
 
 #include "Components/SplineComponent.h"
 #include "Components/SplineMeshComponent.h"

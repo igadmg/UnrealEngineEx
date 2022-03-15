@@ -10,6 +10,7 @@ public class MathEx : ModuleRules
 	{
 		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
+		PrivatePCHHeaderFile = "Private/MathExPrivatePCH.h";
 
 
 		PublicIncludePaths.AddRange(new string[] {

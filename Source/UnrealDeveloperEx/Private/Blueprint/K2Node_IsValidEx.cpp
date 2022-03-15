@@ -5,6 +5,7 @@
 #include "BlueprintActionDatabaseRegistrar.h"
 #include "BlueprintNodeSpawner.h"
 #include "EditorCategoryUtils.h"
+#include "ScopedTransaction.h"
 #include "ToolMenu.h"
 
 #include "ValidEx.h"

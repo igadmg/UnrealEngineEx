@@ -43,6 +43,14 @@ UK2Node_TemporaryVariable* FK2NodeCompilerHelper::SpawnInternalVariable(const FE
 		, PinType.ContainerType, PinType.PinValueType);
 }
 
+void FK2NodeCompilerHelper::LogString(const FString& InString, bool bPrintToLog)
+{
+	auto nolog = TGuardValue<bool>(bLog, false);
+	auto PrintString = SpawnIntermediateNode<UK2Node_CallFunction>(EXPAND_FUNCTION_NAME(UKismetSystemLibrary, LogString));
+	PrintString->FindPin(TEXT("InString"))->DefaultValue = InString;
+	PrintString->FindPin(TEXT("bPrintToLog"))->DefaultValue = UKismetStringLibrary::Conv_BoolToString(bPrintToLog);
+}
+
 UEdGraphPin* FK2NodeCompilerHelper::CacheInLocalVariable(bool Value)
 {
 	auto LocalObjectVar = SpawnInternalVariable(FK2NodeHelpers::MakePinType(UEdGraphSchema_K2::PC_Boolean));
@@ -366,6 +374,49 @@ void FK2NodeCompilerHelper::ConnectNode(UK2Node_Knot* KnotNode, UEdGraphPin* Obj
 			bIsErrorFree &= CompilerContext.GetSchema()->TryCreateConnection(KnotNode->GetOutputPin(), ObjectPin);
 		}
 	}
+}
+/*
+void FK2NodeCompilerHelper::LogNode(UK2Node_AddDelegate* AddDelegate)
+{
+
+}
+
+void FK2NodeCompilerHelper::LogNode(UK2Node_RemoveDelegate* RemoveDelegate)
+{
+
+}
+
+void FK2NodeCompilerHelper::LogNode(UK2Node_AssignmentStatement* AssignmentStatement)
+{
+
+}
+
+void FK2NodeCompilerHelper::LogNode(UK2Node_Cache* Cahce)
+{
+
+}
+
+void FK2NodeCompilerHelper::LogNode(UK2Node_CallFunction* CallFunction)
+{
+
+}
+
+void FK2NodeCompilerHelper::LogNode(UK2Node_DynamicCast* DynamicCast)
+{
+
+}
+
+void FK2NodeCompilerHelper::LogNode(UK2Node_IfThenElse* IfThenElse)
+{
+
+}
+*/
+void FK2NodeCompilerHelper::LogNode(UK2Node* GenericNode)
+{
+	if (GenericNode->IsNodePure())
+		return;
+
+	LogString(GenericNode->GetName());
 }
 
 #undef LOCTEXT_NAMESPACE

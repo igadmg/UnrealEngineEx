@@ -1,5 +1,7 @@
 #pragma once
 
+#include "EdGraph/EdGraphPin.h"
+
 class UEdGraphNode;
 class UEdGraphPin;
 

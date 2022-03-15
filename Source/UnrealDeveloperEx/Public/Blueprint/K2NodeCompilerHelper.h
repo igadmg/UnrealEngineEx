@@ -30,6 +30,7 @@ public:
 	UEdGraphPin* FinishPin;
 	bool bIsErrorFree = true;
 	bool bFinalize = true;
+	bool bLog = false;
 
 
 public:
@@ -95,6 +96,7 @@ public:
 		Result->AllocateDefaultPins();
 		ConnectNode(Result, args...);
 
+		if (bLog) LogNode(Result);
 		ConnectToExecChain(Result);
 
 		return Result;
@@ -129,6 +131,8 @@ protected:
 
 
 public:
+	void LogString(const FString& InString = FString(TEXT("Hello")), bool bPrintToLog = true);
+
 	UEdGraphPin* CacheInLocalVariable(bool Value);
 	UEdGraphPin* CacheInLocalVariable(int32 Value);
 	UEdGraphPin* CacheInLocalVariable(UEdGraphPin* ObjectPin);
@@ -184,6 +188,17 @@ protected:
 
 	void SetupNode(UK2Node_Knot* KnotNode, UEdGraphPin* ObjectPin) {}
 	void ConnectNode(UK2Node_Knot* KnotNode, UEdGraphPin* ObjectPin);
+
+	/*
+	void LogNode(UK2Node_AddDelegate* AddDelegate);
+	void LogNode(UK2Node_RemoveDelegate* RemoveDelegate);
+	void LogNode(UK2Node_AssignmentStatement* AssignmentStatement);
+	void LogNode(UK2Node_Cache* Cahce);
+	void LogNode(UK2Node_CallFunction* CallFunction);
+	void LogNode(UK2Node_DynamicCast* DynamicCast);
+	void LogNode(UK2Node_IfThenElse* IfThenElse);
+	*/
+	void LogNode(UK2Node* Node);
 };
 
 #define EXPAND_FUNCTION_NAME(ClassName, FunctionName) \

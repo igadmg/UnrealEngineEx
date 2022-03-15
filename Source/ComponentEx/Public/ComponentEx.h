@@ -35,6 +35,10 @@ public:
 #include "SkeletalMeshEx.h"
 #endif
 
+#ifdef ENGINE_World_generated_h
+#include "WorldEx.h"
+#endif
+
 
 
 struct FComponentEx

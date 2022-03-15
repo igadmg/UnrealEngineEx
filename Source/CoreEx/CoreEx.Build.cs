@@ -10,6 +10,7 @@ public class CoreEx : ModuleRules
 	{
 		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
+		PrivatePCHHeaderFile = "Private/CoreExPrivatePCH.h";
 
 
 		PublicIncludePaths.AddRange(new string[] {

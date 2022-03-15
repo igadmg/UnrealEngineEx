@@ -10,6 +10,7 @@ public class UnrealEditorEx : ModuleRules
 	{
 		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
+		PrivatePCHHeaderFile = "Private/UnrealEditorExPrivatePCH.h";
 
 
 		PublicIncludePaths.AddRange(new string[] {
