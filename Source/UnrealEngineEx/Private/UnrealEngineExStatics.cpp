@@ -37,8 +37,7 @@
 #include "Settings/LevelEditorPlaySettings.h"
 #endif
 
-#include "CoreEx.h"
-#include "CoordinateFrame.h"
+#include "UnrealEngineEx.final.h"
 
 
 struct FFindStreamingLevelBy {
@@ -205,6 +204,13 @@ TResult* ForEachOwningActor(UObject* Object, TFunction<TResult* (AActor*)> Funct
 	}
 
 	return ForEachOwningActor(Object->GetOuter(), Function);
+}
+
+bool UUnrealEngineExStatics::IsOwnedBy(const UObject* Object, const UObject* Owner)
+{
+	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("UUnrealEngineExStatics::IsOwnedBy"), STAT_UnrealEngineExStaticsIsOwnedBy, STATGROUP_UnrealEngineEx);
+
+	return ForEachOwningActor<AActor>(const_cast<UObject*>(Object), [Owner](auto Actor) { return Actor == Owner ? Actor : nullptr; }) != nullptr;
 }
 
 AActor* UUnrealEngineExStatics::GetOwningActor(const UObject* Object)

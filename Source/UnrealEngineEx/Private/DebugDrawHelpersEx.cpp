@@ -8,6 +8,8 @@
 #include "Engine/Canvas.h"
 #include "GameFramework/HUD.h"
 
+#include "UnrealEngineEx.final.h"
+
 
 
 #if ENABLE_DRAW_DEBUG

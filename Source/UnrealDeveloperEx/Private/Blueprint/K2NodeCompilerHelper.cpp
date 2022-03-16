@@ -36,6 +36,64 @@ FK2NodeCompilerHelper::~FK2NodeCompilerHelper()
 	}
 }
 
+UK2Node_CallFunction* FK2NodeCompilerHelper::SpawnSetVariableNode(const FEdGraphPinType& PinType)
+{
+	UFunction* SetByNameFunction = UEdGraphSchema_K2::FindSetVariableByNameFunction(PinType);
+	if (SetByNameFunction)
+	{
+		if (PinType.IsArray())
+		{
+			return SpawnIntermediateNode<UK2Node_CallArrayFunction>(SetByNameFunction);
+		}
+
+		return SpawnIntermediateNode<UK2Node_CallFunction>(SetByNameFunction);
+	}
+
+	return nullptr;
+}
+
+UK2Node_CallFunction* FK2NodeCompilerHelper::SpawnSetVariableNode(UEdGraphPin* SourcePin)
+{
+	auto SetVariableNode = SpawnSetVariableNode(SourcePin->PinType);
+	if (SetVariableNode)
+	{
+		UEdGraphPin* PropertyNamePin = SetVariableNode->FindPinChecked(TEXT("PropertyName"));
+#if !UE_VERSION_OLDER_THAN(4, 19, 0)
+		PropertyNamePin->DefaultValue = SourcePin->PinName.ToString();
+#else
+		PropertyNamePin->DefaultValue = SourcePin->PinName;
+#endif
+
+		// Move connection from the variable pin on the spawn node to the 'value' pin
+		UEdGraphPin* ValuePin = SetVariableNode->FindPinChecked(TEXT("Value"));
+		if (SourcePin->LinkedTo.Num() == 0) // TODO: sus
+		{
+			if (SourcePin->DefaultValue != FString()
+				&& SourcePin->PinType.PinCategory == UEdGraphSchema_K2::PC_Byte
+				&& SourcePin->PinType.PinSubCategoryObject.IsValid()
+				&& SourcePin->PinType.PinSubCategoryObject->IsA<UEnum>())
+			{
+				// Pin is an enum, we need to alias the enum value to an int:
+				SourcePin = SpawnIntermediateNode<UK2Node_EnumLiteral>(SourcePin)
+					->FindPin(UEdGraphSchema_K2::PN_ReturnValue);
+			}
+			else if (!SourcePin->PinType.IsArray()
+				&& SourcePin->PinType.PinCategory == UEdGraphSchema_K2::PC_Struct)
+			{
+				// For non-array struct pins that are not linked, transfer the pin type so that the node will expand an auto-ref that will assign the value by-ref.
+				ValuePin->PinType.PinCategory = SourcePin->PinType.PinCategory;
+				ValuePin->PinType.PinSubCategory = SourcePin->PinType.PinSubCategory;
+				ValuePin->PinType.PinSubCategoryObject = SourcePin->PinType.PinSubCategoryObject;
+			}
+		}
+
+		ConnectPins(SourcePin, ValuePin);
+		SetVariableNode->PinConnectionListChanged(ValuePin);
+	}
+
+	return SetVariableNode;
+}
+
 UK2Node_TemporaryVariable* FK2NodeCompilerHelper::SpawnInternalVariable(const FEdGraphPinType& PinType)
 {
 	return CompilerContext.SpawnInternalVariable(Node
@@ -134,65 +192,18 @@ bool FK2NodeCompilerHelper::ConnectPins(class UEdGraphPin* SourcePin, class UEdG
 	return bIsErrorFree;
 }
 
-bool FK2NodeCompilerHelper::CreateSetParamByNameNodes(UEdGraphPin* ObjectPin, UEdGraphPin* SpawnVarPin)
+bool FK2NodeCompilerHelper::ConnectSetVariable(UEdGraphPin* SourcePin, UEdGraphPin* ObjectPin)
 {
-	auto Schema = CompilerContext.GetSchema();
-
-	UFunction* SetByNameFunction = Schema->FindSetVariableByNameFunction(SpawnVarPin->PinType);
-	if (SetByNameFunction)
+	if (auto SetVarNode = SpawnSetVariableNode(SourcePin))
 	{
-		UK2Node_CallFunction* SetVarNode = NULL;
-		if (SpawnVarPin->PinType.IsArray())
-		{
-			SetVarNode = SpawnIntermediateNode<UK2Node_CallArrayFunction>(SetByNameFunction);
-		}
-		else
-		{
-			SetVarNode = SpawnIntermediateNode<UK2Node_CallFunction>(SetByNameFunction);
-		}
+		ConnectPins(ObjectPin, SetVarNode->FindPinChecked(TEXT("Object")));
 
-		// Connect the new actor to the 'object' pin
-		bIsErrorFree &= Schema->TryCreateConnection(ObjectPin, SetVarNode->FindPinChecked(TEXT("Object")));
-
-		// Fill in literal for 'property name' pin - name of pin is property name
-		UEdGraphPin* PropertyNamePin = SetVarNode->FindPinChecked(TEXT("PropertyName"));
-#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 19 || ENGINE_MAJOR_VERSION >= 5
-		PropertyNamePin->DefaultValue = SpawnVarPin->PinName.ToString();
-#else
-		PropertyNamePin->DefaultValue = SpawnVarPin->PinName;
-#endif
-
-		// Move connection from the variable pin on the spawn node to the 'value' pin
-		UEdGraphPin* ValuePin = SetVarNode->FindPinChecked(TEXT("Value"));
-		if (SpawnVarPin->LinkedTo.Num() == 0 &&
-			SpawnVarPin->DefaultValue != FString() &&
-			SpawnVarPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Byte &&
-			SpawnVarPin->PinType.PinSubCategoryObject.IsValid() &&
-			SpawnVarPin->PinType.PinSubCategoryObject->IsA<UEnum>())
-		{
-			// Pin is an enum, we need to alias the enum value to an int:
-			SpawnIntermediateNode<UK2Node_EnumLiteral>(SpawnVarPin, ValuePin);
-		}
-		else
-		{
-			// For non-array struct pins that are not linked, transfer the pin type so that the node will expand an auto-ref that will assign the value by-ref.
-			if (SpawnVarPin->PinType.IsArray() == false && SpawnVarPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Struct && SpawnVarPin->LinkedTo.Num() == 0)
-			{
-				ValuePin->PinType.PinCategory = SpawnVarPin->PinType.PinCategory;
-				ValuePin->PinType.PinSubCategory = SpawnVarPin->PinType.PinSubCategory;
-				ValuePin->PinType.PinSubCategoryObject = SpawnVarPin->PinType.PinSubCategoryObject;
-				ConnectPins(SpawnVarPin, ValuePin);
-			}
-			else
-			{
-				ConnectPins(SpawnVarPin, ValuePin);
-				SetVarNode->PinConnectionListChanged(ValuePin);
-			}
-		}
+		return bIsErrorFree;
 	}
 
 	return bIsErrorFree;
 }
+
 
 void FK2NodeCompilerHelper::SetupNode(UK2Node_Event* Event, FName CustomFunctionName)
 {
@@ -326,15 +337,13 @@ void FK2NodeCompilerHelper::ConnectNode(UK2Node_DynamicCast* DynamicCast, UClass
 	ConnectPins(ObjectPin, DynamicCast->GetCastSourcePin());
 }
 
-void FK2NodeCompilerHelper::SetupNode(UK2Node_EnumLiteral* EnumLiteral, UEdGraphPin* ValuePin, UEdGraphPin* ResultPin)
+void FK2NodeCompilerHelper::SetupNode(UK2Node_EnumLiteral* EnumLiteral, UEdGraphPin* ValuePin)
 {
 	EnumLiteral->Enum = CastChecked<UEnum>(ValuePin->PinType.PinSubCategoryObject.Get());
 }
 
-void FK2NodeCompilerHelper::ConnectNode(UK2Node_EnumLiteral* EnumLiteral, UEdGraphPin* ValuePin, UEdGraphPin* ResultPin)
+void FK2NodeCompilerHelper::ConnectNode(UK2Node_EnumLiteral* EnumLiteral, UEdGraphPin* ValuePin)
 {
-	ConnectPins(EnumLiteral->FindPin(UEdGraphSchema_K2::PN_ReturnValue), ResultPin);
-
 	if (auto InPin = EnumLiteral->FindPinChecked(UK2Node_EnumLiteral::GetEnumInputPinName()))
 	{
 		InPin->DefaultValue = ValuePin->DefaultValue;

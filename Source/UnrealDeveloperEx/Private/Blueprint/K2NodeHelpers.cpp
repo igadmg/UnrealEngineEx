@@ -210,6 +210,25 @@ UEdGraphNode* FK2NodeHelpers::GetLinkedPinNode(UEdGraphPin* Pin)
 
 	return nullptr;
 }
+#if 0
+void FK2NodeHelpers::ForEachOutputDelegate(UClass* ObjectClass, TFunction<void(FMulticastDelegateProperty*)> Predicate)
+{
+	for (TFieldIterator<FProperty> PropertyIt(ObjectClass); PropertyIt; ++PropertyIt)
+	{
+		if (auto AsMulticastDelegateProperty = Valid<FMulticastDelegateProperty>(*PropertyIt))
+		{
+			if (auto PropertyClass = AsMulticastDelegateProperty->GetOwnerClass())
+			{
+				// Expose only delegates declare in object implementing UStateInterface
+				if (!PropertyClass->ImplementsInterface(UStateInterface::StaticClass()))
+					continue;
+
+				Predicate(AsMulticastDelegateProperty);
+			}
+		}
+	}
+}
+#endif
 
 FDelegateAndPins
 FDelegateAndPins::FindDelegatePins(UEdGraphNode* Node, FMulticastDelegateProperty* Delegate)

@@ -2,6 +2,7 @@
 
 #include "AsyncTaskManager.h"
 
+#include "UnrealEngineEx.final.h"
 
 
 UAsyncTask::UAsyncTask(const FObjectInitializer& ObjectInitializer)

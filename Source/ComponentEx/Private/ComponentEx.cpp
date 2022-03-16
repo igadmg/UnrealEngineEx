@@ -3,9 +3,11 @@
 #include "Components/ActorComponent.h"
 #include "GameFramework/Actor.h"
 
+#include "ComponentEx.final.h"
 
 
-#define LOCTEXT_NAMESPACE "FComponentExModule"
+
+#define LOCTEXT_NAMESPACE "ComponentEx"
 
 
 
@@ -16,10 +18,6 @@ void FComponentExModule::StartupModule()
 void FComponentExModule::ShutdownModule()
 {
 }
-
-
-
-#undef LOCTEXT_NAMESPACE
 
 
 
@@ -58,3 +56,5 @@ void FComponentEx::SetActorEnabled(AActor* Actor, bool bIsEnabled)
 	}
 #endif
 }
+
+#undef LOCTEXT_NAMESPACE

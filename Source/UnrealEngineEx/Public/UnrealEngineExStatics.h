@@ -58,6 +58,9 @@ public:
 	static class AHUD* GetLocalPlayerHUD(const UObject* WorldContextObject);
 
 
+	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, meta = (DefaultToSelf = "Owner"))
+	static bool IsOwnedBy(const UObject* Object, const UObject* Owner);
+
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, meta = (DefaultToSelf = "Object"))
 	static class AActor* GetOwningActor(const UObject* Object);
 

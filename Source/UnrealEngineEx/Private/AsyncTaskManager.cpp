@@ -2,6 +2,7 @@
 
 #include "AsyncTask.h"
 
+#include "UnrealEngineEx.final.h"
 
 
 UAsyncTaskManager* UAsyncTaskManager::Instance = nullptr;

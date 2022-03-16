@@ -3,7 +3,7 @@
 #include "Framework/Application/SlateApplication.h"
 #include "Framework/Application/SlateUser.h"
 
-#include "CoreEx.h"
+#include "UnrealEngineEx.final.h"
 
 
 UUserWidgetEx::UUserWidgetEx(const FObjectInitializer& ObjectInitializer)

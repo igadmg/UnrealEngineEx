@@ -1,6 +1,7 @@
 #include "InputTrigger.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "UnrealEngineEx.final.h"
 
 
 UInputTrigger::UInputTrigger(const FObjectInitializer& ObjectInitializer)

@@ -1,7 +1,7 @@
-#include "ChildActorPrimitiveComponent.h"
+#include "Components/ChildActorPrimitiveComponent.h"
 #include "Misc/EngineVersionComparison.h"
 
-#include "CoreEx.h"
+#include "ComponentEx.final.h"
 
 
 UChildActorPrimitiveComponent::UChildActorPrimitiveComponent(const FObjectInitializer& ObjectInitializer)

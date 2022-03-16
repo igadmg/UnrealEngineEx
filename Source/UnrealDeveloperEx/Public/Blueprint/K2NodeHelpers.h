@@ -31,6 +31,19 @@ public:
 	static UClass* GetPinTypeClass(UEdGraphPin* Pin, const FEdGraphPinType& PinType);
 
 	static UEdGraphNode* GetLinkedPinNode(UEdGraphPin* Pin);
+
+
+	template <typename T>
+	static void ForEachProperty(UClass* ObjectClass, TFunction<void (T*)> Predicate)
+	{
+		for (TFieldIterator<T> PropertyIt(ObjectClass); PropertyIt; ++PropertyIt)
+		{
+			Predicate(*PropertyIt);
+		}
+	}
+#if 0
+	void ForEachOutputDelegate(class UClass* ObjectClass, TFunction<void(FMulticastDelegateProperty*)> Predicate);
+#endif
 };
 
 #define DECLARE_PIN(PinName)\

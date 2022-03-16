@@ -1,5 +1,7 @@
 #include "NetworkSimulationPlayerController.h"
 
+#include "UnrealEngineEx.final.h"
+
 
 ANetworkSimulationPlayerController::ANetworkSimulationPlayerController(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

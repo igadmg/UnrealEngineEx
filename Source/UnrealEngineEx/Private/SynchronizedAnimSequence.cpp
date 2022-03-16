@@ -4,6 +4,7 @@
 #include "Components/SkeletalMeshComponent.h"
 
 #include "UnrealEngineExStatics.h"
+#include "UnrealEngineEx.final.h"
 
 
 

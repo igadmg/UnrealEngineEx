@@ -1,8 +1,10 @@
-#include "DiscComponent.h"
+#include "Components/DiscComponent.h"
 
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
 #include "PrimitiveSceneProxy.h"
+
+#include "ComponentEx.final.h"
 
 
 UDiscComponent::UDiscComponent()

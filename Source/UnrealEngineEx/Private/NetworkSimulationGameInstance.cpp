@@ -5,7 +5,7 @@
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "CoreEx.h"
+#include "UnrealEngineEx.final.h"
 
 
 UNetworkSimulationGameInstance::UNetworkSimulationGameInstance(const FObjectInitializer& ObjectInitializer)

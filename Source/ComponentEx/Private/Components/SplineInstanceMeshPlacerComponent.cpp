@@ -1,9 +1,9 @@
-#include "SplineInstanceMeshPlacerComponent.h"
+#include "Components/SplineInstanceMeshPlacerComponent.h"
 
 #include "Components/SplineComponent.h"
 #include "Misc/EngineVersionComparison.h"
 
-#include "IsValidEx.h"
+#include "ComponentEx.final.h"
 
 
 

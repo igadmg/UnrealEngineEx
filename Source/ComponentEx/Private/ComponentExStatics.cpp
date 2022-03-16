@@ -19,7 +19,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "TimerManager.h"
 
-#include "CoreEx.h"
+#include "ComponentEx.final.h"
 
 
 

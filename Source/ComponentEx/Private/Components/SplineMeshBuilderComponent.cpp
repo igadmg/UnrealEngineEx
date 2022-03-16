@@ -1,4 +1,4 @@
-#include "SplineMeshBuilderComponent.h"
+#include "Components/SplineMeshBuilderComponent.h"
 
 #include "Components/SplineComponent.h"
 #include "Components/SplineMeshComponent.h"
@@ -6,7 +6,7 @@
 #include "Materials/Material.h"
 #include "ComponentExStatics.h"
 
-#include "IsValidEx.h"
+#include "ComponentEx.final.h"
 
 
 

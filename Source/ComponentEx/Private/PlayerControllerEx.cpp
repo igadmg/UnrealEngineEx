@@ -3,6 +3,8 @@
 #include "Engine/LocalPlayer.h"
 #include "Engine/GameViewportClient.h"
 
+#include "ComponentEx.final.h"
+
 
 
 FVector2D FPlayerControllerEx::GetViewportFoV() const

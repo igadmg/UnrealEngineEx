@@ -2,8 +2,10 @@
 #define COREEX_CoreEx_h
 
 #include "CoreMinimal.h"
+#include "Engine/EngineBaseTypes.h"
 #include "Engine/EngineTypes.h"
 #include "Engine/Engine.h"
+#include "CoreTypesEx.h"
 
 
 #define CONCAT(a, b) CONCAT_INNER(a, b)

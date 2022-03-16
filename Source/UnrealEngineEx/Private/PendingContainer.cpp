@@ -1,5 +1,6 @@
 #include "PendingContainer.h"
 
+#include "UnrealEngineEx.final.h"
 
 
 UPendingContainer::UPendingContainer(const FObjectInitializer& ObjectInitializer)

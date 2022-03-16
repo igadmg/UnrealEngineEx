@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CoreEx.h"
 #include "UnrealEngineEx.h"
 
 #if WITH_EDITOR

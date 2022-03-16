@@ -66,6 +66,16 @@ public:
 
 public:
 	UK2Node_TemporaryVariable* SpawnInternalVariable(const struct FEdGraphPinType& PinType);
+	UK2Node_CallFunction* SpawnSetVariableNode(const FEdGraphPinType& PinType);
+	UK2Node_CallFunction* SpawnSetVariableNode(UEdGraphPin* SourcePin);
+
+	template <typename NodeType, typename... Ts>
+	NodeType* SpawnSetVariableNode(UEdGraphPin* SourcePin, Ts... args)
+	{
+		auto Result = SpawnSetVariableNode<NodeType>(UEdGraphPin * SourcePin);
+
+		return Result;
+	}
 
 	template <typename NodeType, typename... Ts>
 	NodeType* SpawnIntermediateEventNode(UEdGraphPin* SourcePin, Ts... args)
@@ -139,8 +149,7 @@ public:
 	UK2Node_CallFunction* SpawnIsValidNode(UEdGraphPin* ObjectPin);
 
 	bool ConnectPins(UEdGraphPin* SourcePin, UEdGraphPin* TargetPin, bool bOptional = false);
-
-	bool CreateSetParamByNameNodes(UEdGraphPin* ObjectPin, UEdGraphPin* SpawnVarPin);
+	bool ConnectSetVariable(UEdGraphPin* SourcePin, UEdGraphPin* ObjectPin);
 
 
 protected:
@@ -180,8 +189,8 @@ protected:
 	void SetupNode(UK2Node_DynamicCast* DynamicCast, class UClass* CastClass, UEdGraphPin* ObjectPin);
 	void ConnectNode(UK2Node_DynamicCast* DynamicCast, class UClass* CastClass, UEdGraphPin* ObjectPin);
 
-	void SetupNode(UK2Node_EnumLiteral* EnumLiteral, UEdGraphPin* ValuePin, UEdGraphPin* ResultPin);
-	void ConnectNode(UK2Node_EnumLiteral* EnumLiteral, UEdGraphPin* ValuePin, UEdGraphPin* ResultPin);
+	void SetupNode(UK2Node_EnumLiteral* EnumLiteral, UEdGraphPin* ValuePin);
+	void ConnectNode(UK2Node_EnumLiteral* EnumLiteral, UEdGraphPin* ValuePin);
 
 	void SetupNode(UK2Node_IfThenElse* IfThenElse, UEdGraphPin* ConditionPin) {}
 	void ConnectNode(UK2Node_IfThenElse* IfThenElse, UEdGraphPin* ConditionPin);

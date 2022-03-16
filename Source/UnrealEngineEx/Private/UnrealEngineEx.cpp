@@ -11,7 +11,7 @@
 #include "LatentActions.h"
 
 #include "UnrealEngineExStatics.h"
-
+#include "UnrealEngineEx.final.h"
 
 
 #define LOCTEXT_NAMESPACE "FUnrealEngineExModule"

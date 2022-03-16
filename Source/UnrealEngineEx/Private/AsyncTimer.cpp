@@ -2,6 +2,7 @@
 
 #include "Engine/Engine.h"
 
+#include "UnrealEngineEx.final.h"
 
 
 /*

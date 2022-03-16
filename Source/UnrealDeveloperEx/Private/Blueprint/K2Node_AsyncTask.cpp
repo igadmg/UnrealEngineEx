@@ -207,14 +207,12 @@ void UK2Node_AsyncTask::ExpandNode(FKismetCompilerContext& CompilerContext, UEdG
 	auto UpCastNode = Compiler.SpawnIntermediateNode<UK2Node_DynamicCast>(AsyncTaskClass, AsyncTaskPin);
 	AsyncTaskPin = UpCastNode->GetCastResultPin();
 
-	// Create 'set var by name' nodes and hook them up
 	for (auto SpawnVarPin : Pins)
 	{
-		// Only create 'set param by name' node if this pin is linked to something
-		if (SpawnVarPin->LinkedTo.Num() > 0)
-		{
-			Compiler.CreateSetParamByNameNodes(AsyncTaskPin, SpawnVarPin);
-		}
+		if (SpawnVarPin->LinkedTo.Num() == 0)
+			continue;
+
+		Compiler.ConnectSetVariable(SpawnVarPin, AsyncTaskPin);
 	}
 
 	for (TFieldIterator<FMulticastDelegateProperty> PropertyIt(AsyncTaskClass, EFieldIteratorFlags::IncludeSuper); PropertyIt && Compiler.bIsErrorFree; ++PropertyIt)

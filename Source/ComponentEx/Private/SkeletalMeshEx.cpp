@@ -2,6 +2,8 @@
 
 #include "Engine/SkeletalMeshSocket.h"
 
+#include "ComponentEx.final.h"
+
 
 
 TArray<USkeletalMeshSocket*> FSkeletalMeshEx::SearchSocketsStartWith(FString InSocketName) const

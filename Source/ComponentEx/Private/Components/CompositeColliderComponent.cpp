@@ -1,6 +1,8 @@
-#include "CompositeColliderComponent.h"
+#include "Components/CompositeColliderComponent.h"
 
 #include "Components/ShapeComponent.h"
+
+#include "ComponentEx.final.h"
 
 
 

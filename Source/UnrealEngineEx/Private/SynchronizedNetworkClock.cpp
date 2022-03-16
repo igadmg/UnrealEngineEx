@@ -5,6 +5,7 @@
 #include "Engine/NetworkObjectList.h"
 #include "Net/UnrealNetwork.h"
 
+#include "UnrealEngineEx.final.h"
 
 
 USynchronizedNetworkClock::USynchronizedNetworkClock(const FObjectInitializer& ObjectInitializer)
