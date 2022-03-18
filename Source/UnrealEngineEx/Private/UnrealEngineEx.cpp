@@ -44,22 +44,22 @@ UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, AGameStateB
 
 UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, AHUD* Unused)
 {
-	return UUnrealEngineExStatics::GetPlayerHUD(Object);
+	return XX::GetPlayerHUD(Object);
 }
 
 UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, APlayerController* Unused)
 {
-	return Cast<APlayerController>(UUnrealEngineExStatics::GetController(Object));
+	return Cast<APlayerController>(XX::GetController(Object));
 }
 
 UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, APlayerState* Unused)
 {
-	return UUnrealEngineExStatics::GetPlayerState(Object);
+	return XX::GetPlayerState(Object);
 }
 
 UObject* FUnrealEngineEx::GetAssociatedObject(const UObject* Object, APawn* Unused)
 {
-	return UUnrealEngineExStatics::GetPlayerPawn(Object);
+	return XX::GetPlayerPawn(Object);
 }
 
 

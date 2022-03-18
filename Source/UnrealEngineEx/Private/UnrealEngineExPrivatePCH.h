@@ -3,6 +3,8 @@
 #include "CoreEx.h"
 #include "UnrealEngineEx.h"
 
+#include "GuessExStatics.h"
+
 #if WITH_EDITOR
 #include "UnrealEd.h"
 #endif

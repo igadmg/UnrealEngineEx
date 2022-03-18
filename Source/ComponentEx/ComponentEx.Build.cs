@@ -24,11 +24,11 @@ public class ComponentEx : ModuleRules
 
 
 		PublicDependencyModuleNames.AddRange(new string[] {
+				"AIModule",
 				"Core",
 				"CoreUObject",
 				"Engine",
-
-				"AIModule",
+				"UMG",
 			});
 
 		PublicDependencyModuleNames.AddRange(new string[] {

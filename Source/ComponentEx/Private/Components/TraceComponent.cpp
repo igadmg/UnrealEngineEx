@@ -15,6 +15,8 @@ UTraceComponent::UTraceComponent(const FObjectInitializer& ObjectInitializer)
 
 void UTraceComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+#if 0
 	auto TraceStart = GetComponentLocation();
 	auto TraceEnd = TraceStart + GetForwardVector() * TraceDistance;
 	
@@ -46,6 +48,21 @@ void UTraceComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, F
 	default:
 		break;
 	}
+#endif
+}
+
+bool UTraceComponent::LineTraceSingle(TEnumAsByte<ETraceTypeQuery> TraceChannel, TArray<AActor*> ActorsToIgnore, FHitResult& HitResult)
+{
+	auto TraceStart = GetComponentLocation();
+	auto TraceEnd = TraceStart + GetForwardVector() * TraceDistance;
+
+	if (auto Pawn = XX::GetPlayerPawn(this))
+	{
+		ActorsToIgnore.Add(Pawn);
+		Pawn->GetAttachedActors(ActorsToIgnore, false, true);
+	}
+
+	return UKismetSystemLibrary::LineTraceSingle(this, TraceStart, TraceEnd, TraceChannel, bTraceComplex, ActorsToIgnore, EDrawDebugTrace::None, HitResult, bIgnoreSelf);
 }
 
 #undef LOCTEXT_NAMESPACE

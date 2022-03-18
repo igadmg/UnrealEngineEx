@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "CoreExStatics.generated.h"
 
@@ -24,9 +25,4 @@ public:
 	/** Return self class to blueprint. */
 	UFUNCTION(Category = "CoreEx", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static UClass* GetSelfClass(const UObject* WorldContextObject);
-
-	/** Filter Array by predicate */
-	UFUNCTION(Category = "CoreEx", BlueprintCallable)
-	static TArray<UObject*> ArrayFilter(UPARAM(ref) TArray<UObject*>& Array, FObjectArrayPredicate Predicate);
 };
-

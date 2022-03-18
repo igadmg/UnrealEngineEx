@@ -159,15 +159,16 @@ struct TValid<T, U, typename std::enable_if<std::is_same<T, U>::value>::type>
 
 struct FCoreEx
 {
-	template <typename UI>
+	template <typename IT>
 	static bool DoesImplementInterface(const UObject* Object)
 	{
-		checkf(UI::StaticClass()->IsChildOf(UInterface::StaticClass()), TEXT("Interface parameter %s is not actually an interface."), *UI::StaticClass()->GetName());
+		auto InterfaceStaticClass = typename IT::UClassType::StaticClass();
+		checkf(InterfaceStaticClass->IsChildOf(UInterface::StaticClass()), TEXT("Interface parameter %s is not actually an interface."), *InterfaceStaticClass->GetName());
 
 		if (!IsValid(Object))
 			return false;
 
-		return Object->GetClass()->ImplementsInterface(UI::StaticClass());
+		return Object->GetClass()->ImplementsInterface(InterfaceStaticClass);
 	}
 
 	static bool DoesImplementInterface(const UObject* Object, UClass* SomeInterface)
@@ -181,21 +182,18 @@ struct FCoreEx
 	static COREEX_API bool IsObjectReinst(UObject* Object);
 };
 
-template <typename UT, typename T>
-const T* ValidInterface(const T* v) { return IsValid(v) && FCoreEx::DoesImplementInterface<UT>(v) ? v : nullptr; }
+template <typename IT, typename T>
+TScriptInterface<IT> ValidInterface(const T* v) { return IsValid(v) && FCoreEx::DoesImplementInterface<IT>(v) ? TScriptInterface<IT>(v) : nullptr; }
 
-template <typename UT, typename T>
-T* ValidInterface(T* v) { return IsValid(v) && FCoreEx::DoesImplementInterface<UT>(v) ? v : nullptr; }
+template <typename IT, typename T>
+TScriptInterface<IT> ValidInterface(T* v) { return IsValid(v) && FCoreEx::DoesImplementInterface<IT>(v) ? TScriptInterface<IT>(v) : nullptr; }
 
 #define if_Implements(...) EXPAND(GET_MACRO_2_3(__VA_ARGS__, if_Implements3, if_Implements2)(__VA_ARGS__))
 
 #define if_Implements2(TypeAndName, Expression) \
-if (auto TypeAndName = ValidInterface<U ## TypeAndName>(Expression))
+if (auto TypeAndName = ValidInterface<I ## TypeAndName>(Expression))
 
 #define if_Implements3(Type, Name, Expression) \
-if (auto Name = ValidInterface<U ## Type>(Expression))
-
-#define if_ImplementsT(UType, Name, Expression) \
-if (auto Name = ValidInterface<UType>(Expression))
+if (auto Name = ValidInterface<Type>(Expression))
 
 #endif

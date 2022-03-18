@@ -28,11 +28,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TraceDistance = 2000.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ETaceType TaceType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TEnumAsByte<ETraceTypeQuery> TraceChannel;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//ETaceType TaceType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bTraceComplex = false;
@@ -40,11 +37,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIgnoreSelf = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<AActor*> ActorsToIgnore;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//TArray<AActor*> ActorsToIgnore;
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
-	TArray<FHitResult> HitResults;
+	//UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
+	//TArray<FHitResult> HitResults;
+
+
+public:
+	UFUNCTION(BlueprintCallable)
+	bool LineTraceSingle(TEnumAsByte<ETraceTypeQuery> TraceChannel, TArray<AActor*> ActorsToIgnore, FHitResult& HitResult);
 
 
 public:

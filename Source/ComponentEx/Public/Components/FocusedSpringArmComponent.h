@@ -13,8 +13,16 @@ class COMPONENTEX_API UFocusedSpringArmComponent : public USpringArmComponent
 
 public:
 	/** Focal point where camera should be rotated and look at. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
-	FVector FocusOffset;
+	UPROPERTY(Category = "Camera", EditAnywhere, BlueprintReadWrite)
+	FVector FocusOffset = FVector(2000.f, 0.f, 0.f);
+
+
+public:
+	UFUNCTION(BlueprintPure)
+	FVector GetFocusLocation() const;
+
+	UFUNCTION(BlueprintPure)
+	FRotator GetFocusRotation() const;
 
 
 public:
@@ -23,4 +31,12 @@ public:
 
 public:
 	virtual FTransform GetSocketTransform(FName InSocketName, ERelativeTransformSpace TransformSpace = RTS_World) const override;
+
+
+protected:
+	virtual void UpdateDesiredArmLocation(bool bDoTrace, bool bDoLocationLag, bool bDoRotationLag, float DeltaTime) override;
+
+
+protected:
+	FRotator PreviousFocusRotation;
 };
