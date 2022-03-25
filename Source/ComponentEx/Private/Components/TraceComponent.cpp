@@ -1,5 +1,6 @@
 #include "Components/TraceComponent.h"
 
+#include "Camera/CameraComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 #include "ComponentEx.final.h"
@@ -62,7 +63,34 @@ bool UTraceComponent::LineTraceSingle(TEnumAsByte<ETraceTypeQuery> TraceChannel,
 		Pawn->GetAttachedActors(ActorsToIgnore, false, true);
 	}
 
+#if WITH_EDITOR
+	return UKismetSystemLibrary::LineTraceSingle(this, TraceStart, TraceEnd, TraceChannel, bTraceComplex, ActorsToIgnore, DrawDebugTrace, HitResult, bIgnoreSelf, TraceColor, TraceHitColor, DrawTime);
+#else
 	return UKismetSystemLibrary::LineTraceSingle(this, TraceStart, TraceEnd, TraceChannel, bTraceComplex, ActorsToIgnore, EDrawDebugTrace::None, HitResult, bIgnoreSelf);
+#endif
+}
+
+bool UTraceComponent::CameraLineTraceSingle(TEnumAsByte<ETraceTypeQuery> TraceChannel, TArray<AActor*> ActorsToIgnore, FHitResult& HitResult)
+{
+	if (auto CameraManager = XX::GetPlayerCameraManager(this))
+	{
+		auto TraceStart = CameraManager->GetCameraLocation();
+		auto TraceEnd = TraceStart + FTransform(CameraManager->GetCameraRotation()).GetUnitAxis(EAxis::X) * TraceDistance;
+
+		if (auto Pawn = XX::GetPlayerPawn(this))
+		{
+			ActorsToIgnore.Add(Pawn);
+			Pawn->GetAttachedActors(ActorsToIgnore, false, true);
+		}
+
+#if WITH_EDITOR
+		return UKismetSystemLibrary::LineTraceSingle(this, TraceStart, TraceEnd, TraceChannel, bTraceComplex, ActorsToIgnore, DrawDebugTrace, HitResult, bIgnoreSelf, TraceColor, TraceHitColor, DrawTime);
+#else
+		return UKismetSystemLibrary::LineTraceSingle(this, TraceStart, TraceEnd, TraceChannel, bTraceComplex, ActorsToIgnore, EDrawDebugTrace::None, HitResult, bIgnoreSelf);
+#endif
+	}
+
+	return LineTraceSingle(TraceChannel, ActorsToIgnore, HitResult);
 }
 
 #undef LOCTEXT_NAMESPACE

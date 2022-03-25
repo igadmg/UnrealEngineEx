@@ -262,7 +262,8 @@ UCameraComponent* UGuessExStatics::GetPlayerActiveCamera(const UObject* Object)
 	if (!IsValid(Controller->PlayerCameraManager))
 		return nullptr;
 
-	return nullptr;
+	// TODO: implement
+	return nullptr;// Controller->PlayerCameraManager->GetCameraRotation;
 }
 
 UCharacterMovementComponent* UGuessExStatics::GetCharacterMovementComponent(const UObject* Object)

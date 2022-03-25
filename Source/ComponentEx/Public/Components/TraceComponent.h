@@ -40,13 +40,27 @@ public:
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	//TArray<AActor*> ActorsToIgnore;
 
-	//UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
-	//TArray<FHitResult> HitResults;
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TEnumAsByte<EDrawDebugTrace::Type> DrawDebugTrace;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FLinearColor TraceColor = FLinearColor::Red;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FLinearColor TraceHitColor = FLinearColor::Green;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float DrawTime = 5.0f;
+#endif
 
 
 public:
 	UFUNCTION(BlueprintCallable)
 	bool LineTraceSingle(TEnumAsByte<ETraceTypeQuery> TraceChannel, TArray<AActor*> ActorsToIgnore, FHitResult& HitResult);
+
+	UFUNCTION(BlueprintCallable)
+	bool CameraLineTraceSingle(TEnumAsByte<ETraceTypeQuery> TraceChannel, TArray<AActor*> ActorsToIgnore, FHitResult& HitResult);
 
 
 public:

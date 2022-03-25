@@ -15,6 +15,17 @@ static bool IsValid(const FName& Name)
 	return Name != NAME_None && Name.IsValid();
 }
 
+static bool IsValid(const FString& String)
+{
+	return !String.IsEmpty();
+}
+
+static bool IsValid(const FText& Text)
+{
+	return !Text.IsEmpty();
+}
+
+
 static bool IsValid(const void* Ptr)
 {
 	return Ptr != nullptr;
@@ -110,6 +121,14 @@ static bool IsValid(FBodyInstance* BodyInstance)
 static bool IsValid(const FDataTableRowHandle& DataTableRowHandle)
 {
 	return !DataTableRowHandle.IsNull();
+}
+#endif
+
+#if defined(GAMEPLAYTAGS_GameplayTagContainer_generated_h) && !defined(IsValid_GAMEPLAYTAGS_GameplayTagContainer_generated_h)
+#define IsValid_GAMEPLAYTAGS_GameplayTagContainer_generated_h
+static bool IsValid(const FGameplayTag& GameplayTag)
+{
+	return GameplayTag.IsValid();
 }
 #endif
 

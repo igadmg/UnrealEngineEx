@@ -144,4 +144,22 @@ namespace XX
 	{
 		return TValid<TController, AController>::Valid(UGuessExStatics::GetLocalPlayerController(Object));
 	}
+
+	template <typename TPlayerCameraManager = APlayerCameraManager>
+	TPlayerCameraManager* GetPlayerCameraManager(const UObject* Object)
+	{
+		return TValid<TPlayerCameraManager, APlayerCameraManager>::Valid(UGuessExStatics::GetPlayerCameraManager(Object));
+	}
+
+	template <typename TCameraComponent = UCameraComponent>
+	TCameraComponent* GetPlayerActiveCamera(const UObject* Object)
+	{
+		return TValid<TCameraComponent, UCameraComponent>::Valid(UGuessExStatics::GetPlayerActiveCamera(Object));
+	}
+
+	template <typename TCharacterMovementComponent = UCharacterMovementComponent>
+	TCharacterMovementComponent* GetCharacterMovementComponent(const UObject* Object)
+	{
+		return TValid<TCharacterMovementComponent, UCharacterMovementComponent>::Valid(UGuessExStatics::GetCharacterMovementComponent(Object));
+	}
 }

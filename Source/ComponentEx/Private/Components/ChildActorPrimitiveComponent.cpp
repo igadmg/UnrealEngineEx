@@ -10,14 +10,13 @@ UChildActorPrimitiveComponent::UChildActorPrimitiveComponent(const FObjectInitia
 	bAllowReregistration = false;
 }
 
-/*
 void UChildActorPrimitiveComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UChildActorPrimitiveComponent, ChildActor);
+	DOREPLIFETIME(UChildActorPrimitiveComponent, ChildActorClass);
+	DOREPLIFETIME(UChildActorPrimitiveComponent, ChildActorPtr);
 }
-*/
 
 void UChildActorPrimitiveComponent::OnRegister()
 {
@@ -104,6 +103,28 @@ void UChildActorPrimitiveComponent::PostLoad()
 	Super::PostLoad();
 }
 #endif
+
+void UChildActorPrimitiveComponent::SetChildActor(AActor* ChildActor, FName SocketName)
+{
+	ChildAttachedActors.Empty();
+	if (IsValid(ChildActorPtr))
+	{
+		DestroyChildActor();
+	}
+
+	if (IsValid(ChildActor))
+	{
+		if (USceneComponent* ChildRoot = ChildActor->GetRootComponent())
+		{
+			TGuardValue<TEnumAsByte<EComponentMobility::Type>> MobilityGuard(ChildRoot->Mobility, Mobility);
+			ChildRoot->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+		}
+
+		ChildActorClass = ChildActor->GetClass();
+		ChildActorPtr = ChildActor;
+		OnChildActorCreated(ChildActor);
+	}
+}
 
 void UChildActorPrimitiveComponent::SetChildActorClass(TSubclassOf<AActor> InClass, AActor* NewChildActorTemplate)
 {

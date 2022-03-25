@@ -11,10 +11,10 @@ class COMPONENTEX_API UChildActorPrimitiveComponent : public UPrimitiveComponent
 
 
 protected:
-	UPROPERTY(Category = "ChildActorPrimitiveComponent", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", OnlyPlaceable))
+	UPROPERTY(Category = "ChildActorPrimitiveComponent", EditAnywhere, BlueprintReadOnly, Replicated, meta = (AllowPrivateAccess = "true", OnlyPlaceable))
 	TSubclassOf<AActor> ChildActorClass;
 
-	UPROPERTY(Category = "ChildActorPrimitiveComponent", VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(Category = "ChildActorPrimitiveComponent", VisibleAnywhere, BlueprintReadOnly, Replicated)
 	TSoftObjectPtr<AActor> ChildActorPtr;
 
 	/** Temprory storage of Actors attached to Child Actor. They are reattached if actor is recreated. */
@@ -25,6 +25,9 @@ protected:
 public:
 	UFUNCTION(Category = "UnrealEngineEx: ChildActorPrimitiveComponent", BlueprintPure)
 	AActor* GetChildActor() const { return ChildActorPtr.Get(); }
+
+	UFUNCTION(Category = "UnrealEngineEx: ChildActorPrimitiveComponent", BlueprintCallable)
+	void SetChildActor(AActor* ChildActor, FName SocketName = NAME_None);
 
 	UFUNCTION(Category = "UnrealEngineEx: ChildActorPrimitiveComponent", BlueprintPure)
 	AActor* GetChildActorTemplate() const { return ChildActorClass ? ChildActorClass->GetDefaultObject<AActor>() : nullptr; }
