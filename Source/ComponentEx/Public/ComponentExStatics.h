@@ -25,6 +25,13 @@ public:
 	static void Attach(const FAttachmentDescription& Where, class AActor* What, class AActor* ParentActor, const FAttachmentTransformRules& AttachmentRules);
 
 
+	UFUNCTION(Category = "ComponentEx|Collision", BlueprintPure)
+	static FVector GetHitOrEndLocation(const FHitResult& HitResult);
+
+	UFUNCTION(Category = "ComponentEx|Collision", BlueprintPure)
+	static FVector GetTraceDirection(const FHitResult& HitResult);
+
+
 	UFUNCTION(Category = "ComponentEx|Controller", BlueprintCallable)
 	static bool RunBehaviorTree(class AController* Controller, class UBehaviorTree* BehaviorTreeAsset, class UBehaviorTreeComponent* BehaviourTreeComponent = nullptr, class UBlackboardComponent* BlackboardComponent = nullptr);
 

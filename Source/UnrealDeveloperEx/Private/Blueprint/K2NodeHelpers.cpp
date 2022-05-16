@@ -97,7 +97,7 @@ void FK2NodeHelpers::CreateOutputPins(UEdGraphNode* Node, FMulticastDelegateProp
 
 	// HACK: Store Delegate here to later Find it in FindDelegatePins
 	//ExecPin->DefaultObject = Property->SignatureFunction;
-	ExecPin->DefaultValue = Property->GetName();
+	ExecPin->PinToolTip = Property->GetName();
 
 	if (auto DelegateSignatureFunction = Valid(Property->SignatureFunction))
 	{
@@ -115,8 +115,7 @@ void FK2NodeHelpers::CreateOutputPins(UEdGraphNode* Node, FMulticastDelegateProp
 				Schema->ConvertPropertyToPinType(Param, /*out*/ Pin->PinType);
 
 				// HACK: Store Delegate here to later Find it in FindDelegatePins
-				//Pin->DefaultObject = Property->SignatureFunction;
-				Pin->DefaultValue = Property->GetName();
+				Pin->PinToolTip = Property->GetName();
 
 				ParameterPins.Add(Pin);
 			}
@@ -238,7 +237,7 @@ FDelegateAndPins::FindDelegatePins(UEdGraphNode* Node, FMulticastDelegatePropert
 	for (auto Pin : Node->Pins)
 	{
 		//if (Pin->DefaultObject != Delegate->SignatureFunction)
-		if (Pin->DefaultValue != Delegate->GetName())
+		if (Pin->PinToolTip != Delegate->GetName())
 			continue;
 
 		if (Pin->PinType.PinCategory == UEdGraphSchema_K2::PC_Exec)

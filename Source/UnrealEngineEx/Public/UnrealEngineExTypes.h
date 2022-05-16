@@ -6,20 +6,34 @@
 
 
 UENUM(BlueprintType)
-enum class EAsyncTaskResult : uint8
-{
-	Complete,
-	Abort,
-	Timeout,
-};
-
-UENUM(BlueprintType)
 enum class EInputMode : uint8
 {
 	None = 0,
 	UIOnly,
 	GameAndUI,
 	GameOnly,
+};
+
+USTRUCT(BlueprintType)
+struct UNREALENGINEEX_API FInputModeConfiguration
+{
+	GENERATED_BODY()
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EInputMode InputMode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "InputMode != EInputMode::GameOnly", EditConditionHides))
+	class UWidget* WidgetToFocus = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "InputMode != EInputMode::GameOnly", EditConditionHides))
+	EMouseLockMode MouseLockMode = EMouseLockMode::DoNotLock;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "InputMode == EInputMode::GameAndUI", EditConditionHides))
+	bool bHideCursorDuringCapture = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bShowCursor = true;
 };
 
 USTRUCT(BlueprintType)
@@ -202,5 +216,4 @@ struct FViewFrustum
 };
 
 
-DECLARE_DYNAMIC_DELEGATE_OneParam(FUnrealEngineExOnAsyncTaskFinishedDelegate, EAsyncTaskResult, Result);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FUnrealEngineExOnLevelStreamedDelegate, class ULevelStreaming*, StreamedLevel);

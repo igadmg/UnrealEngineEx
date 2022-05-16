@@ -1,59 +1,64 @@
 {
-  "FileVersion": 3,
-  "Version": 1,
-  "VersionName": "0.1",
-  "FriendlyName": "UnrealEngineEx",
-  "Description": "Unreal Engine Extension Library",
-  "Category": "Other",
-  "CreatedBy": "Igor Karatayev",
-  "CreatedByURL": "",
-  "DocsURL": "",
-  "MarketplaceURL": "",
-  "SupportURL": "",
-  "Modules": [
-    {
-      "Name": "CoreEx",
-      "Type": "Runtime",
-      "LoadingPhase": "PreDefault"
-    },
-    {
-      "Name": "ComponentEx",
-      "Type": "Runtime",
-      "LoadingPhase": "PreDefault"
-    },
-    {
-      "Name": "CoordinateSystemEx",
-      "Type": "Runtime",
-      "LoadingPhase": "PreDefault"
-    },
-    {
-      "Name": "InterpolationEx",
-      "Type": "Runtime",
-      "LoadingPhase": "PreDefault"
-    },
-    {
-      "Name": "MathEx",
-      "Type": "Runtime",
-      "LoadingPhase": "PreDefault"
-    },
-    {
-      "Name": "UnrealDeveloperEx",
-      "Type": "UncookedOnly",
-      "LoadingPhase": "PreDefault"
-    },
-    {
-      "Name": "UnrealEngineEx",
-      "Type": "Runtime",
-      "LoadingPhase": "Default"
-    },
-    {
-      "Name": "UnrealEditorEx",
-      "Type": "Editor",
-      "LoadingPhase": "PostEngineInit"
-    }
-  ],
-  "EnabledByDefault": false,
-  "CanContainContent": true,
-  "IsBetaVersion": false,
-  "Installed": true
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1",
+	"FriendlyName": "UnrealEngineEx",
+	"Description": "Unreal Engine Extension Library",
+	"Category": "Other",
+	"CreatedBy": "Igor Karatayev",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"Modules": [
+		{
+			"Name": "CoreEx",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		},
+		{
+			"Name": "ComponentEx",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		},
+		{
+			"Name": "CoordinateSystemEx",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		},
+		{
+			"Name": "InterpolationEx",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		},
+		{
+			"Name": "MathEx",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		},
+		{
+			"Name": "UnrealDeveloperEx",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "PreDefault"
+		},
+		{
+			"Name": "UnrealEngineEx",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "UnrealEditorEx",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
+		},
+		{
+			"Name": "DebugEx",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"EnabledByDefault": false,
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": true
 }

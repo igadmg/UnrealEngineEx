@@ -14,15 +14,16 @@ public:
 
 
 public:
-	FORCEINLINE FVector GetRelativeLocation() const;
-	FORCEINLINE FRotator GetRelativeRotation() const;
-	FORCEINLINE FVector GetRelativeScale() const;
-	FORCEINLINE FTransform GetRelativeTransform() const;
+	//FORCEINLINE FVector GetRelativeLocation() const;
+	//FORCEINLINE FRotator GetRelativeRotation() const;
+	//FORCEINLINE FVector GetRelativeScale() const;
+	//FORCEINLINE FTransform GetRelativeTransform() const;
 	FORCEINLINE FVector GetWorldLocation() const { return Object.GetActorLocation(); }
 	FORCEINLINE FRotator GetWorldRotation() const { return Object.GetActorRotation(); }
 	FORCEINLINE FVector GetWorldScale() const { return Object.GetActorScale3D(); }
 	FORCEINLINE FTransform GetWorldTransform() const { return Object.GetActorTransform(); }
 
+	DEFINE_CF_COMMON_FUNCTIONS()
 
 
 protected:
@@ -42,11 +43,11 @@ public:
 
 
 public:
-	FORCEINLINE TCoordinateFrame<AActor>& SetRelativeLocation(FVector NewLocation);
-	FORCEINLINE TCoordinateFrame<AActor>& SetRelativeRotation(FRotator NewRotation);
-	FORCEINLINE TCoordinateFrame<AActor>& SetRelativeRotation(FQuat NewRotation);
-	FORCEINLINE TCoordinateFrame<AActor>& SetRelativeScale(FVector NewScale);
-	FORCEINLINE TCoordinateFrame<AActor>& SetRelativeTransform(FTransform NewTransform);
+	//FORCEINLINE TCoordinateFrame<AActor>& SetRelativeLocation(FVector NewLocation);
+	//FORCEINLINE TCoordinateFrame<AActor>& SetRelativeRotation(FRotator NewRotation);
+	//FORCEINLINE TCoordinateFrame<AActor>& SetRelativeRotation(FQuat NewRotation);
+	//FORCEINLINE TCoordinateFrame<AActor>& SetRelativeScale(FVector NewScale);
+	//FORCEINLINE TCoordinateFrame<AActor>& SetRelativeTransform(FTransform NewTransform);
 	FORCEINLINE TCoordinateFrame<AActor>& SetWorldLocation(FVector NewLocation) { Object.SetActorLocation(NewLocation); return *this; }
 	FORCEINLINE TCoordinateFrame<AActor>& SetWorldRotation(FRotator NewRotation) { Object.SetActorRotation(NewRotation); return *this; }
 	FORCEINLINE TCoordinateFrame<AActor>& SetWorldRotation(FQuat NewRotation) { Object.SetActorRotation(NewRotation); return *this; }

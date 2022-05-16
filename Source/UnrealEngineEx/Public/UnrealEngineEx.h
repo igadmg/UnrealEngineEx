@@ -65,3 +65,7 @@ struct FUnrealEngineEx
 
 //General Log
 DECLARE_LOG_CATEGORY_EXTERN(LogUnrealEngineEx, Log, All);
+
+
+#include "Extensions/IHttpRequestEx.h"
+#include "Extensions/IHttpResponseEx.h"

@@ -23,6 +23,7 @@ public:
 	FORCEINLINE FVector GetWorldScale() const { return Object.GetComponentScale(); }
 	FORCEINLINE FTransform GetWorldTransform() const { return Object.GetComponentTransform(); }
 
+	DEFINE_CF_COMMON_FUNCTIONS()
 
 
 protected:

@@ -20,23 +20,27 @@ public:
 
 
 #ifdef ENGINE_Actor_generated_h
-#include "ActorEx.h"
+#include "Extensions/ActorEx.h"
 #endif
 
 #ifdef ENGINE_PlayerCameraManager_generated_h
-#include "PlayerCameraManagerEx.h"
+#include "Extensions/PlayerCameraManagerEx.h"
 #endif
 
 #ifdef ENGINE_PlayerController_generated_h
-#include "PlayerControllerEx.h"
+#include "Extensions/PlayerControllerEx.h"
+#endif
+
+#ifdef ENGINE_ArrowComponent_generated_h
+#include "Extensions/ArrowComponentEx.h"
 #endif
 
 #ifdef ENGINE_SkeletalMesh_generated_h
-#include "SkeletalMeshEx.h"
+#include "Extensions/SkeletalMeshEx.h"
 #endif
 
 #ifdef ENGINE_World_generated_h
-#include "WorldEx.h"
+#include "Extensions/WorldEx.h"
 #endif
 
 

@@ -24,6 +24,7 @@ IMPLEMENT_PIN(UK2Node_ForEachLoop, OutputElement, "Output Element");
 IMPLEMENT_PIN(UK2Node_ForEachLoop, FilterFlag, "Keep?");
 IMPLEMENT_PIN(UK2Node_ForEachLoop, Completed, "Completed");
 IMPLEMENT_PIN(UK2Node_ForEachLoop, ResultArray, "Result Array");
+IMPLEMENT_PIN(UK2Node_ForEachLoop, ResultItem, "Result Item");
 
 
 UK2Node_ForEachLoop::UK2Node_ForEachLoop(const FObjectInitializer& ObjectInitializer)
@@ -54,6 +55,14 @@ FText UK2Node_ForEachLoop::GetNodeTitle(ENodeTitleType::Type TitleType) const
 		return LoopDirection == ELoopDirection::Forward
 			? LOCTEXT("K2Node_ForEachFilter_Title", "Filter Loop")
 			: LOCTEXT("K2Node_ForEachFilter_TitleReverse", "Reverse Filter Loop");
+	case ELoopFunction::Accumulate:
+		return LoopDirection == ELoopDirection::Forward
+			? LOCTEXT("K2Node_ForEachAccumulate_Title", "Accumulate Loop")
+			: LOCTEXT("K2Node_ForEachAccumulate_TitleReverse", "Reverse Accumulate Loop");
+	case ELoopFunction::Find:
+		return LoopDirection == ELoopDirection::Forward
+			? LOCTEXT("K2Node_ForEachFind_Title", "Find Loop")
+			: LOCTEXT("K2Node_ForEachFind_TitleReverse", "Reverse Find Loop");
 	}
 
 	return LOCTEXT("K2Node_ForEachLoop_Title", "For Each Loop");
@@ -113,6 +122,9 @@ void UK2Node_ForEachLoop::AllocateDefaultPins()
 	case ELoopFunction::Filter:
 		CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Boolean, PN_FilterFlag);
 		break;
+	case ELoopFunction::Find:
+		CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Boolean, PN_FilterFlag);
+		break;
 	}
 
 	if (bHaveBreak)
@@ -124,7 +136,10 @@ void UK2Node_ForEachLoop::AllocateDefaultPins()
 	{
 	case ELoopFunction::Transfrom:
 	case ELoopFunction::Filter:
-		CreatePin(EGPD_Output, OutputArrayType, PN_ResultArray);
+		CreatePin(EGPD_Output, ResultArrayType, PN_ResultArray);
+		break;
+	case ELoopFunction::Find:
+		CreatePin(EGPD_Output, ArrayElementType, PN_ResultItem);
 		break;
 	}
 
@@ -142,7 +157,7 @@ void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerConte
 	auto ArrayPin = Compiler.SpawnIntermediateNode<UK2Node_Cache>(GetArrayPin())->GetOutputObjectPin();
 	auto ArrayLength = Compiler.SpawnIntermediateNode<UK2Node_CallArrayFunction>(EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Length)
 		, TMap<FName, UEdGraphPin*>{ { FName(TEXT("TargetArray")), ArrayPin } });
-	
+
 	auto Counter = LoopDirection == ELoopDirection::Forward
 		? Compiler.CacheInLocalVariable(0)
 		: Compiler.CacheInLocalVariable(ArrayLength->GetReturnValuePin());
@@ -218,8 +233,8 @@ void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerConte
 		switch (LoopFunction)
 		{
 		case ELoopFunction::Transfrom:
-		if (IsValid(OutputArrayType)) {
-			auto OutputArray = Compiler.SpawnInternalVariable(OutputArrayType);
+		if (IsValid(ResultArrayType)) {
+			auto OutputArray = Compiler.SpawnInternalVariable(ResultArrayType);
 			Compiler.ConnectPins(OutputArray->GetVariablePin(), GetResultArrayPin());
 			Compiler.SpawnIntermediateNode<UK2Node_CallArrayFunction>(EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Add)
 				, TMap<FName, UEdGraphPin*>{ { TEXT("TargetArray"), OutputArray->GetVariablePin() }
@@ -263,12 +278,12 @@ void UK2Node_ForEachLoop::UpdateOutputTypes()
 	switch (LoopFunction)
 	{
 	case ELoopFunction::Transfrom:
-		OutputArrayType = OutputElementType;
-		OutputArrayType.bIsReference = false;
-		OutputArrayType.ContainerType = EPinContainerType::Array;
+		ResultArrayType = OutputElementType;
+		ResultArrayType.bIsReference = false;
+		ResultArrayType.ContainerType = EPinContainerType::Array;
 		break;
 	case ELoopFunction::Filter:
-		OutputArrayType = ArrayType;
+		ResultArrayType = ArrayType;
 		break;
 	}
 }
@@ -297,7 +312,7 @@ void UK2Node_ForEachLoop::NotifyPinConnectionListChanged(UEdGraphPin* Pin)
 		UpdateOutputTypes();
 
 		if_Valid(GetOutputElementPin())->PinType = OutputElementType;
-		if_Valid(GetResultArrayPin())->PinType = OutputArrayType;
+		if_Valid(GetResultArrayPin())->PinType = ResultArrayType;
 	}
 }
 

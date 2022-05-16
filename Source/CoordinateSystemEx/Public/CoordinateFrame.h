@@ -8,13 +8,13 @@ That file should be included after all include files in cpp. Btter include it in
 
  Can be used by simply making Cooridante frame from any object (if it is supported)
 
- auto cf = MakeCoordinateFrame(MyActor);
+ auto cf = cf(MyActor);
  cf.GetWorldLocation();
  cf.SetWorldLocation(NewLocation);
 
  or
 
- auto cf = MakeCoordinateFrame(MyActorComponent);
+ auto cf = cf(MyActorComponent);
  cf.GetWorldLocation();
  cf.GetRelativeLocation();
  cf.SetWorldLocation(NewLocation);
@@ -28,6 +28,22 @@ That file should be included after all include files in cpp. Btter include it in
 */
 
 #include "CoordinateFrame.0.h"
+
+#define DEFINE_CF_COMMON_FUNCTIONS() \
+FORCEINLINE FVector GetForwardVector() const { return GetWorldTransform().GetUnitAxis(EAxis::X); }\
+FORCEINLINE FVector GetRightVector() const { return GetWorldTransform().GetUnitAxis(EAxis::Y); }\
+FORCEINLINE FVector GetUpVector() const { return GetWorldTransform().GetUnitAxis(EAxis::Z); }\
+\
+FORCEINLINE FVector LocalToWorldPosition(const FVector& v) const { return GetWorldTransform().TransformPosition(v); }\
+FORCEINLINE FVector LocalToWorldVector(const FVector& v) const { return GetWorldTransform().TransformVector(v); }\
+FORCEINLINE FRotator LocalToWorldRotation(const FRotator& r) const { return GetWorldTransform().TransformRotation(r.Quaternion()).Rotator(); }\
+FORCEINLINE FQuat LocalToWorldRotation(const FQuat& r) const { return GetWorldTransform().TransformRotation(r); }\
+\
+FORCEINLINE FVector WorldToLocalPosition(const FVector& v) const { return GetWorldTransform().InverseTransformPosition(v); }\
+FORCEINLINE FVector WorldToLocalVector(const FVector& v) const { return GetWorldTransform().InverseTransformVector(v); }\
+FORCEINLINE FRotator WorldToLocalRotation(const FRotator& r) const { return GetWorldTransform().InverseTransformRotation(r.Quaternion()).Rotator(); }\
+FORCEINLINE FQuat WorldToLocalRotation(const FQuat& r) const { return GetWorldTransform().InverseTransformRotation(r); }\
+
 
 #include "CoordinateFrame.FTransform.h"
 #include "CoordinateFrame.FPlane.h"

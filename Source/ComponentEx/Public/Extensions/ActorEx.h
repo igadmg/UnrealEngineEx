@@ -1,19 +1,11 @@
 #pragma once
 
+#include "ExPrologue.h"
 #include "GameFramework/Actor.h"
 #include "ValidEx.h"
 
 
-struct FActorConstEx
-{
-	FActorConstEx(const AActor* This)
-		: This_(This)
-	{
-	}
-
-	const AActor* This() const { return This_; }
-
-public:
+DECLARE_CONST_EXTENSION(AActor)
 	COMPONENTEX_API class UCameraComponent* GetCameraComponent() const;
 
 	template <typename T>
@@ -89,28 +81,9 @@ public:
 			return true;
 		});
 	}
-
-private:
-	const AActor* This_;
 };
 
-struct FActorMutableEx : FActorConstEx
-{
-	FActorMutableEx(AActor* This)
-		: FActorConstEx(This)
-	{
-	}
-
-	AActor* This() { return const_cast<AActor*>(FActorConstEx::This()); }
-public:
+DECLARE_MUTABLE_EXTENSION(AActor)
 };
 
-static FActorConstEx FActorEx(const AActor* This)
-{
-	return FActorConstEx(This);
-}
-
-static FActorMutableEx FActorEx(AActor* This)
-{
-	return FActorMutableEx(This);
-}
+DECLARE_EXTENSION(AActor);

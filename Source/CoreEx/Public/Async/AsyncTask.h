@@ -1,21 +1,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UnrealEngineExTypes.h"
+#include "Async/AsyncTypes.h"
 #include "AsyncTask.generated.h"
 
 
-
 UCLASS(blueprintable, BlueprintType)
-class UNREALENGINEEX_API UAsyncTask : public UObject
+class COREEX_API UAsyncTask : public UObject
 {
 	GENERATED_BODY()
 
 
-
 public:
 	virtual class UWorld* GetWorld() const override;
-
 
 
 public:
@@ -25,28 +22,26 @@ public:
 	UPROPERTY(Category = "AsyncTask", VisibleInstanceOnly, transient)
 	float RunTime;
 
-	UPROPERTY(Category = "UnrealEditorEx", EditAnywhere)
-	FUnrealEngineExOnAsyncTaskFinishedDelegate OnFinishedDelegate;
-
+	UPROPERTY(Category = "AsyncTask", EditAnywhere)
+	FCoreExOnAsyncTaskFinishedDelegate OnFinishedDelegate;
 
 
 public:
-	UFUNCTION(Category = "UnrealEngineEx: AsyncTask", BlueprintCallable)
+	UFUNCTION(Category = "CoreEx|AsyncTask", BlueprintCallable)
 	void Run();
 
-	UFUNCTION(Category = "UnrealEngineEx: AsyncTask", BlueprintCallable)
+	UFUNCTION(Category = "CoreEx|AsyncTask", BlueprintCallable)
 	void Abort();
 
-	UFUNCTION(Category = "UnrealEngineEx: AsyncTask", BlueprintImplementableEvent)
+	UFUNCTION(Category = "CoreEx|AsyncTask", BlueprintImplementableEvent)
 	void Begin();
 
 	/** Update function returns true if Task is finished. */
-	UFUNCTION(Category = "UnrealEngineEx: AsyncTask", BlueprintImplementableEvent)
+	UFUNCTION(Category = "CoreEx|AsyncTask", BlueprintImplementableEvent)
 	bool Update(float DeltaSeconds);
 
-	UFUNCTION(Category = "UnrealEngineEx: AsyncTask", BlueprintImplementableEvent)
+	UFUNCTION(Category = "CoreEx|AsyncTask", BlueprintImplementableEvent)
 	void Finish(EAsyncTaskResult Result);
-
 
 
 public:

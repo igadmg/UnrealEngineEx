@@ -21,6 +21,7 @@ enum class ELoopFunction : uint8
 	Transfrom,
 	Filter,
 	Accumulate,
+	Find,
 };
 
 UCLASS()
@@ -49,8 +50,9 @@ public:
 protected:
 	FEdGraphPinType ArrayType;
 	FEdGraphPinType ArrayElementType;
-	FEdGraphPinType OutputArrayType;
 	FEdGraphPinType OutputElementType;
+	FEdGraphPinType ResultArrayType;
+	FEdGraphPinType ResultItemType;
 
 	void UpdateArrayTypes();
 	void UpdateOutputTypes();
@@ -66,6 +68,7 @@ public:
 	DECLARE_PIN(FilterFlag);
 	DECLARE_PIN(Completed);
 	DECLARE_PIN(ResultArray);
+	DECLARE_PIN(ResultItem);
 
 
 public:

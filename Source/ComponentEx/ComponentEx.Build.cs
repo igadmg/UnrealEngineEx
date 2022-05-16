@@ -32,7 +32,9 @@ public class ComponentEx : ModuleRules
 			});
 
 		PublicDependencyModuleNames.AddRange(new string[] {
-				"CoreEx"
+				"CoordinateSystemEx",
+				"CoreEx",
+				"InterpolationEx",
 			});
 
 

@@ -9,7 +9,7 @@ static FORCEINLINE FTransform GetPlaneTransform(const FPlane& Plane)
 		, FVector::PointPlaneProject(FVector(0, 0, 1), Plane)
 	};
 
-	float PlaneAxisSizes[] = {
+	double PlaneAxisSizes[] = {
 		PlaneAxis[0].SizeSquared()
 		, PlaneAxis[1].SizeSquared()
 		, PlaneAxis[2].SizeSquared()
@@ -17,8 +17,8 @@ static FORCEINLINE FTransform GetPlaneTransform(const FPlane& Plane)
 	int indices[] = { 0, 1, 2 };
 
 	struct FAxisSortBySize {
-		float* PlaneAxisSizes;
-		FAxisSortBySize(float* PlaneAxisSizes) : PlaneAxisSizes(PlaneAxisSizes) {}
+		double* PlaneAxisSizes;
+		FAxisSortBySize(double* PlaneAxisSizes) : PlaneAxisSizes(PlaneAxisSizes) {}
 		bool operator()(int a, int b) const { return PlaneAxisSizes[a] > PlaneAxisSizes[b]; }
 	};
 	Sort(indices, 3, FAxisSortBySize(PlaneAxisSizes));

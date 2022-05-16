@@ -72,7 +72,7 @@ public:
 	template <typename NodeType, typename... Ts>
 	NodeType* SpawnSetVariableNode(UEdGraphPin* SourcePin, Ts... args)
 	{
-		auto Result = SpawnSetVariableNode<NodeType>(UEdGraphPin * SourcePin);
+		auto Result = SpawnSetVariableNode<NodeType>(SourcePin);
 
 		return Result;
 	}

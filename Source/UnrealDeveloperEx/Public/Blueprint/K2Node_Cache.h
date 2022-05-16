@@ -1,19 +1,24 @@
 #pragma once
 
 #include "K2Node.h"
+#include "K2Node_AddPinInterface.h"
 #include "Blueprint/K2NodeHelpers.h"
+#include "Misc/EngineVersionComparison.h"
 
 #include "K2Node_Cache.generated.h"
 
 
 UCLASS()
-class UNREALDEVELOPEREX_API UK2Node_Cache : public UK2Node
+class UNREALDEVELOPEREX_API UK2Node_Cache
+	: public UK2Node
+	, public IK2Node_AddPinInterface
 {
 	GENERATED_BODY()
 
 
-protected:
-	FEdGraphPinType InputObjectType;
+public:
+	UPROPERTY()
+	TArray<FEdGraphPinType> InputObjectType;
 
 
 public:
@@ -21,7 +26,11 @@ public:
 	DECLARE_PIN(OutputObject);
 	DECLARE_PIN(Then);
 
-	bool ShouldCacheValue() const;
+	int GetInputObjectNum() const { return InputObjectType.Num(); }
+	UEdGraphPin* GetInputObjectPin(int Index) const;
+	UEdGraphPin* GetOutputObjectPin(int Index) const;
+
+	bool ShouldCacheValue(int Index) const;
 
 
 public:
@@ -35,8 +44,13 @@ public:
 
 	virtual FText GetMenuCategory() const override;
 	virtual void GetMenuActions(class FBlueprintActionDatabaseRegistrar& ActionRegistrar) const override;
+	virtual void GetNodeContextMenuActions(class UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const override;
 
 	virtual void AllocateDefaultPins() override;
+	void AllocateInputObjectPins();
+	void AllocateOutputObjectPins();
+	void UpdateWildcardPins();
+
 	virtual void ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph) override;
 
 	virtual void ReconstructNode() override;
@@ -44,5 +58,18 @@ public:
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
+
+public: /// IK2Node_AddPinInterface
+	void InteractiveAddInputPin();
+	virtual void AddInputPin() override;
+
+#if !UE_VERSION_OLDER_THAN(5, 0, 0)
+	virtual bool CanRemovePin(const UEdGraphPin* Pin) const override;
+	virtual void RemoveInputPin(UEdGraphPin* Pin) override;
+#else
+	virtual bool CanRemovePin(const UEdGraphPin* Pin) const;
+	virtual void RemoveInputPin(UEdGraphPin* Pin);
 #endif
 };

@@ -75,7 +75,7 @@ public:
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
-public:
+public: /// IK2Node_AddPinInterface
 	void InteractiveAddInputPin();
 	virtual void AddInputPin() override;
 

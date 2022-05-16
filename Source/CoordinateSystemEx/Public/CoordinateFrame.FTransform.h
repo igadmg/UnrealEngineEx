@@ -14,19 +14,16 @@ public:
 
 
 public:
-	FORCEINLINE FVector GetRelativeLocation() const { return FVector::ZeroVector; }
-	FORCEINLINE FRotator GetRelativeRotation() const { return FRotator::ZeroRotator; }
-	FORCEINLINE FVector GetRelativeScale() const { return FVector::OneVector; }
-	FORCEINLINE FTransform GetRelativeTransform() const { return FTransform::Identity; }
+	//FORCEINLINE FVector GetRelativeLocation() const { return FVector::ZeroVector; }
+	//FORCEINLINE FRotator GetRelativeRotation() const { return FRotator::ZeroRotator; }
+	//FORCEINLINE FVector GetRelativeScale() const { return FVector::OneVector; }
+	//FORCEINLINE FTransform GetRelativeTransform() const { return FTransform::Identity; }
 	FORCEINLINE FVector GetWorldLocation() const { return Object.GetLocation(); }
 	FORCEINLINE FRotator GetWorldRotation() const { return Object.Rotator(); }
 	FORCEINLINE FVector GetWorldScale() const { return Object.GetScale3D(); }
 	FORCEINLINE FTransform GetWorldTransform() const { return Object; }
 
-	FORCEINLINE FVector GetForwardVector() const { return Object.GetUnitAxis(EAxis::X); }
-	FORCEINLINE FVector GetRightVector() const { return Object.GetUnitAxis(EAxis::Y); }
-	FORCEINLINE FVector GetUpVector() const { return Object.GetUnitAxis(EAxis::Z); }
-
+	DEFINE_CF_COMMON_FUNCTIONS()
 
 
 protected:
@@ -46,11 +43,11 @@ public:
 
 
 public:
-	FORCEINLINE TCoordinateFrame<FTransform>& SetRelativeLocation(FVector NewLocation) { return *this; }
-	FORCEINLINE TCoordinateFrame<FTransform>& SetRelativeRotation(FRotator NewRotation) { return *this; }
-	FORCEINLINE TCoordinateFrame<FTransform>& SetRelativeRotation(FQuat NewRotation) { return *this; }
-	FORCEINLINE TCoordinateFrame<FTransform>& SetRelativeScale(FVector NewScale) { return *this; }
-	FORCEINLINE TCoordinateFrame<FTransform>& SetRelativeTransform(FTransform NewTransform) { return *this; }
+	//FORCEINLINE TCoordinateFrame<FTransform>& SetRelativeLocation(FVector NewLocation) { return *this; }
+	//FORCEINLINE TCoordinateFrame<FTransform>& SetRelativeRotation(FRotator NewRotation) { return *this; }
+	//FORCEINLINE TCoordinateFrame<FTransform>& SetRelativeRotation(FQuat NewRotation) { return *this; }
+	//FORCEINLINE TCoordinateFrame<FTransform>& SetRelativeScale(FVector NewScale) { return *this; }
+	//FORCEINLINE TCoordinateFrame<FTransform>& SetRelativeTransform(FTransform NewTransform) { return *this; }
 	FORCEINLINE TCoordinateFrame<FTransform>& SetWorldLocation(FVector NewLocation) { Object.SetLocation(NewLocation); return *this; }
 	FORCEINLINE TCoordinateFrame<FTransform>& SetWorldRotation(FRotator NewRotation) { Object.SetRotation(FQuat(NewRotation)); return *this; }
 	FORCEINLINE TCoordinateFrame<FTransform>& SetWorldRotation(FQuat NewRotation) { Object.SetRotation(NewRotation); return *this; }

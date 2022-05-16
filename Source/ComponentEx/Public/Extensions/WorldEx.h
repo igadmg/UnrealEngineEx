@@ -1,34 +1,14 @@
 #pragma once
 
+#include "ExPrologue.h"
 #include "Engine/World.h"
 #include "ValidEx.h"
 
 
-struct FWorldConstEx
-{
-	FWorldConstEx(const UWorld* This)
-		: This_(This)
-	{
-	}
-
-	const UWorld* This() const { return This_; }
-
-
-private:
-	const UWorld* This_;
+DECLARE_CONST_EXTENSION(UWorld)
 };
 
-struct FWorldMutableEx : public FWorldConstEx
-{
-	FWorldMutableEx(UWorld* This)
-		: FWorldConstEx(This)
-	{
-	}
-
-	UWorld* This() { return const_cast<UWorld*>(FWorldConstEx::This()); }
-
-
-public:
+DECLARE_MUTABLE_EXTENSION(UWorld)
 	template <typename T, typename InitializerFunction>
 	T* SpawnActor(const TSubclassOf<T>& Class, const FActorSpawnParameters& SpawnParameters, InitializerFunction Initializer)
 	{
@@ -53,12 +33,4 @@ public:
 	}
 };
 
-static FWorldConstEx FWorldEx(const UWorld* This)
-{
-	return FWorldConstEx(This);
-}
-
-static FWorldMutableEx FWorldEx(UWorld* This)
-{
-	return FWorldMutableEx(This);
-}
+DECLARE_EXTENSION(UWorld);

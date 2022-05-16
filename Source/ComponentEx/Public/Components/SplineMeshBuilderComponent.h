@@ -25,10 +25,10 @@ public:
 	class UMaterial* Material;
 
 	UPROPERTY(Category = "SplineMeshBuilderComponent", EditAnywhere, BlueprintReadWrite)
-	TEnumAsByte<ECollisionEnabled::Type> CollisionEnabled;
+	bool bGenerateOverlapEvents = false;
 
 	UPROPERTY(Category = "SplineMeshBuilderComponent", EditAnywhere, BlueprintReadWrite)
-	TEnumAsByte<ECollisionChannel> CollisionChannel;
+	FBodyInstance CollisionPresets;
 
 	UPROPERTY(Category = "SplineMeshBuilderComponent", EditAnywhere, BlueprintReadWrite)
 	float SplineMeshCullDistance = 15000.f;

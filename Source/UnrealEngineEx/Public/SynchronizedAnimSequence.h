@@ -20,11 +20,11 @@ public:
 	class UAnimSequenceBase* Animation = nullptr;
 
 	UPROPERTY(Category = "SynchronizedAnimSequence", VisibleInstanceOnly, BlueprintReadOnly) /* Replicated */
-	float PlayStartServerTime;
+	float PlayStartServerTime = 0.f;
 
 	/** Play Rate. Negative means backward play. */
 	UPROPERTY(Category = "SynchronizedAnimSequence", VisibleInstanceOnly, BlueprintReadOnly) /* Replicaterd */
-	float PlayRate;
+	float PlayRate = 0.f;
 
 
 public:

@@ -51,8 +51,8 @@ bool IsValid(TFunction<FuncType> Func)
 	return (bool)Func;
 }
 
-template <typename T>
-static bool IsValid(const TSharedPtr<T>& SharedPtr)
+template <typename T, ESPMode InMode>
+static bool IsValid(const TSharedPtr<T, InMode>& SharedPtr)
 {
 	return SharedPtr.IsValid();
 }
@@ -65,8 +65,8 @@ static bool IsValid(const TObjectPtr<T>& ObjectPtr)
 }
 #endif
 
-template <typename T>
-static bool IsValid(const TWeakObjectPtr<T>& WeakObjectPtr)
+template <typename T, typename TWeakObjectPtrBase>
+static bool IsValid(const TWeakObjectPtr<T, TWeakObjectPtrBase>& WeakObjectPtr)
 {
 	return WeakObjectPtr.IsValid();
 }

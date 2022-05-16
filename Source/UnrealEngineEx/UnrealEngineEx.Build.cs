@@ -39,6 +39,9 @@ public class UnrealEngineEx : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[] {
 				"EngineSettings",
 				"InputCore",
+				"Json",
+				"JsonUtilities",
+				"HTTP",
 				"SlateCore",
 				"Slate",
 				"UMG",

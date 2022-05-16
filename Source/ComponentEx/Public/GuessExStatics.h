@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "ValidEx.h"
 #include "GuessExStatics.generated.h"
 
@@ -76,9 +77,10 @@ class AHUD;
 class APawn;
 class APlayerState;
 class ASpectatorPawn;
+class UGameInstance;
 
 namespace XX
-{	
+{
 	template <typename TActor = AActor>
 	TActor* GetOwningActor(const UObject* Object)
 	{
@@ -95,6 +97,12 @@ namespace XX
 	TActor* GetOwningActor(const UActorComponent* Object)
 	{
 		return Cast<TActor>(Object->GetOwner());
+	}
+
+	template <typename TGameInstance = UGameInstance>
+	TGameInstance* GetGameInstance(const UObject* Object)
+	{
+		return TValid<TGameInstance, UGameInstance>::Valid(UGameplayStatics::GetGameInstance(Object));
 	}
 
 	template <typename TGameMode = AGameModeBase>
@@ -139,10 +147,10 @@ namespace XX
 		return TValid<TController, AController>::Valid(UGuessExStatics::GetController(Object));
 	}
 
-	template <typename TController = AController>
+	template <typename TController = APlayerController>
 	TController* GetLocalPlayerController(const UObject* Object)
 	{
-		return TValid<TController, AController>::Valid(UGuessExStatics::GetLocalPlayerController(Object));
+		return TValid<TController, APlayerController>::Valid(UGuessExStatics::GetLocalPlayerController(Object));
 	}
 
 	template <typename TPlayerCameraManager = APlayerCameraManager>

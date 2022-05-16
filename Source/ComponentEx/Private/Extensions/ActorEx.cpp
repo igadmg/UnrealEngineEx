@@ -1,11 +1,11 @@
-#include "ActorEx.h"
+#include "Extensions/ActorEx.h"
 
 #include "Camera/CameraComponent.h"
 
 #include "ComponentEx.final.h"
 
 
-UCameraComponent* FActorConstEx::GetCameraComponent() const
+UCameraComponent* FAActorConstEx::GetCameraComponent() const
 {
 	if (!IsValid(This()))
 		return nullptr;

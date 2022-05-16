@@ -110,7 +110,7 @@ AActor* UGuessExStatics::GetControlledActor(const UObject* Object)
 		{
 			return XX::GetPawnOrSpectator(AsHud);
 		}
-		
+
 		return Actor;
 	});
 }

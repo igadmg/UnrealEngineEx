@@ -46,10 +46,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FLinearColor TraceColor = FLinearColor::Red;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FLinearColor TraceHitColor = FLinearColor::Green;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float DrawTime = 5.0f;
 #endif

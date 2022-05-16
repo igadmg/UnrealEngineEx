@@ -366,10 +366,12 @@ void FK2NodeCompilerHelper::ConnectNode(UK2Node_Knot* KnotNode, UEdGraphPin* Obj
 		if (ObjectPin->Direction == EEdGraphPinDirection::EGPD_Input)
 		{
 			bIsErrorFree &= CompilerContext.MovePinLinksToIntermediate(*ObjectPin, *KnotNode->GetInputPin()).CanSafeConnect();
+			KnotNode->NotifyPinConnectionListChanged(KnotNode->GetInputPin());
 		}
 		else
 		{
 			bIsErrorFree &= CompilerContext.MovePinLinksToIntermediate(*ObjectPin, *KnotNode->GetOutputPin()).CanSafeConnect();
+			KnotNode->NotifyPinConnectionListChanged(KnotNode->GetOutputPin());
 		}
 	}
 	else
@@ -377,10 +379,12 @@ void FK2NodeCompilerHelper::ConnectNode(UK2Node_Knot* KnotNode, UEdGraphPin* Obj
 		if (ObjectPin->Direction == EEdGraphPinDirection::EGPD_Output)
 		{
 			bIsErrorFree &= CompilerContext.GetSchema()->TryCreateConnection(ObjectPin, KnotNode->GetInputPin());
+			KnotNode->NotifyPinConnectionListChanged(KnotNode->GetInputPin());
 		}
 		else
 		{
 			bIsErrorFree &= CompilerContext.GetSchema()->TryCreateConnection(KnotNode->GetOutputPin(), ObjectPin);
+			KnotNode->NotifyPinConnectionListChanged(KnotNode->GetOutputPin());
 		}
 	}
 }

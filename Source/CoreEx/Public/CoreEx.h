@@ -14,11 +14,13 @@
 #define EXPAND(x) x
 #define GET_MACRO_1_2(_1,_2,NAME,...) NAME
 #define GET_MACRO_2_3(_1,_2,_3,NAME,...) NAME
+#define GET_N(_1, _2, _3, _4, NAME, ...) NAME
 
-#define EXPAND_1(X) typename X
-#define EXPAND_2(X, ...) typename X, EXPAND(EXPAND_1(__VA_ARGS__))
-#define EXPAND_3(X, ...) typename X, EXPAND(EXPAND_2(__VA_ARGS__))
-#define EXPAND_4(X, ...) typename X, EXPAND(EXPAND_3(__VA_ARGS__))
+#define TYPENAME_1(X) typename X
+#define TYPENAME_2(X, ...) typename X, EXPAND(TYPENAME_1(__VA_ARGS__))
+#define TYPENAME_3(X, ...) typename X, EXPAND(TYPENAME_2(__VA_ARGS__))
+#define TYPENAME_4(X, ...) typename X, EXPAND(TYPENAME_3(__VA_ARGS__))
+#define TYPENAME_N(...) EXPAND(GET_N(__VA_ARGS__, TYPENAME_4, TYPENAME_3, TYPENAME_2, TYPENAME_1)(__VA_ARGS__))
 
 
 #define if_CanExecuteCosmeticEvents(WorldContextObject) \
@@ -78,6 +80,23 @@ static bool IsInGame(const UObject* WorldContextObject)
 }
 
 
+namespace XX
+{
+	template <typename TSubsystemClass>
+	inline TSubsystemClass* GetSubsystem(const UObject* WorldContextObject)
+	{
+		auto World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+		return World ? World->GetSubsystem<TSubsystemClass>() : nullptr;
+	}
+}
+
+template <typename RefType, typename AssignedType = RefType>
+TGuardValue<RefType, AssignedType> MakeGuardValue(RefType& ReferenceValue, const AssignedType& NewValue)
+{
+	return TGuardValue<RefType, AssignedType>(ReferenceValue, NewValue);
+}
+
+
 #if WITH_EDITOR
 
 #define if_PropertyChanged(...) EXPAND(GET_MACRO_1_2(__VA_ARGS__, if_PropertyChanged2, if_PropertyChanged1)(__VA_ARGS__))
@@ -97,8 +116,9 @@ if (PropertyChangedEvent.PropertyChain.GetActiveMemberNode()->GetValue()->GetFNa
 #include "EnumEx.h"
 #include "Throttle.h"
 
-#include "ArrayEx.h"
-#include "MapEx.h"
+#include "Extensions/ArrayEx.h"
+#include "Extensions/MapEx.h"
+#include "Extensions/ClassEx.h"
 
 #endif
 

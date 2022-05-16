@@ -6,8 +6,7 @@
 #include "BlueprintNodeSpawner.h"
 #include "EditorCategoryUtils.h"
 
-#include "ClassEx.h"
-#include "MapEx.h"
+#include "CoreEx.h"
 
 
 #define LOCTEXT_NAMESPACE "UnrealDeveloperEx"
@@ -130,8 +129,8 @@ void UK2Node_DispatchEvents::ExpandNode(class FKismetCompilerContext& CompilerCo
 
 	if (auto ObjectType = Valid(InputObjectType))
 	{
-		FUClassConstEx(ObjectType).ForEachOutputDelegate([this](auto Delegate) {
-			if (FilterByClass && !FUClassConstEx(FilterByClass).IsAssignableFrom(Delegate->GetOwnerClass()))
+		ex(ObjectType).ForEachOutputDelegate([this](auto Delegate) {
+			if (FilterByClass && !ex(*FilterByClass).IsAssignableFrom(Delegate->GetOwnerClass()))
 				return;
 
 			auto DelegateName = Delegate->GetFName();
@@ -190,12 +189,12 @@ void UK2Node_DispatchEvents::ReconstructNode()
 
 	if (auto ObjectType = Valid(InputObjectType))
 	{
-		FUClassConstEx(ObjectType).ForEachOutputDelegate([this, PrevExposedEvents](auto Delegate) {
-			if (FilterByClass && !FUClassConstEx(FilterByClass).IsAssignableFrom(Delegate->GetOwnerClass()))
+		ex(ObjectType).ForEachOutputDelegate([this, PrevExposedEvents](auto Delegate) {
+			if (FilterByClass && !ex(*FilterByClass).IsAssignableFrom(Delegate->GetOwnerClass()))
 				return;
 
 			auto DelegateName = Delegate->GetFName();
-			ExposedEvents.Add(DelegateName, FTMapEx(PrevExposedEvents).FindRef(DelegateName, EEventDispatchType::Permanent));
+			ExposedEvents.Add(DelegateName, ex(PrevExposedEvents).FindRef(DelegateName, EEventDispatchType::Permanent));
 			EventsByName.Add(DelegateName, Delegate);
 		});
 	}

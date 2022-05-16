@@ -7,27 +7,39 @@
 #include "CoordinateFrame.h"
 
 
+#define RETURN_CF_CALL(Object, Call)\
+if (auto AsActor = Cast<AActor>(Object))\
+{\
+	return cf(AsActor).Call;\
+}\
+else if (auto AsActorComponent = Cast<UActorComponent>(Object))\
+{\
+	auto AsSceneComponent = Cast<USceneComponent>(AsActorComponent);\
+	if (AsSceneComponent)\
+		return cf(AsSceneComponent).Call;\
+\
+	return cf(AsActorComponent).Call;\
+}
+
+#define SET_CF_CALL(Object, Call)\
+if (auto AsActor = Cast<AActor>(Object))\
+{\
+	cf(AsActor).Call;\
+}\
+else if (auto AsActorComponent = Cast<UActorComponent>(Object))\
+{\
+	if (auto AsSceneComponent = Cast<USceneComponent>(AsActorComponent))\
+		cf(AsSceneComponent).Call;\
+	else\
+		cf(AsActorComponent).Call;\
+}
 
 FVector UCoordinateSystemExStatics::GetWorldLocation(class UObject* Object)
 {
 	if (!IsValid(Object))
 		return FVector::ZeroVector;
 
-	AActor* AsActor = Cast<AActor>(Object);
-	if (AsActor)
-	{
-		return MakeCoordinateFrame(AsActor).GetWorldLocation();
-	}
-	else
-	{
-		USceneComponent* AsSceneComponent = Cast<USceneComponent>(Object);
-		if (AsSceneComponent)
-			return MakeCoordinateFrame(AsSceneComponent).GetWorldLocation();
-
-		UActorComponent* AsActorComponent = Cast<UActorComponent>(Object);
-		if (AsActorComponent)
-			return MakeCoordinateFrame(AsActorComponent).GetWorldLocation();
-	}
+	RETURN_CF_CALL(Object, GetWorldLocation());
 
 	return FVector::ZeroVector;
 }
@@ -37,21 +49,7 @@ FTransform UCoordinateSystemExStatics::GetWorldTransform(class UObject* Object)
 	if (!IsValid(Object))
 		return FTransform::Identity;
 
-	AActor* AsActor = Cast<AActor>(Object);
-	if (AsActor)
-	{
-		return MakeCoordinateFrame(AsActor).GetWorldTransform();
-	}
-	else
-	{
-		USceneComponent* AsSceneComponent = Cast<USceneComponent>(Object);
-		if (AsSceneComponent)
-			return MakeCoordinateFrame(AsSceneComponent).GetWorldTransform();
-
-		UActorComponent* AsActorComponent = Cast<UActorComponent>(Object);
-		if (AsActorComponent)
-			return MakeCoordinateFrame(AsActorComponent).GetWorldTransform();
-	}
+	RETURN_CF_CALL(Object, GetWorldTransform());
 
 	return FTransform::Identity;
 }
@@ -61,21 +59,7 @@ void UCoordinateSystemExStatics::SetWorldLocation(class UObject* Object, FVector
 	if (!IsValid(Object))
 		return;
 
-	AActor* AsActor = Cast<AActor>(Object);
-	if (AsActor)
-	{
-		MakeCoordinateFrame(AsActor).SetWorldLocation(NewLocation);
-	}
-	else
-	{
-		USceneComponent* AsSceneComponent = Cast<USceneComponent>(Object);
-		if (AsSceneComponent)
-			MakeCoordinateFrame(AsSceneComponent).SetWorldLocation(NewLocation);
-
-		UActorComponent* AsActorComponent = Cast<UActorComponent>(Object);
-		if (AsActorComponent)
-			MakeCoordinateFrame(AsActorComponent).SetWorldLocation(NewLocation);
-	}
+	SET_CF_CALL(Object, SetWorldLocation(NewLocation));
 }
 
 void UCoordinateSystemExStatics::SetWorldTransform(class UObject* Object, FTransform NewTransform)
@@ -83,19 +67,8 @@ void UCoordinateSystemExStatics::SetWorldTransform(class UObject* Object, FTrans
 	if (!IsValid(Object))
 		return;
 
-	AActor* AsActor = Cast<AActor>(Object);
-	if (AsActor)
-	{
-		MakeCoordinateFrame(AsActor).SetWorldTransform(NewTransform);
-	}
-	else
-	{
-		USceneComponent* AsSceneComponent = Cast<USceneComponent>(Object);
-		if (AsSceneComponent)
-			MakeCoordinateFrame(AsSceneComponent).SetWorldTransform(NewTransform);
-
-		UActorComponent* AsActorComponent = Cast<UActorComponent>(Object);
-		if (AsActorComponent)
-			MakeCoordinateFrame(AsActorComponent).SetWorldTransform(NewTransform);
-	}
+	SET_CF_CALL(Object, SetWorldTransform(NewTransform));
 }
+
+#undef RETURN_CF_CALL
+#undef SET_CF_CALL

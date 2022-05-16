@@ -34,7 +34,6 @@ public class InterpolationEx : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
 				"InputCore",
-				"UnrealEngineEx",
 			});
 	}
 }

@@ -22,7 +22,6 @@
 #include "ComponentEx.final.h"
 
 
-
 void UComponentExStatics::SetActorEnabled(AActor* Actor, bool bIsEnabled)
 {
 	FComponentEx::SetActorEnabled(Actor, bIsEnabled);
@@ -30,7 +29,7 @@ void UComponentExStatics::SetActorEnabled(AActor* Actor, bool bIsEnabled)
 
 UCameraComponent* UComponentExStatics::GetCameraComponent(const AActor* Actor)
 {
-	return FActorEx(Actor).GetCameraComponent();
+	return ex(Actor).GetCameraComponent();
 }
 
 void UComponentExStatics::Attach(const FAttachmentDescription& Where, AActor* What, AActor* ParentActor, const FAttachmentTransformRules& AttachmentRules)
@@ -43,6 +42,16 @@ void UComponentExStatics::Attach(const FAttachmentDescription& Where, AActor* Wh
 	{
 		What->AttachToComponent(Where.Component, AttachmentRules, Where.SocketName);
 	}
+}
+
+FVector UComponentExStatics::GetHitOrEndLocation(const FHitResult& HitResult)
+{
+	return HitResult.bBlockingHit ? HitResult.Location : HitResult.TraceEnd;
+}
+
+FVector UComponentExStatics::GetTraceDirection(const FHitResult& HitResult)
+{
+	return (HitResult.TraceEnd - HitResult.TraceStart).GetSafeNormal();
 }
 
 bool UComponentExStatics::RunBehaviorTree(AController* Controller, UBehaviorTree* BehaviorTreeAsset, UBehaviorTreeComponent* BehaviourTreeComponent, UBlackboardComponent* BlackboardComponent)
@@ -115,7 +124,7 @@ bool UComponentExStatics::UseBlackboard(AController* Controller, UBlackboardData
 			BlackboardComponent->RegisterComponent();
 		}
 	}
-	
+
 	if (BlackboardComponent->GetBlackboardAsset() == nullptr)
 	{
 		InitializeBlackboard(Controller, *BlackboardComponent, *BlackboardAsset);

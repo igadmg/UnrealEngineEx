@@ -18,10 +18,10 @@ public:
 	FORCEINLINE FRotator GetRelativeRotation() const { return Object.RelativeRotation; }
 	FORCEINLINE FVector GetRelativeScale() const { return Object.RelativeScale; }
 	FORCEINLINE FTransform GetRelativeTransform() const { return FTransform(Object.RelativeRotation, Object.RelativeLocation, Object.RelativeScale); }
-	FORCEINLINE FVector GetWorldLocation() const;
-	FORCEINLINE FRotator GetWorldRotation() const;
-	FORCEINLINE FVector GetWorldScale() const;
-	FORCEINLINE FTransform GetWorldTransform() const;
+	//FORCEINLINE FVector GetWorldLocation() const;
+	//FORCEINLINE FRotator GetWorldRotation() const;
+	//FORCEINLINE FVector GetWorldScale() const;
+	//FORCEINLINE FTransform GetWorldTransform() const;
 
 
 

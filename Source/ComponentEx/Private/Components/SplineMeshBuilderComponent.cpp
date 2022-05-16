@@ -40,22 +40,32 @@ void USplineMeshBuilderComponent::BuildSplineMesh()
 			{
 				SplineMeshComponent = SpareSplineMeshComponents.Last();
 				SpareSplineMeshComponents.SetNum(SpareSplineMeshComponents.Num() - 1);
+
+				if (IsValid(SplineMeshComponent))
+				{
+					SplineMeshComponent->SetMobility(Mobility);
+				}
 			}
 			if (!IsValid(SplineMeshComponent))
 			{
 				SplineMeshComponent = NewObject<USplineMeshComponent>(GetOuter(), NAME_None, RF_Transactional);
 
+				SplineMeshComponent->SetMobility(Mobility);
 				SplineMeshComponent->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 				SplineMeshComponent->RegisterComponent();
 			}
 
 			SplineMeshComponent->SetStaticMesh(Mesh);
 			if (IsValid(Material))
+			{
 				SplineMeshComponent->SetMaterial(0, Material);
-			SplineMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			SplineMeshComponent->SetCollisionObjectType(CollisionChannel);
+			}
+
 			SplineMeshComponent->SetCullDistance(SplineMeshCullDistance);
-			SplineMeshComponent->SetRelativeTransform(SplineComponent->GetRelativeTransform());
+			SplineMeshComponent->SetRelativeTransform(cf(SplineComponent).GetRelativeTransform());
+
+			SplineMeshComponent->BodyInstance = CollisionPresets;
+			SplineMeshComponent->SetGenerateOverlapEvents(bGenerateOverlapEvents);
 
 			UComponentExStatics::SetupSplineMeshComponentFromSpline(SplineMeshComponent, SplineComponent
 				, IntervalStart, IntervalEnd, ESplineCoordinateSpace::Local);
@@ -71,6 +81,7 @@ void USplineMeshBuilderComponent::BuildSplineMesh()
 			continue;
 
 		GetOwner()->RemoveInstanceComponent(SplineMeshComponent);
+		SplineMeshComponent->DestroyBodySetup();
 		SplineMeshComponent->UnregisterComponent();
 		SplineMeshComponent->DestroyComponent();
 	}
@@ -104,7 +115,7 @@ bool USplineMeshBuilderComponent::OnWorldLoaded()
 
 bool USplineMeshBuilderComponent::OnWorldSaved()
 {
-	SetCollisionEnabled(CollisionEnabled);
+	SetCollisionEnabled(CollisionPresets.GetCollisionEnabled());
 	for (auto SplineMeshComponent : SplineMeshComponents)
 	{
 		GetOwner()->AddInstanceComponent(SplineMeshComponent);
@@ -122,5 +133,5 @@ void USplineMeshBuilderComponent::OnHiddenInGameChanged()
 		SplineMeshComponent->SetHiddenInGame(bHiddenInGame);
 	}
 
-	SetCollisionEnabled(bHiddenInGame ? ECollisionEnabled::NoCollision : (ECollisionEnabled::Type)CollisionEnabled);
+	SetCollisionEnabled(bHiddenInGame ? ECollisionEnabled::NoCollision : CollisionPresets.GetCollisionEnabled());
 }

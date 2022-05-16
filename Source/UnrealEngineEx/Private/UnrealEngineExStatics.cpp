@@ -25,8 +25,6 @@
 #include "GameFramework/SpectatorPawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "AsyncTask.h"
-#include "AsyncTaskManager.h"
 #include "DebugDrawHelpersEx.h"
 #include "EngineUtils.h"
 #include "GameMapsSettings.h"
@@ -840,51 +838,6 @@ float UUnrealEngineExStatics::GetTimerPercentTimeHandle(const UObject* WorldCont
 	return 0.f;
 }
 
-UAsyncTask* UUnrealEngineExStatics::CreateAsyncTask(const UObject* WorldContextObject, TSubclassOf<UAsyncTask> AsyncTaskClass)
-{
-	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
-	if (!IsValid(World))
-		return nullptr;
-
-	return NewObject<UAsyncTask>(World, AsyncTaskClass);
-}
-
-
-UAsyncTask* UUnrealEngineExStatics::CreateAsyncTaskWithCallback(const UObject* WorldContextObject, TSubclassOf<UAsyncTask> AsyncTaskClass, const FUnrealEngineExOnAsyncTaskFinishedDelegate& OnFinished, bool bAutorun)
-{
-	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
-	if (!IsValid(World))
-		return nullptr;
-
-	UAsyncTask* AsyncTask = NewObject<UAsyncTask>(World, AsyncTaskClass);
-
-	AsyncTask->OnFinishedDelegate = OnFinished;
-	if (bAutorun)
-	{
-		AsyncTask->Run();
-	}
-
-	return AsyncTask;
-}
-
-UAsyncTask* UUnrealEngineExStatics::CreateAsyncTaskNoCallback(const UObject* WorldContextObject, TSubclassOf<class UAsyncTask> AsyncTaskClass, bool bAutorun)
-{
-	return CreateAsyncTaskWithCallback(WorldContextObject, AsyncTaskClass, FUnrealEngineExOnAsyncTaskFinishedDelegate(), bAutorun);
-}
-
-void UUnrealEngineExStatics::ClearAsyncTasks()
-{
-	for (UAsyncTask* AsyncTask : UAsyncTaskManager::Instance->Tasks)
-	{
-		if (IsValid(AsyncTask))
-		{
-			AsyncTask->Abort();
-		}
-	}
-
-	UAsyncTaskManager::Instance->Tasks.Empty();
-}
-
 FNetworkStatus UUnrealEngineExStatics::GetNetworkStatus(const UObject* WorldContextObject)
 {
 	FNetworkStatus Result;
@@ -1081,9 +1034,9 @@ FTransform UUnrealEngineExStatics::GetTransfromInFrontOfPlayer(AActor* PlayerPaw
 
 	FTransform Result(CameraRotation, CameraLocation, FVector::OneVector);
 	Result.AddToTranslation(
-		MakeCoordinateFrame(Result).GetForwardVector() * Offset.X
-		+ MakeCoordinateFrame(Result).GetRightVector() * Offset.Y
-		+ MakeCoordinateFrame(Result).GetUpVector() * Offset.Z
+		cf(Result).GetForwardVector() * Offset.X
+		+ cf(Result).GetRightVector() * Offset.Y
+		+ cf(Result).GetUpVector() * Offset.Z
 	);
 
 	return Result;

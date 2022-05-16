@@ -32,7 +32,7 @@ public:
 		{
 			this->SetNum(N - 1, false);
 		}
-		
+
 		this->Insert(Value, 0);
 	}
 
@@ -69,8 +69,8 @@ public:
 			Interpolator::Extrapolate(this->GetData(), this->Num(), Time, Result);
 
 			return EInterpolationStatus::IT_Extrapolated;
-		}		
-		
+		}
+
 		// interpolate
 		{
 			const T &FirstState = (*this)[PreviousIndex];

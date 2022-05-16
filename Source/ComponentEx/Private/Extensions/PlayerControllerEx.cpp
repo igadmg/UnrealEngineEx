@@ -1,4 +1,4 @@
-#include "PlayerControllerEx.h"
+#include "Extensions/PlayerControllerEx.h"
 
 #include "Engine/LocalPlayer.h"
 #include "Engine/GameViewportClient.h"
@@ -7,9 +7,9 @@
 
 
 
-FVector2D FPlayerControllerEx::GetViewportFoV() const
+FVector2D FAPlayerControllerConstEx::GetViewportFoV() const
 {
-	if (auto PlayerCameraManager = This->PlayerCameraManager)
+	if (auto PlayerCameraManager = This()->PlayerCameraManager)
 	{
 		float FOV = PlayerCameraManager->GetFOVAngle();
 
@@ -21,9 +21,9 @@ FVector2D FPlayerControllerEx::GetViewportFoV() const
 	return FVector2D(1, 1);
 }
 
-FVector2D FPlayerControllerEx::GetViewportSize() const
+FVector2D FAPlayerControllerConstEx::GetViewportSize() const
 {
-	if (auto LocalPlayer = This->GetLocalPlayer())
+	if (auto LocalPlayer = This()->GetLocalPlayer())
 	{
 		if (auto ViewportClient = LocalPlayer->ViewportClient)
 		{

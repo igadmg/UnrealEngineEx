@@ -5,6 +5,8 @@
 #include "BlueprintActionDatabaseRegistrar.h"
 #include "BlueprintNodeSpawner.h"
 #include "EditorCategoryUtils.h"
+#include "ScopedTransaction.h"
+#include "ToolMenu.h"
 
 #include "K2Node_FunctionEntry.h"
 #include "K2Node_VariableGet.h"
@@ -21,8 +23,8 @@ IMPLEMENT_SCHEMA_PIN(UK2Node_Cache, Then, UEdGraphSchema_K2::PN_Then);
 
 UK2Node_Cache::UK2Node_Cache(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, InputObjectType(FK2NodeHelpers::MakePinType(UEdGraphSchema_K2::PC_Wildcard))
 {
+	InputObjectType.Add(FK2NodeHelpers::MakePinType(UEdGraphSchema_K2::PC_Wildcard));
 }
 
 FText UK2Node_Cache::GetTooltipText() const
@@ -32,9 +34,7 @@ FText UK2Node_Cache::GetTooltipText() const
 
 FText UK2Node_Cache::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
-	return ShouldCacheValue()
-		? LOCTEXT("K2Node_Cache_Title", "Cached")
-		: LOCTEXT("K2Node_Cache_Title", "Cache");
+	return LOCTEXT("K2Node_Cache_Title", "Cache");
 }
 
 FSlateIcon UK2Node_Cache::GetIconAndTint(FLinearColor& OutColor) const
@@ -74,9 +74,58 @@ void UK2Node_Cache::GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegi
 	}
 }
 
-bool UK2Node_Cache::ShouldCacheValue() const
+void UK2Node_Cache::GetNodeContextMenuActions(UToolMenu* Menu, UGraphNodeContextMenuContext* Context) const
 {
-	if (auto LinkedObjectPinNode = FK2NodeHelpers::GetLinkedPinNode(GetInputObjectPin()))
+	Super::GetNodeContextMenuActions(Menu, Context);
+
+	if (!Context->bIsDebugging)
+	{
+		FToolMenuSection& Section = Menu->AddSection("K2NodeCache", LOCTEXT("K2Node_Cache_ContextMenu", "Cache"));
+
+		if (Context->Pin != NULL)
+		{
+			if (Context->Pin->PinType.PinCategory != UEdGraphSchema_K2::PC_Exec)
+			{
+				Section.AddMenuEntry(
+					"RemovePin",
+					LOCTEXT("RemovePin", "Remove array element pin"),
+					LOCTEXT("RemovePinTooltip", "Remove this array element pin"),
+					FSlateIcon(),
+					FUIAction(
+						FExecuteAction::CreateUObject(const_cast<UK2Node_Cache*>(this), &UK2Node_Cache::RemoveInputPin, const_cast<UEdGraphPin*>(Context->Pin))
+					)
+				);
+			}
+		}
+		else
+		{
+			Section.AddMenuEntry(
+				"AddPin",
+				LOCTEXT("AddPin", "Add array element pin"),
+				LOCTEXT("AddPinTooltip", "Add another array element pin"),
+				FSlateIcon(),
+				FUIAction(
+					FExecuteAction::CreateUObject(const_cast<UK2Node_Cache*>(this), &UK2Node_Cache::InteractiveAddInputPin)
+				)
+			);
+		}
+
+		Section.AddMenuEntry(
+			"ResetToWildcard",
+			LOCTEXT("ResetToWildcard", "Reset to wildcard"),
+			LOCTEXT("ResetToWildcardTooltip", "Reset the node to have wildcard input/outputs. Requires no pins are connected."),
+			FSlateIcon(),
+			FUIAction(
+				//FExecuteAction::CreateUObject(const_cast<UK2Node_Cache*>(this), &UK2Node_Cache::ClearPinTypeToWildcard),
+				//FCanExecuteAction::CreateUObject(this, &UK2Node_MakeArray::CanResetToWildcard)
+			)
+		);
+	}
+}
+
+bool UK2Node_Cache::ShouldCacheValue(int Index) const
+{
+	if (auto LinkedObjectPinNode = FK2NodeHelpers::GetLinkedPinNode(GetInputObjectPin(Index)))
 	{
 		if (LinkedObjectPinNode->IsA<UK2Node_VariableGet>())
 			return false;
@@ -88,21 +137,71 @@ bool UK2Node_Cache::ShouldCacheValue() const
 			return AsFunctionCall->bIsPureFunc;
 		}
 
-		return GetOutputObjectPin()->LinkedTo.Num() > 1;
+		return GetOutputObjectPin(Index)->LinkedTo.Num() > 1;
 	}
 
 	return false;
 }
 
+UEdGraphPin* UK2Node_Cache::GetInputObjectPin(int Index) const
+{
+	if (Index == 0)
+		return GetInputObjectPin();
+
+	int InputObjectPinIndex = Pins.IndexOfByKey(GetInputObjectPin()) + Index;
+	return Pins[InputObjectPinIndex];
+}
+
+UEdGraphPin* UK2Node_Cache::GetOutputObjectPin(int Index) const
+{
+	if (Index == 0)
+		return GetOutputObjectPin();
+
+	int OutputObjectPinIndex = Pins.IndexOfByKey(GetOutputObjectPin()) + Index;
+	return Pins[OutputObjectPinIndex];
+}
+
 void UK2Node_Cache::AllocateDefaultPins()
 {
 	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Execute);
-	CreatePin(EGPD_Input, InputObjectType, PN_InputObject);
+	AllocateInputObjectPins();
 
 	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Then);
-	CreatePin(EGPD_Output, InputObjectType, PN_OutputObject);
-	
+	AllocateOutputObjectPins();
+
 	Super::AllocateDefaultPins();
+}
+
+void UK2Node_Cache::AllocateInputObjectPins()
+{
+	for (int i = 0; i < GetInputObjectNum(); i++)
+	{
+		auto PinName = i == 0 ? PN_InputObject : FName(FString::Printf(TEXT("%s %d"), *PN_InputObject.ToString(), i));
+		CreatePin(EGPD_Input, InputObjectType[i], PinName);
+	}
+}
+
+void UK2Node_Cache::AllocateOutputObjectPins()
+{
+	for (int i = 0; i < GetInputObjectNum(); i++)
+	{
+		auto PinName = i == 0 ? PN_OutputObject : FName(FString::Printf(TEXT("%s %d"), *PN_OutputObject.ToString(), i));
+		auto PinType = InputObjectType[i];
+
+		CreatePin(EGPD_Output, PinType, PinName);
+	}
+}
+
+void UK2Node_Cache::UpdateWildcardPins()
+{
+	for (int i = 0; i < GetInputObjectNum(); i++)
+	{
+		InputObjectType[i] = FK2NodeHelpers::GetWildcardPinType(GetInputObjectPin(i));
+		auto ValidPinType = InputObjectType[i];
+
+		if_Valid(GetInputObjectPin(i))->PinType = InputObjectType[i];
+		if_Valid(GetOutputObjectPin(i))->PinType = ValidPinType;
+	}
 }
 
 void UK2Node_Cache::ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
@@ -111,37 +210,34 @@ void UK2Node_Cache::ExpandNode(class FKismetCompilerContext& CompilerContext, UE
 
 	FK2NodeCompilerHelper Compiler(this, CompilerContext, SourceGraph, GetExecPin(), GetThenPin());
 
-	auto ObjectPin = GetInputObjectPin();
-	if (ShouldCacheValue())
+	for (int i = 0; i < GetInputObjectNum(); i++)
 	{
-		ObjectPin = Compiler.CacheInLocalVariable(ObjectPin);
-	}
-	else
-	{
-		ObjectPin = Compiler.SpawnIntermediateNode<UK2Node_Knot>(ObjectPin)->GetOutputPin();
-	}
+		auto ObjectPin = GetInputObjectPin(i);
+		if (ShouldCacheValue(i))
+		{
+			ObjectPin = Compiler.CacheInLocalVariable(ObjectPin);
+		}
+		else
+		{
+			ObjectPin = Compiler.SpawnIntermediateNode<UK2Node_Knot>(ObjectPin)->GetOutputPin();
+		}
 
-	Compiler.ConnectPins(ObjectPin, GetOutputObjectPin());
+		Compiler.ConnectPins(ObjectPin, GetOutputObjectPin(i));
+	}
 }
 
 void UK2Node_Cache::ReconstructNode()
 {
-	InputObjectType = FK2NodeHelpers::GetWildcardPinType(GetInputObjectPin());
-
 	Super::ReconstructNode();
+
+	UpdateWildcardPins();
 }
 
 void UK2Node_Cache::NotifyPinConnectionListChanged(UEdGraphPin* Pin)
 {
 	Super::NotifyPinConnectionListChanged(Pin);
 
-	if (Pin == GetInputObjectPin())
-	{
-		InputObjectType = FK2NodeHelpers::GetWildcardPinType(GetInputObjectPin());
-
-		GetInputObjectPin()->PinType = InputObjectType;
-		GetOutputObjectPin()->PinType = InputObjectType;
-	}
+	UpdateWildcardPins();
 }
 
 #if WITH_EDITOR
@@ -154,4 +250,29 @@ void UK2Node_Cache::PostEditChangeProperty(FPropertyChangedEvent& PropertyChange
 #endif // WITH_EDITOR
 
 
-#undef LOCTEXT_NAMESPACE 
+void UK2Node_Cache::InteractiveAddInputPin()
+{
+	FScopedTransaction Transaction(LOCTEXT("AddPinTx", "Add Pin"));
+	AddInputPin();
+}
+
+void UK2Node_Cache::AddInputPin()
+{
+	//UpcastType.Add(nullptr);
+	InputObjectType.Add(FK2NodeHelpers::MakePinType(UEdGraphSchema_K2::PC_Wildcard, UObject::StaticClass()));
+
+	ReconstructNode();
+}
+
+bool UK2Node_Cache::CanRemovePin(const UEdGraphPin* Pin) const
+{
+	return InputObjectType.Num() > 1;
+}
+
+void UK2Node_Cache::RemoveInputPin(UEdGraphPin* Pin)
+{
+	//UpcastType.Add(nullptr);
+	//InputObjectType.Add(nullptr);
+}
+
+#undef LOCTEXT_NAMESPACE

@@ -1,8 +1,40 @@
 #pragma once
 
+#include "UObject/Object.h"
 #include "InterpolationTimer.generated.h"
 
 
+
+struct FInterpolationTimer
+{
+	float Duration;
+	float CurrentTime;
+	bool bIsCyclic;
+
+	FInterpolationTimer()
+		: Duration(-1)
+	{
+	}
+
+	FInterpolationTimer(float Duration, bool bIsCyclic = false)
+		: Duration(Duration)
+		, bIsCyclic(bIsCyclic)
+	{
+	}
+
+	bool IsFinished() const { return CurrentTime >= Duration; }
+	float Alpha() const { return Duration > 0 ? FMath::Clamp(CurrentTime / Duration, 0.f, 1.f) : 1.f; }
+	bool Advance(float DeltaSeconds)
+	{
+		CurrentTime += DeltaSeconds;
+		bool bIsFinished = IsFinished();
+		if (bIsCyclic && bIsFinished)
+		{
+			if (Duration > 0) while (CurrentTime > Duration) CurrentTime -= Duration;
+		}
+		return bIsFinished;
+	}
+};
 
 UCLASS(BlueprintType)
 class INTERPOLATIONEX_API UInterpolationTimer : public UObject

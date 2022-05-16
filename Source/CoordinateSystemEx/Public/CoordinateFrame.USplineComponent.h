@@ -42,11 +42,7 @@ public:
 	}
 
 
-	FORCEINLINE FVector GetForwardVector() const;
-	FORCEINLINE FVector GetRightVector() const;
-	FORCEINLINE FVector GetUpVector() const {
-		return Object.GetUpVectorAtSplineInputKey(InputKey, ESplineCoordinateSpace::World);
-	}
+	DEFINE_CF_COMMON_FUNCTIONS()
 
 
 

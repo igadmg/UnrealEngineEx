@@ -5,7 +5,7 @@
 
 
 DECLARE_CONST_EXTENSION_TEMPLATE_REF(TMap, KeyType, ValueType, SetAllocator, KeyFuncs)
-	FORCEINLINE typename ValueType FindRef(typename ThisType::KeyConstPointerType Key, const ValueType& DefualtValue)
+	FORCEINLINE ValueType FindRef(typename ThisType::KeyConstPointerType Key, const ValueType& DefualtValue)
 	{
 		if (auto ValuePtr = This().Find(Key))
 		{
@@ -42,15 +42,9 @@ DECLARE_MUTABLE_EXTENSION_TEMPLATE_REF(TMap, KeyType, ValueType, SetAllocator, K
 		{
 			return This().AddByHash(KeyHash, Key, Value);
 		}
-		
+
 		return Value;
 	}
 };
-
-#define EXTENSION_TEMPLATE_REF(TypeName, ...)\
-template <EXPAND(EXPAND_4(__VA_ARGS__))>\
-F##TypeName##ConstEx<__VA_ARGS__> F##TypeName##Ex(const TypeName<__VA_ARGS__>& This) { return F##TypeName##ConstEx<__VA_ARGS__>(This); }\
-template <EXPAND(EXPAND_4(__VA_ARGS__))>\
-F##TypeName##MutableEx<__VA_ARGS__> F##TypeName##Ex(TypeName<__VA_ARGS__>& This) { return F##TypeName##MutableEx<__VA_ARGS__>(This); }
 
 EXTENSION_TEMPLATE_REF(TMap, KeyType, ValueType, SetAllocator, KeyFuncs);

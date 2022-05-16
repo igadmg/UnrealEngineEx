@@ -81,7 +81,7 @@ void UK2Node_IsValidEx::GetNodeContextMenuActions(UToolMenu* Menu, UGraphNodeCon
 
 	if (!Context->bIsDebugging)
 	{
-		FToolMenuSection& Section = Menu->AddSection("K2NodeMakeArray", NSLOCTEXT("K2Nodes", "MakeArrayHeader", "MakeArray"));
+		FToolMenuSection& Section = Menu->AddSection("K2NodeIsValid", LOCTEXT("K2Node_IsValidEx_ContextMenu", "IsValid"));
 
 		if (Context->Pin != NULL)
 		{
@@ -174,7 +174,7 @@ void UK2Node_IsValidEx::AllocateValidObjectPins()
 			PinType.PinSubCategoryObject = UpcastType[i];
 			if (UpcastType[i]->IsChildOf(UInterface::StaticClass()))
 				PinType.PinCategory = UEdGraphSchema_K2::PC_Interface;
-			else 
+			else
 				PinType.PinCategory = UEdGraphSchema_K2::PC_Object;
 		}
 
@@ -208,15 +208,18 @@ void UK2Node_IsValidEx::ExpandNode(class FKismetCompilerContext& CompilerContext
 
 		auto ValidateObjectIfThenElse = Compiler.SpawnIntermediateNode<UK2Node_IfThenElse>(
 			Compiler.SpawnIsValidNode(ObjectPin)->GetReturnValuePin());
+		auto NotValidPin = ValidateObjectIfThenElse->GetElsePin();
 
 		auto UpcastType_ = UpcastType[i];
 		if (UpcastType_ && UpcastType_ != InputObjectType[i].PinSubCategoryObject)
 		{
-			ObjectPin = Compiler.SpawnIntermediateNode<UK2Node_DynamicCast>(UpcastType_, ObjectPin)->GetCastResultPin();
+			auto CastNode = Compiler.SpawnIntermediateNode<UK2Node_DynamicCast>(UpcastType_, ObjectPin);
+			ObjectPin = CastNode->GetCastResultPin();
+			NotValidPin = CastNode->GetInvalidCastPin();
 		}
 
 		Compiler.ConnectPins(ObjectPin, GetValidObjectPin(i));
-		Compiler.ConnectPins(ValidateObjectIfThenElse->GetElsePin(), GetIsNotValidPin());
+		Compiler.ConnectPins(NotValidPin, GetIsNotValidPin());
 	}
 }
 

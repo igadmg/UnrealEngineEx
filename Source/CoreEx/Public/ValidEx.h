@@ -101,6 +101,9 @@ template <typename T>
 T* Valid(const TObjectPtr<T>& v) { return IsValid(v) ? v.Get() : nullptr; }
 #endif
 
+template <class T, ESPMode InMode>
+T* Valid(const TSharedPtr<T, InMode>& v) { return IsValid(v) ? v.Get() : nullptr; }
+
 template <typename T>
 T* Valid(const TWeakObjectPtr<T>& v) { return IsValid(v) ? v.Get() : nullptr; }
 
@@ -162,7 +165,7 @@ struct FCoreEx
 	template <typename IT>
 	static bool DoesImplementInterface(const UObject* Object)
 	{
-		auto InterfaceStaticClass = typename IT::UClassType::StaticClass();
+		auto InterfaceStaticClass = IT::UClassType::StaticClass();
 		checkf(InterfaceStaticClass->IsChildOf(UInterface::StaticClass()), TEXT("Interface parameter %s is not actually an interface."), *InterfaceStaticClass->GetName());
 
 		if (!IsValid(Object))
@@ -188,12 +191,12 @@ TScriptInterface<IT> ValidInterface(const T* v) { return IsValid(v) && FCoreEx::
 template <typename IT, typename T>
 TScriptInterface<IT> ValidInterface(T* v) { return IsValid(v) && FCoreEx::DoesImplementInterface<IT>(v) ? TScriptInterface<IT>(v) : nullptr; }
 
-#define if_Implements(...) EXPAND(GET_MACRO_2_3(__VA_ARGS__, if_Implements3, if_Implements2)(__VA_ARGS__))
+#define if_Implements(...) EXPAND(GET_N(__VA_ARGS__, _, if_Implements3, if_Implements2, _)(__VA_ARGS__))
 
 #define if_Implements2(TypeAndName, Expression) \
-if (auto TypeAndName = ValidInterface<I ## TypeAndName>(Expression))
+if (auto TypeAndName = ValidInterface<I ## TypeAndName>(Expression); IsValid(TypeAndName))
 
 #define if_Implements3(Type, Name, Expression) \
-if (auto Name = ValidInterface<Type>(Expression))
+if (auto Name = ValidInterface<Type>(Expression); IsValid(Name))
 
 #endif

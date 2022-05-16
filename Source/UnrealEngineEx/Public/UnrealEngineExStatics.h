@@ -70,7 +70,7 @@ public:
 	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static AActor* GetLevelScriptActorFromStreamingLevel(const UObject* WorldContextObject, class ULevelStreaming* StreamingLevel);
 
-	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
+	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintPure, meta = (DeterminesOutputType = "ObjectClass", HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static UObject* FindLevelScriptObject(const UObject* WorldContextObject, UClass* ObjectClass);
 
 	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
@@ -112,19 +112,6 @@ public:
 
 	UFUNCTION(Category = "Utilities|Time", BlueprintPure, meta = (DisplayName = "Get Timer Percent by Handle", WorldContext = "WorldContextObject"))
 	static float GetTimerPercentTimeHandle(const UObject* WorldContextObject, FTimerHandle Handle);
-
-
-	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable, BlueprintInternalUseOnly, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
-	static UAsyncTask* CreateAsyncTask(const UObject* WorldContextObject, TSubclassOf<class UAsyncTask> AsyncTaskClass);
-
-	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
-	static UAsyncTask* CreateAsyncTaskWithCallback(const UObject* WorldContextObject, TSubclassOf<class UAsyncTask> AsyncTaskClass, const FUnrealEngineExOnAsyncTaskFinishedDelegate& OnFinished, bool bAutorun = true);
-
-	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
-	static UAsyncTask* CreateAsyncTaskNoCallback(const UObject* WorldContextObject, TSubclassOf<class UAsyncTask> AsyncTaskClass, bool bAutorun = true);
-
-	UFUNCTION(Category = "UnrealEngineEx", BlueprintCallable)
-	static void ClearAsyncTasks();
 
 
 	UFUNCTION(Category = "UnrealEngineEx", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))

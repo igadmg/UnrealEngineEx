@@ -2,7 +2,8 @@
 
 #include "Blueprint/K2NodeCompilerHelper.h"
 #include "Engine/Engine.h"
-#include "AsyncTask.h"
+#include "Async/AsyncTaskStatics.h"
+#include "Async/AsyncTask.h"
 #include "EdGraphSchema_K2.h"
 #include "UnrealEngineExStatics.h"
 
@@ -76,7 +77,7 @@ void UK2Node_AsyncTask::FAsyncTaskHelper::HandleDelegateImplementation(
 UK2Node_AsyncTask::UK2Node_AsyncTask(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	ProxyFactoryFunctionName = GET_FUNCTION_NAME_CHECKED(UUnrealEngineExStatics, CreateAsyncTask);
+	ProxyFactoryFunctionName = GET_FUNCTION_NAME_CHECKED(UAsyncTaskStatics, CreateAsyncTask);
 	ProxyFactoryClass = UUnrealEngineExStatics::StaticClass();
 }
 
@@ -129,11 +130,11 @@ void UK2Node_AsyncTask::AllocateDefaultPins()
 
 	UK2Node::AllocateDefaultPins();
 
-	UEdGraphPin* AsyncTaskClassPin = GetAsyncTaskClassPin();
-	check(AsyncTaskClassPin);
-
-	AsyncTaskClassPin->bHidden = true;
-	AsyncTaskClassPin->DefaultObject = AsyncTaskClass;
+	if (UEdGraphPin* AsyncTaskClassPin = GetAsyncTaskClassPin())
+	{
+		AsyncTaskClassPin->bHidden = true;
+		AsyncTaskClassPin->DefaultObject = AsyncTaskClass;
+	}
 
 	FK2NodeHelpers::CreateOutputPins(this, AsyncTaskClass);
 }

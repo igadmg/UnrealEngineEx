@@ -50,6 +50,7 @@ public:
 	template <typename T>
 	bool RemoveComponent() { return RemoveComponent(T::StaticClass()); }
 
+#if false
 	template <typename T, typename TComponent = UContainedComponent>
 	void ForeachComponent(TFunction<void (TComponent*)> Callback) const
 	{
@@ -64,6 +65,7 @@ public:
 			}
 		}
 	}
+#endif
 
 
 protected:
