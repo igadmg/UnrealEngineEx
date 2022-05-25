@@ -20,6 +20,60 @@
 class UEdGraphNode;
 class UEdGraphPin;
 
+/**
+Used to pass parameters to spawn node calls
+All parameters should be in round brackets (Name, Value)
+ex.
+	PARAMETERS((TEXT("A"), 1))
+	PARAMETERS((TEXT("A"), 1), (TEXT("B"), TEXT("Text")), (TEXT("C"), 1))
+*/
+#define PARAMETER(X) MP X
+#define PARAMETERS(...) FOLD_N(PARAMETER, __VA_ARGS__)
+
+struct FFunctionParameterList
+{
+	typedef TVariant<UEdGraphPin*, int, bool, FString> Variant;
+	typedef std::initializer_list<TPairInitializer<FString, Variant>> Initializer;
+
+	TMap<FName, Variant> list;
+
+	FFunctionParameterList(std::initializer_list<TPairInitializer<FName, Variant>> i)
+//		: list(i)
+	{
+		list.Reserve((int32)i.size());
+		for (auto& Element : i)
+		{
+			list.Add(Element.Key, Element.Value);
+		}
+	}
+
+	template <typename ...Ks, typename ...Vs>
+	FFunctionParameterList(TPairInitializer<Ks, Vs> ...pair)
+	{
+		(list.Add(FString(pair.Key), Variant(TInPlaceType<Vs>(), pair.Value)), ...);
+	}
+
+	template <typename T>
+	static Variant v(T v_)
+	{
+		return Variant(TInPlaceType<T>(), v_);
+	}
+
+	template <typename Ks, typename Vs>
+	static TPairInitializer<Ks, Vs> p(Ks k, Vs v)
+	{
+		return TPairInitializer(k, v);
+	}
+};
+typedef FFunctionParameterList FPL;
+typedef TPairInitializer<FName, FPL::Variant> FP;
+
+template <typename Ks, typename Vs>
+inline TPairInitializer<Ks, Vs> MP(Ks k, Vs v)
+{
+	return TPairInitializer(k, v);
+}
+
 class UNREALDEVELOPEREX_API FK2NodeCompilerHelper
 {
 public:
@@ -164,6 +218,8 @@ protected:
 	void SetupNode(UK2Node_RemoveDelegate* RemoveDelegate, const FProperty* Property, UEdGraphPin* SelfPin, UEdGraphPin* DelegatePin);
 	void ConnectNode(UK2Node_RemoveDelegate* RemoveDelegate, const FProperty* Property, UEdGraphPin* SelfPin, UEdGraphPin* DelegatePin);
 
+	void SetupNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin) {}
+	void ConnectNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin);
 	void SetupNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin, bool Value) {}
 	void ConnectNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin, bool Value);
 	void SetupNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin, int32 Value) {}
@@ -180,6 +236,23 @@ protected:
 	void ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName) {}
 	void SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params);
 	void ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params);
+
+	void SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params);
+	void ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params);
+
+	template <typename ...Ks, typename ...Vs>
+	void SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, TPairInitializer<Ks, Vs> ...pair)
+	{
+		auto list = { FP(FName(pair.Key), FPL::Variant(TInPlaceType<Vs>(), pair.Value))... };
+		SetupNode(CallFunction, FunctionClass, FunctionName, FFunctionParameterList(list));
+	}
+
+	template <typename ...Ks, typename ...Vs>
+	void ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, TPairInitializer<Ks, Vs> ...pair)
+	{
+		auto list = { FP(FName(pair.Key), FPL::Variant(TInPlaceType<Vs>(), pair.Value))... };
+		ConnectNode(CallFunction, FunctionClass, FunctionName, FFunctionParameterList(list));
+	}
 
 	void SetupNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UFunction* Function);
 	void ConnectNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UFunction* Function);

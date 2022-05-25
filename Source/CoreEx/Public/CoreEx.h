@@ -16,11 +16,11 @@
 #define GET_MACRO_2_3(_1,_2,_3,NAME,...) NAME
 #define GET_N(_1, _2, _3, _4, NAME, ...) NAME
 
-#define TYPENAME_1(X) typename X
-#define TYPENAME_2(X, ...) typename X, EXPAND(TYPENAME_1(__VA_ARGS__))
-#define TYPENAME_3(X, ...) typename X, EXPAND(TYPENAME_2(__VA_ARGS__))
-#define TYPENAME_4(X, ...) typename X, EXPAND(TYPENAME_3(__VA_ARGS__))
-#define TYPENAME_N(...) EXPAND(GET_N(__VA_ARGS__, TYPENAME_4, TYPENAME_3, TYPENAME_2, TYPENAME_1)(__VA_ARGS__))
+#define FOLD_1(A, X) EXPAND(A(X))
+#define FOLD_2(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_1(A, __VA_ARGS__))
+#define FOLD_3(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_2(A, __VA_ARGS__))
+#define FOLD_4(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_3(A, __VA_ARGS__))
+#define FOLD_N(A, ...) EXPAND(GET_N(__VA_ARGS__, FOLD_4, FOLD_3, FOLD_2, FOLD_1)(A, __VA_ARGS__))
 
 
 #define if_CanExecuteCosmeticEvents(WorldContextObject) \

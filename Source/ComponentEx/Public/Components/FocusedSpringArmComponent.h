@@ -12,11 +12,15 @@ struct COMPONENTEX_API FFocusedSpringArmConfig
 	GENERATED_BODY()
 
 
+	/** Camera Field of View in degrees */
+	UPROPERTY(Category = "Camera", EditAnywhere, BlueprintReadWrite)
+	float CameraFOV = 90.f;
+
 	/** Natural length of the spring arm when there are no collisions */
 	UPROPERTY(Category = "Camera", EditAnywhere, BlueprintReadWrite)
 	float TargetArmLength = 0.f;
 
-	/** offset at end of spring arm; use this instead of the relative offset of the attached component to ensure the line trace works as desired */
+	/** Offset at end of spring arm; use this instead of the relative offset of the attached component to ensure the line trace works as desired */
 	UPROPERTY(Category = "Camera", EditAnywhere, BlueprintReadWrite)
 	FVector SocketOffset = FVector::ZeroVector;
 
@@ -29,9 +33,10 @@ struct COMPONENTEX_API FFocusedSpringArmConfig
 	FVector FocusOffset = FVector(2000.f, 0.f, 0.f);
 
 
-	static FFocusedSpringArmConfig Make(float InTargetArmLength, FVector InSocketOffset, FVector InTargetOffset, FVector InFocusOffset)
+	static FFocusedSpringArmConfig Make(float InCameraFOV, float InTargetArmLength, FVector InSocketOffset, FVector InTargetOffset, FVector InFocusOffset)
 	{
 		FFocusedSpringArmConfig Result;
+		Result.CameraFOV = InCameraFOV;
 		Result.TargetArmLength = InTargetArmLength;
 		Result.SocketOffset = InSocketOffset;
 		Result.TargetOffset = InTargetOffset;
@@ -48,7 +53,8 @@ namespace XX
 		static FFocusedSpringArmConfig Lerp(const FFocusedSpringArmConfig& A, const FFocusedSpringArmConfig& B, float V)
 		{
 			return FFocusedSpringArmConfig::Make(
-				XX::Lerp(A.TargetArmLength, B.TargetArmLength, V)
+				XX::Lerp(A.CameraFOV, B.CameraFOV, V)
+				, XX::Lerp(A.TargetArmLength, B.TargetArmLength, V)
 				, XX::Lerp(A.SocketOffset, B.SocketOffset, V)
 				, XX::Lerp(A.TargetOffset, B.TargetOffset, V)
 				, XX::Lerp(A.FocusOffset, B.FocusOffset, V)
@@ -65,6 +71,10 @@ class COMPONENTEX_API UFocusedSpringArmComponent : public USpringArmComponent
 
 
 public:
+	/** Camera Field of View in degrees */
+	UPROPERTY(Category = "Camera", EditAnywhere, BlueprintReadWrite)
+	float CameraFOV = 90.f;
+
 	/** Focal point where camera should be rotated and look at. */
 	UPROPERTY(Category = "Camera", EditAnywhere, BlueprintReadWrite)
 	FVector FocusOffset = FVector(2000.f, 0.f, 0.f);
@@ -78,7 +88,7 @@ public:
 	FRotator GetFocusRotation() const;
 
 	UFUNCTION(BlueprintCallable)
-	FFocusedSpringArmConfig ChangeCameraConfig(FFocusedSpringArmConfig SpringArmConfig, float Time, TEnumAsByte<EEasingFunc::Type> EasingFunc);
+	FFocusedSpringArmConfig ChangeCameraConfig(FFocusedSpringArmConfig NewCameraConfig, float Time, TEnumAsByte<EEasingFunc::Type> EasingFunc);
 
 
 public:
@@ -102,7 +112,8 @@ protected:
 inline FFocusedSpringArmConfig FFocusedSpringArmConfig::Make(UFocusedSpringArmComponent* ArmComponent)
 {
 	return FFocusedSpringArmConfig::Make(
-		ArmComponent->TargetArmLength
+		ArmComponent->CameraFOV
+		, ArmComponent->TargetArmLength
 		, ArmComponent->SocketOffset
 		, ArmComponent->TargetOffset
 		, ArmComponent->FocusOffset);

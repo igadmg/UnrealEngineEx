@@ -261,6 +261,12 @@ void FK2NodeCompilerHelper::ConnectNode(UK2Node_RemoveDelegate* RemoveDelegate, 
 	ConnectPins(RemoveDelegate->FindPin(TEXT("Delegate")), DelegatePin);
 }
 
+void FK2NodeCompilerHelper::ConnectNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin)
+{
+	ConnectPins(VariablePin, AssignmentStatement->GetVariablePin());
+	AssignmentStatement->GetValuePin()->DefaultValue = TEXT("");
+}
+
 void FK2NodeCompilerHelper::ConnectNode(UK2Node_AssignmentStatement* AssignmentStatement, UEdGraphPin* VariablePin, bool Value)
 {
 	ConnectPins(VariablePin, AssignmentStatement->GetVariablePin());
@@ -304,6 +310,24 @@ void FK2NodeCompilerHelper::ConnectNode(UK2Node_CallFunction* CallFunction, UCla
 	for (auto Pair : Params)
 	{
 		ConnectPins(Pair.Value, CallFunction->FindPin(Pair.Key));
+	}
+}
+
+void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params)
+{
+	SetupNode(CallFunction, FunctionClass, FunctionName);
+}
+
+void FK2NodeCompilerHelper::ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params)
+{
+	for (auto Pair : Params.list)
+	{
+		auto Pin = CallFunction->FindPin(Pair.Key);
+		auto& v = Pair.Value;
+		if (v.IsType<UEdGraphPin*>()) ConnectPins(v.Get<UEdGraphPin*>(), Pin);
+		else if (v.IsType<bool>()) Pin->DefaultValue = UKismetStringLibrary::Conv_BoolToString(v.Get<bool>());
+		else if (v.IsType<int>()) Pin->DefaultValue = UKismetStringLibrary::Conv_IntToString(v.Get<int>());
+		else if (v.IsType<FString>()) Pin->DefaultValue = v.Get<FString>();
 	}
 }
 

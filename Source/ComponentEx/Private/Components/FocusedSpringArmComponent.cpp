@@ -25,21 +25,27 @@ FRotator UFocusedSpringArmComponent::GetFocusRotation() const
 	return FRotationMatrix::MakeFromXZ(Direction, FVector::ZAxisVector).Rotator();
 }
 
-FFocusedSpringArmConfig UFocusedSpringArmComponent::ChangeCameraConfig(FFocusedSpringArmConfig SpringArmConfig, float Time, TEnumAsByte<EEasingFunc::Type> EasingFunc)
+FFocusedSpringArmConfig UFocusedSpringArmComponent::ChangeCameraConfig(FFocusedSpringArmConfig NewCameraConfig, float Time, TEnumAsByte<EEasingFunc::Type> EasingFunc)
 {
 	FFocusedSpringArmConfig OldConfig = FFocusedSpringArmConfig::Make(this);
 	ChangeCameraConfigInterpolationTimer = TLerpInterpolationTimer<FFocusedSpringArmConfig>(
-		FFocusedSpringArmConfig::Make(this), SpringArmConfig, Time, EasingFunc);
+		OldConfig, NewCameraConfig, Time, EasingFunc);
 
 	if (auto AsyncTaskManager = XX::GetSubsystem<UAsyncTaskManager>(this))
 	{
 		AsyncTaskManager->TaskTickFunctions.Add(FCoreExOnAsyncTaskTickFunction::CreateWeakLambda(this, [this](float DeltaTime) {
 			auto Config = ChangeCameraConfigInterpolationTimer.Advance(DeltaTime);
 
+			CameraFOV = Config.CameraFOV;
 			TargetArmLength = Config.TargetArmLength;
 			SocketOffset = Config.SocketOffset;
 			TargetOffset = Config.TargetOffset;
 			FocusOffset = Config.FocusOffset;
+
+			if (auto CameraManager = XX::GetPlayerCameraManager(this))
+			{
+				CameraManager->SetFOV(CameraFOV);
+			}
 
 			return ChangeCameraConfigInterpolationTimer.IsFinished();
 		}));

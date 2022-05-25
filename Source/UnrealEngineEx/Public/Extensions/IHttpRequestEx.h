@@ -9,6 +9,13 @@
 
 
 DECLARE_CONST_EXTENSION(IHttpRequest)
+	FString GetContentAsString()
+	{
+		auto Content = This()->GetContent();
+		// Content is NOT null-terminated; we need to specify lengths here
+		FUTF8ToTCHAR TCHARData(reinterpret_cast<const ANSICHAR*>(Content.GetData()), Content.Num());
+		return FString(TCHARData.Length(), TCHARData.Get());
+	}
 };
 
 DECLARE_MUTABLE_EXTENSION(IHttpRequest)

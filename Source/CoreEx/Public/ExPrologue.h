@@ -1,5 +1,7 @@
 #pragma once
 
+#define TYPENAME(X) typename X
+#define TYPENAME_N(...) FOLD_N(TYPENAME, __VA_ARGS__)
 
 template <typename T>
 struct TEx

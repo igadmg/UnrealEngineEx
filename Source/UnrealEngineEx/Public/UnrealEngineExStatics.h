@@ -162,6 +162,15 @@ public:
 	UFUNCTION(Category = "UnrealEngineEx|User Interface", BlueprintPure)
 	static FVector2D GetWidgetPositionOnViewport(class UWidget* Widget);
 
+	UFUNCTION(Category = "UnrealEngineEx|User Interface", BlueprintCallable)
+	static void Write(class UMultiLineEditableTextBox* Widget, FText Text);
+
+	UFUNCTION(Category = "UnrealEngineEx|User Interface", BlueprintCallable)
+	static void WriteLine(class UMultiLineEditableTextBox* Widget, FText Text);
+
+	UFUNCTION(Category = "UnrealEngineEx|User Interface", BlueprintCallable)
+	static void ClearText(class UMultiLineEditableTextBox* Widget, FText Text);
+
 
 	UFUNCTION(Category = "UnrealEngineEx|Debug", BlueprintCallable, meta = (WorldContext = "WorldContextObject", DevelopmentOnly))
 	static FString GetInstanceStringID(UObject* WorldContextObject);
@@ -182,6 +191,11 @@ public:
 		return Timespan.ToString(*Format);
 	}
 
+
+public:
+	UFUNCTION(Category = "UnrealEngineEx|Json", BlueprintPure, CustomThunk, meta = (AutoCreateRefTerm = "Value", CustomStructureParam = "Value"))
+	static FString ToJsonString(const int32& Value);
+	DECLARE_FUNCTION(execToJsonString);
 
 
 public:

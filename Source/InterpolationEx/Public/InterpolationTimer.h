@@ -13,11 +13,13 @@ struct FInterpolationTimer
 
 	FInterpolationTimer()
 		: Duration(-1)
+		, CurrentTime(0.f)
 	{
 	}
 
 	FInterpolationTimer(float Duration, bool bIsCyclic = false)
 		: Duration(Duration)
+		, CurrentTime(0.f)
 		, bIsCyclic(bIsCyclic)
 	{
 	}

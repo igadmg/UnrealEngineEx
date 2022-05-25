@@ -5,6 +5,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Components/MultiLineEditableTextBox.h"
 #include "Components/PanelSlot.h"
 #include "Components/PanelWidget.h"
 #include "Components/Widget.h"
@@ -1192,6 +1193,30 @@ FVector2D UUnrealEngineExStatics::GetWidgetPositionOnViewport(UWidget* Widget)
 	return ViewportPosition;
 }
 
+void UUnrealEngineExStatics::Write(UMultiLineEditableTextBox* Widget, FText Text)
+{
+	if (!IsValid(Widget))
+		return;
+
+	Widget->SetText(FText::Join(FText::GetEmpty(), TArray<FText>{ Widget->GetText(), Text }));
+}
+
+void UUnrealEngineExStatics::WriteLine(UMultiLineEditableTextBox* Widget, FText Text)
+{
+	if (!IsValid(Widget))
+		return;
+
+	Widget->SetText(FText::Join(FText::GetEmpty(), TArray<FText>{ Widget->GetText(), Text, FText::FromString(TEXT("\n")) }));
+}
+
+void UUnrealEngineExStatics::ClearText(UMultiLineEditableTextBox* Widget, FText Text)
+{
+	if (!IsValid(Widget))
+		return;
+
+	Widget->SetText(FText::GetEmpty());
+}
+
 FString UUnrealEngineExStatics::GetInstanceStringID(UObject* WorldContextObject)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
@@ -1274,4 +1299,29 @@ bool UUnrealEngineExStatics::IsKeyMappedToAction(FKey Key, const FName ActionNam
 	}
 
 	return false;
+}
+
+FString ToJsonStringImpl(FProperty* Property, void* Value)
+{
+	FString Result;
+
+	auto JsonWriter = TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&Result, 0);
+	auto JsonValue = FJsonObjectConverter::UPropertyToJsonValue(Property, Value);
+	FJsonSerializer::Serialize(JsonValue, JsonWriter);
+	JsonWriter->Close();
+
+	return Result;
+}
+
+DEFINE_FUNCTION(UUnrealEngineExStatics::execToJsonString)
+{
+	Stack.StepCompiledIn<FProperty>(nullptr);
+	auto ValueProperty = Stack.MostRecentProperty;
+	auto ValuePropertyPtr = Stack.MostRecentPropertyAddress;
+	// We need this to wrap up the stack
+	P_FINISH;
+
+	P_NATIVE_BEGIN
+	*(FString*)RESULT_PARAM = ToJsonStringImpl(ValueProperty, ValuePropertyPtr);
+	P_NATIVE_END
 }

@@ -146,6 +146,13 @@ void UK2Node_ForEachLoop::AllocateDefaultPins()
 	Super::AllocateDefaultPins();
 }
 
+#define FOLD_1(A, X) EXPAND(A(X))
+#define FOLD_2(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_1(A, __VA_ARGS__))
+#define FOLD_3(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_2(A, __VA_ARGS__))
+#define FOLD_4(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_3(A, __VA_ARGS__))
+#define FOLD_N(A, ...) EXPAND(GET_N(__VA_ARGS__, FOLD_4, FOLD_3, FOLD_2, FOLD_1)(A, __VA_ARGS__))
+
+
 void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
 {
 	TGuardValue<bool> ExpandNode(bIsExpandingNode, true);
@@ -155,8 +162,9 @@ void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerConte
 	FK2NodeCompilerHelper Compiler(this, CompilerContext, SourceGraph, GetExecPin(), GetCompletedPin());
 
 	auto ArrayPin = Compiler.SpawnIntermediateNode<UK2Node_Cache>(GetArrayPin())->GetOutputObjectPin();
-	auto ArrayLength = Compiler.SpawnIntermediateNode<UK2Node_CallArrayFunction>(EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Length)
-		, TMap<FName, UEdGraphPin*>{ { FName(TEXT("TargetArray")), ArrayPin } });
+	auto ArrayLength = Compiler.SpawnIntermediateNode<UK2Node_CallArrayFunction>(
+		EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Length)
+		, PARAMETERS((TEXT("TargetArray"), ArrayPin)));
 
 	auto Counter = LoopDirection == ELoopDirection::Forward
 		? Compiler.CacheInLocalVariable(0)
@@ -167,91 +175,89 @@ void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerConte
 
 	if (LoopDirection == ELoopDirection::Backward)
 	{
-		auto DecreaseCounter1 = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(EXPAND_FUNCTION_NAME(UKismetMathLibrary, Subtract_IntInt)
-			, TMap<FName, UEdGraphPin*>{ { TEXT("A"), Counter } });
+		auto DecreaseCounter1 = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
+			EXPAND_FUNCTION_NAME(UKismetMathLibrary, Subtract_IntInt)
+			, PARAMETERS((TEXT("A"), Counter)));
 		Compiler.SpawnIntermediateNode<UK2Node_AssignmentStatement>(Counter, DecreaseCounter1->GetReturnValuePin());
 	}
 
-	UEdGraphPin* BreakFlag = nullptr;
-	if (bHaveBreak)
+	auto BreakFlag = GetBreakFlagPin() ? Compiler.CacheInLocalVariable(false) : nullptr;
+	auto FilterFlag = GetFilterFlagPin() ? Compiler.CacheInLocalVariable(false) : nullptr;
+	auto OutputElement = GetOutputElementPin() ? Compiler.SpawnInternalVariable(OutputElementType)->GetVariablePin() : nullptr;
+	if (OutputElement) Compiler.ConnectPins(OutputElement, GetOutputElementPin());
+	auto OutputArray = GetResultArrayPin() ? Compiler.SpawnInternalVariable(ResultArrayType) : nullptr;
+	if (OutputArray) Compiler.ConnectPins(OutputArray->GetVariablePin(), GetResultArrayPin());
+
+	if (auto ArrayIndexPin = GetArrayIndexPin()) Compiler.ConnectPins(Counter, ArrayIndexPin);
+	if (auto BreakFlagPin = GetBreakFlagPin()) Compiler.ConnectPins(BreakFlag, BreakFlagPin);
+	if (auto FilterFlagPin = GetFilterFlagPin()) Compiler.ConnectPins(FilterFlag, FilterFlagPin);
+
+	auto LoopCondition = LoopDirection == ELoopDirection::Forward
+		? Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
+			EXPAND_FUNCTION_NAME(UKismetMathLibrary, Less_IntInt)
+			, PARAMETERS((TEXT("A"), Counter), (TEXT("B"), Length)))
+		: Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
+			EXPAND_FUNCTION_NAME(UKismetMathLibrary, Greater_IntInt)
+			, PARAMETERS((TEXT("A"), Counter), (TEXT("B"), Length)));
+
+	auto LoopCounter = LoopDirection == ELoopDirection::Forward
+		? Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
+			EXPAND_FUNCTION_NAME(UKismetMathLibrary, Add_IntInt), PARAMETERS((TEXT("A"), Counter)))
+		: Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
+			EXPAND_FUNCTION_NAME(UKismetMathLibrary, Subtract_IntInt), PARAMETERS((TEXT("A"), Counter)));
+
+	auto LoopIfThenElse = Compiler.SpawnIntermediateNode<UK2Node_IfThenElse>(LoopCondition->GetReturnValuePin());
 	{
-		BreakFlag = Compiler.CacheInLocalVariable(false);
-	}
+		if (BreakFlag) Compiler.SpawnIntermediateNode<UK2Node_AssignmentStatement>(BreakFlag, false);
+		if (FilterFlag) Compiler.SpawnIntermediateNode<UK2Node_AssignmentStatement>(FilterFlag, false);
+		if (OutputElement) Compiler.SpawnIntermediateNode<UK2Node_AssignmentStatement>(OutputElement);
 
-	auto LoopCondifiton = LoopDirection == ELoopDirection::Forward
-		? Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(EXPAND_FUNCTION_NAME(UKismetMathLibrary, Less_IntInt)
-			, TMap<FName, UEdGraphPin*>{ { TEXT("A"), Counter }, { TEXT("B"), Length } })
-		: Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(EXPAND_FUNCTION_NAME(UKismetMathLibrary, Greater_IntInt)
-			, TMap<FName, UEdGraphPin*>{ { TEXT("A"), Counter }, { TEXT("B"), Length } });
+		auto ArrayGet = Compiler.SpawnIntermediateNode<UK2Node_CallArrayFunction>(
+			EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Get)
+			, PARAMETERS((TEXT("TargetArray"), ArrayPin), (TEXT("Index"), Counter)));
+		auto ArrayElement = Compiler.SpawnIntermediateNode<UK2Node_Cache>(ArrayGet->FindPin(TEXT("Item")))->GetOutputObjectPin();
 
-	auto LoopIfThenElse = Compiler.SpawnIntermediateNode<UK2Node_IfThenElse>(LoopCondifiton->GetReturnValuePin());
-	{
-		if (BreakFlag)
-		{
-			Compiler.SpawnIntermediateNode<UK2Node_AssignmentStatement>(BreakFlag, false);
-		}
-
-		UK2Node_TemporaryVariable* OutputElement = nullptr;
-		switch (LoopFunction)
-		{
-		case ELoopFunction::Transfrom:
-		if (IsValid(OutputElementType)) {
-			OutputElement = Compiler.SpawnInternalVariable(OutputElementType);
-			Compiler.ConnectPins(OutputElement->GetVariablePin(), GetOutputElementPin());
-		}	break;
-		case ELoopFunction::Filter:
-			break;
-		}
-
-		auto ArrayGet = Compiler.SpawnIntermediateNode<UK2Node_CallArrayFunction>(EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Get)
-			, TMap<FName, UEdGraphPin*>{ { TEXT("TargetArray"), ArrayPin }, { TEXT("Index"), Counter } });
-		auto ArrayItem = Compiler.SpawnIntermediateNode<UK2Node_Cache>(ArrayGet->FindPin(TEXT("Item")))->GetOutputObjectPin();
-
-		Compiler.ConnectPins(ArrayItem, GetArrayElementPin());
-		if (auto ArrayIndexPin = GetArrayIndexPin())
-			Compiler.ConnectPins(Counter, ArrayIndexPin);
-		if (auto BreakFlagPin = GetBreakFlagPin())
-			Compiler.ConnectPins(BreakFlag, BreakFlagPin);
+		Compiler.ConnectPins(ArrayElement, GetArrayElementPin());
 
 		auto Sequence = Compiler.SpawnIntermediateNode<UK2Node_ExecutionSequence>();
 		Compiler.ConnectPins(Sequence->GetThenPinGivenIndex(0), GetLoopBodyPin());
 
 		Compiler.LastThenPin = Sequence->GetThenPinGivenIndex(1);
-		if (LoopDirection == ELoopDirection::Forward)
-		{
-			auto AddCounter1 = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(EXPAND_FUNCTION_NAME(UKismetMathLibrary, Add_IntInt)
-				, TMap<FName, UEdGraphPin*>{ { TEXT("A"), Counter } });
-			Compiler.SpawnIntermediateNode<UK2Node_AssignmentStatement>(Counter, AddCounter1->GetReturnValuePin());
-		}
-		else if (LoopDirection == ELoopDirection::Backward)
-		{
-			auto DecreaseCounter1 = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(EXPAND_FUNCTION_NAME(UKismetMathLibrary, Subtract_IntInt)
-				, TMap<FName, UEdGraphPin*>{ { TEXT("A"), Counter } });
-			Compiler.SpawnIntermediateNode<UK2Node_AssignmentStatement>(Counter, DecreaseCounter1->GetReturnValuePin());
-		}
-
 		switch (LoopFunction)
 		{
 		case ELoopFunction::Transfrom:
-		if (IsValid(ResultArrayType)) {
-			auto OutputArray = Compiler.SpawnInternalVariable(ResultArrayType);
-			Compiler.ConnectPins(OutputArray->GetVariablePin(), GetResultArrayPin());
-			Compiler.SpawnIntermediateNode<UK2Node_CallArrayFunction>(EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Add)
-				, TMap<FName, UEdGraphPin*>{ { TEXT("TargetArray"), OutputArray->GetVariablePin() }
-				                           , { TEXT("NewItem"), OutputElement->GetVariablePin() } });
-		}	break;
+			Compiler.SpawnIntermediateNode<UK2Node_CallArrayFunction>(
+				EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Add)
+				, PARAMETERS((TEXT("TargetArray"), OutputArray->GetVariablePin()), (TEXT("NewItem"), OutputElement)));
+			break;
 		case ELoopFunction::Filter:
+			if (FilterFlag)
+			{
+				auto FilterFlagCondition = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
+					EXPAND_FUNCTION_NAME(UKismetMathLibrary, EqualEqual_BoolBool)
+					, PARAMETERS((TEXT("A"), FilterFlag), (TEXT("B"), true)));
+				auto FilterIfThenElse = Compiler.SpawnIntermediateNode<UK2Node_IfThenElse>(FilterFlagCondition->GetReturnValuePin());
+				{
+					Compiler.SpawnIntermediateNode<UK2Node_CallArrayFunction>(
+						EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Add)
+						, PARAMETERS((TEXT("TargetArray"), OutputArray->GetVariablePin()), (TEXT("NewItem"), ArrayElement)));
+				}
+			}
 			break;
 		}
 
+		Sequence->AddInputPin();
+		Compiler.LastThenPin = Sequence->GetThenPinGivenIndex(2);
+
 		if (BreakFlag)
 		{
-			auto BreakFlagCondifiton = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(EXPAND_FUNCTION_NAME(UKismetMathLibrary, EqualEqual_BoolBool)
-				, TMap<FName, UEdGraphPin*>{ { TEXT("A"), BreakFlag } });
-			BreakFlagCondifiton->FindPin(TEXT("B"))->DefaultValue = UKismetStringLibrary::Conv_BoolToString(true);
+			auto BreakFlagCondifiton = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
+				EXPAND_FUNCTION_NAME(UKismetMathLibrary, EqualEqual_BoolBool)
+				, PARAMETERS((TEXT("A"), BreakFlag), (TEXT("B"), true)));
 			auto BreakFlagIfThenElse = Compiler.SpawnIntermediateNode<UK2Node_IfThenElse>(BreakFlagCondifiton->GetReturnValuePin());
 			Compiler.LastThenPin = BreakFlagIfThenElse->GetElsePin();
 		}
+		Compiler.SpawnIntermediateNode<UK2Node_AssignmentStatement>(Counter, LoopCounter->GetReturnValuePin());
 
 		Compiler.ConnectPins(Compiler.LastThenPin, LoopIfThenElse->GetExecPin());
 	}
