@@ -63,9 +63,8 @@ void USplineMeshBuilderComponent::BuildSplineMesh()
 
 			SplineMeshComponent->SetCullDistance(SplineMeshCullDistance);
 			SplineMeshComponent->SetRelativeTransform(cf(SplineComponent).GetRelativeTransform());
-
-			SplineMeshComponent->BodyInstance = CollisionPresets;
-			SplineMeshComponent->SetGenerateOverlapEvents(bGenerateOverlapEvents);
+			SplineMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			SplineMeshComponent->SetCollisionObjectType(CollisionPresets.GetObjectType());
 
 			UComponentExStatics::SetupSplineMeshComponentFromSpline(SplineMeshComponent, SplineComponent
 				, IntervalStart, IntervalEnd, ESplineCoordinateSpace::Local);
@@ -97,6 +96,14 @@ void USplineMeshBuilderComponent::SetCollisionEnabled(ECollisionEnabled::Type Ne
 		CollisionComponent->SetNotifyRigidBodyCollision(bIsEnabled);
 		CollisionComponent->SetGenerateOverlapEvents(bIsEnabled);
 		CollisionComponent->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_Yes;
+	}
+}
+
+void USplineMeshBuilderComponent::SetCollisionPresets(FBodyInstance NewCollisionPresets)
+{
+	for (auto CollisionComponent : SplineMeshComponents)
+	{
+		CollisionComponent->BodyInstance = NewCollisionPresets;
 	}
 }
 

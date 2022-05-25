@@ -17,6 +17,11 @@
 			"LoadingPhase": "PreDefault"
 		},
 		{
+			"Name": "CoreEditorEx",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
+		},
+		{
 			"Name": "ComponentEx",
 			"Type": "Runtime",
 			"LoadingPhase": "PreDefault"

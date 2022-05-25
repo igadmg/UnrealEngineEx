@@ -122,6 +122,9 @@ void UK2Node_ForEachLoop::AllocateDefaultPins()
 	case ELoopFunction::Filter:
 		CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Boolean, PN_FilterFlag);
 		break;
+	case ELoopFunction::Accumulate:
+		CreatePin(EGPD_Output, OutputElementType, PN_OutputElement);
+		break;
 	case ELoopFunction::Find:
 		CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Boolean, PN_FilterFlag);
 		break;
@@ -138,6 +141,9 @@ void UK2Node_ForEachLoop::AllocateDefaultPins()
 	case ELoopFunction::Filter:
 		CreatePin(EGPD_Output, ResultArrayType, PN_ResultArray);
 		break;
+	case ELoopFunction::Accumulate:
+		CreatePin(EGPD_Output, OutputElementType, PN_ResultItem);
+		break;
 	case ELoopFunction::Find:
 		CreatePin(EGPD_Output, ArrayElementType, PN_ResultItem);
 		break;
@@ -145,13 +151,6 @@ void UK2Node_ForEachLoop::AllocateDefaultPins()
 
 	Super::AllocateDefaultPins();
 }
-
-#define FOLD_1(A, X) EXPAND(A(X))
-#define FOLD_2(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_1(A, __VA_ARGS__))
-#define FOLD_3(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_2(A, __VA_ARGS__))
-#define FOLD_4(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_3(A, __VA_ARGS__))
-#define FOLD_N(A, ...) EXPAND(GET_N(__VA_ARGS__, FOLD_4, FOLD_3, FOLD_2, FOLD_1)(A, __VA_ARGS__))
-
 
 void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
 {
@@ -185,8 +184,10 @@ void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerConte
 	auto FilterFlag = GetFilterFlagPin() ? Compiler.CacheInLocalVariable(false) : nullptr;
 	auto OutputElement = GetOutputElementPin() ? Compiler.SpawnInternalVariable(OutputElementType)->GetVariablePin() : nullptr;
 	if (OutputElement) Compiler.ConnectPins(OutputElement, GetOutputElementPin());
-	auto OutputArray = GetResultArrayPin() ? Compiler.SpawnInternalVariable(ResultArrayType) : nullptr;
-	if (OutputArray) Compiler.ConnectPins(OutputArray->GetVariablePin(), GetResultArrayPin());
+	auto OutputArray = GetResultArrayPin() ? Compiler.SpawnInternalVariable(ResultArrayType)->GetVariablePin() : nullptr;
+	if (OutputArray) Compiler.ConnectPins(OutputArray, GetResultArrayPin());
+	auto ResultItem = GetResultItemPin() ? (LoopFunction == ELoopFunction::Accumulate) ? Compiler.SpawnInternalVariable(ResultItemType)->GetVariablePin() : nullptr : nullptr;
+	if (ResultItem) Compiler.ConnectPins(ResultItem, GetResultItemPin());
 
 	if (auto ArrayIndexPin = GetArrayIndexPin()) Compiler.ConnectPins(Counter, ArrayIndexPin);
 	if (auto BreakFlagPin = GetBreakFlagPin()) Compiler.ConnectPins(BreakFlag, BreakFlagPin);
@@ -225,14 +226,13 @@ void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerConte
 		Compiler.LastThenPin = Sequence->GetThenPinGivenIndex(1);
 		switch (LoopFunction)
 		{
-		case ELoopFunction::Transfrom:
-			Compiler.SpawnIntermediateNode<UK2Node_CallArrayFunction>(
-				EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Add)
-				, PARAMETERS((TEXT("TargetArray"), OutputArray->GetVariablePin()), (TEXT("NewItem"), OutputElement)));
+		case ELoopFunction::Transfrom: {
+				Compiler.SpawnIntermediateNode<UK2Node_CallArrayFunction>(
+					EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Add)
+					, PARAMETERS((TEXT("TargetArray"), OutputArray), (TEXT("NewItem"), OutputElement)));
+			}
 			break;
-		case ELoopFunction::Filter:
-			if (FilterFlag)
-			{
+		case ELoopFunction::Filter: {
 				auto FilterFlagCondition = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
 					EXPAND_FUNCTION_NAME(UKismetMathLibrary, EqualEqual_BoolBool)
 					, PARAMETERS((TEXT("A"), FilterFlag), (TEXT("B"), true)));
@@ -240,9 +240,12 @@ void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerConte
 				{
 					Compiler.SpawnIntermediateNode<UK2Node_CallArrayFunction>(
 						EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Add)
-						, PARAMETERS((TEXT("TargetArray"), OutputArray->GetVariablePin()), (TEXT("NewItem"), ArrayElement)));
+						, PARAMETERS((TEXT("TargetArray"), OutputArray), (TEXT("NewItem"), ArrayElement)));
 				}
 			}
+			break;
+		case ELoopFunction::Accumulate:
+
 			break;
 		}
 
@@ -281,6 +284,7 @@ void UK2Node_ForEachLoop::UpdateOutputTypes()
 		return;
 
 	OutputElementType = FK2NodeHelpers::GetWildcardPinType(GetOutputElementPin());
+	OutputElementType.bIsReference = false;
 	switch (LoopFunction)
 	{
 	case ELoopFunction::Transfrom:
@@ -320,6 +324,15 @@ void UK2Node_ForEachLoop::NotifyPinConnectionListChanged(UEdGraphPin* Pin)
 		if_Valid(GetOutputElementPin())->PinType = OutputElementType;
 		if_Valid(GetResultArrayPin())->PinType = ResultArrayType;
 	}
+	else if (Pin == GetResultItemPin())
+	{
+		UpdateOutputTypes();
+
+		if (LoopFunction == ELoopFunction::Accumulate)
+		{
+			if_Valid(GetResultItemPin())->PinType = OutputElementType;
+		}
+	}
 }
 
 #if WITH_NOTIFY_GRAPH_PATCH
@@ -338,6 +351,12 @@ void UK2Node_ForEachLoop::NotifyGraphChanged(const struct FEdGraphEditAction& In
 		UpdateOutputTypes();
 
 		if_Valid(GetOutputElementPin())->PinType = OutputElementType;
+		if_Valid(GetResultArrayPin())->PinType = ResultArrayType;
+
+		if (LoopFunction == ELoopFunction::Accumulate)
+		{
+			if_Valid(GetResultItemPin())->PinType = OutputElementType;
+		}
 	}
 }
 #endif

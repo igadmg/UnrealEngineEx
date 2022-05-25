@@ -22,7 +22,7 @@ public:
 	class UStaticMesh* Mesh;
 
 	UPROPERTY(Category = "SplineMeshBuilderComponent", EditAnywhere, BlueprintReadWrite)
-	class UMaterial* Material;
+	class UMaterialInterface* Material;
 
 	UPROPERTY(Category = "SplineMeshBuilderComponent", EditAnywhere, BlueprintReadWrite)
 	bool bGenerateOverlapEvents = false;
@@ -43,6 +43,9 @@ public:
 
 	UFUNCTION(Category = "UnrealEngineEx: SplineMeshBuilderComponent", BlueprintCallable)
 	void SetCollisionEnabled(ECollisionEnabled::Type NewType);
+
+	UFUNCTION(Category = "UnrealEngineEx: SplineMeshBuilderComponent", BlueprintCallable)
+	void SetCollisionPresets(FBodyInstance NewCollisionPresets);
 
 
 public: // ICookInterface
