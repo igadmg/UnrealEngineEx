@@ -5,19 +5,19 @@
 
 
 DECLARE_CONST_EXTENSION_TEMPLATE_REF(TMap, KeyType, ValueType, SetAllocator, KeyFuncs)
-	FORCEINLINE ValueType FindRef(typename ThisType::KeyConstPointerType Key, const ValueType& DefualtValue)
+	FORCEINLINE ValueType FindRef(typename ThisType::KeyConstPointerType Key, const ValueType& DefaultValue)
 	{
 		if (auto ValuePtr = This().Find(Key))
 		{
 			return *ValuePtr;
 		}
 
-		return DefualtValue;
+		return DefaultValue;
 	}
 };
 
 DECLARE_MUTABLE_EXTENSION_TEMPLATE_REF(TMap, KeyType, ValueType, SetAllocator, KeyFuncs)
-	FORCEINLINE ValueType FindOrAdd(const KeyType& Key, TFunction<ValueType(const KeyType&)> ValueConstructor)
+	FORCEINLINE ValueType& FindOrAdd(const KeyType& Key, TFunction<ValueType(const KeyType&)> ValueConstructor)
 	{
 		auto KeyHash = KeyFuncs::GetKeyHash(Key);
 		if (auto* ValuePtr = This().FindByHash(KeyHash, Key))
@@ -28,7 +28,7 @@ DECLARE_MUTABLE_EXTENSION_TEMPLATE_REF(TMap, KeyType, ValueType, SetAllocator, K
 		return This().AddByHash(KeyHash, Key, ValueConstructor(Key));
 	}
 
-	FORCEINLINE ValueType FindOrAddConditionally(const KeyType& Key, TFunction<ValueType(const KeyType&, bool&)> ValueConstructor)
+	FORCEINLINE ValueType& FindOrAddConditionally(const KeyType& Key, TFunction<ValueType(const KeyType&, bool&)> ValueConstructor)
 	{
 		auto KeyHash = KeyFuncs::GetKeyHash(Key);
 		if (auto* ValuePtr = This().FindByHash(KeyHash, Key))
@@ -37,7 +37,8 @@ DECLARE_MUTABLE_EXTENSION_TEMPLATE_REF(TMap, KeyType, ValueType, SetAllocator, K
 		}
 
 		bool bAdd = true;
-		auto Value = ValueConstructor(Key, bAdd);
+		static ValueType Value;
+		Value = ValueConstructor(Key, bAdd);
 		if (bAdd)
 		{
 			return This().AddByHash(KeyHash, Key, Value);

@@ -44,9 +44,6 @@ public:
 	UFUNCTION(Category = "UnrealEngineEx: SplineMeshBuilderComponent", BlueprintCallable)
 	void SetCollisionEnabled(ECollisionEnabled::Type NewType);
 
-	UFUNCTION(Category = "UnrealEngineEx: SplineMeshBuilderComponent", BlueprintCallable)
-	void SetCollisionPresets(FBodyInstance NewCollisionPresets);
-
 
 public: // ICookInterface
 	virtual bool OnWorldLoaded() override;

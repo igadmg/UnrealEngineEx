@@ -92,18 +92,10 @@ void USplineMeshBuilderComponent::SetCollisionEnabled(ECollisionEnabled::Type Ne
 	{
 		bool bIsEnabled = NewType != ECollisionEnabled::NoCollision;
 		CollisionComponent->SetCollisionEnabled(NewType);
-		//CollisionComponent->SetCollisionProfileName(CollisionProfileName, true);
+		CollisionComponent->SetCollisionProfileName(CollisionPresets.GetCollisionProfileName(), true);
 		CollisionComponent->SetNotifyRigidBodyCollision(bIsEnabled);
-		CollisionComponent->SetGenerateOverlapEvents(bIsEnabled);
+		CollisionComponent->SetGenerateOverlapEvents(bGenerateOverlapEvents);
 		CollisionComponent->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_Yes;
-	}
-}
-
-void USplineMeshBuilderComponent::SetCollisionPresets(FBodyInstance NewCollisionPresets)
-{
-	for (auto CollisionComponent : SplineMeshComponents)
-	{
-		CollisionComponent->BodyInstance = NewCollisionPresets;
 	}
 }
 

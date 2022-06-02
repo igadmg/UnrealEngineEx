@@ -26,6 +26,7 @@
 #include "GameFramework/SpectatorPawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Serialization/JsonSerializer.h"
 #include "DebugDrawHelpersEx.h"
 #include "EngineUtils.h"
 #include "GameMapsSettings.h"

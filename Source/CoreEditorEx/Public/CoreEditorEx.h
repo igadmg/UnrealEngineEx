@@ -17,6 +17,7 @@ public:
 
 
 protected:
+	FDelegateHandle PreBeginPIEHandle;
 	FDelegateHandle OnMapOpenedHandle;
 	FDelegateHandle PreSaveWorldWithContextHandle;
 };
@@ -25,5 +26,5 @@ protected:
 
 struct FCoreEditorEx
 {
-	// Declare module static functions here
+	static bool GatherCookInterfaceObjects(const UWorld* World, TArray<class ICookInterface*>& Objects);
 };

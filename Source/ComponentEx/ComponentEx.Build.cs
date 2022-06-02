@@ -28,6 +28,8 @@ public class ComponentEx : ModuleRules
 				"Core",
 				"CoreUObject",
 				"Engine",
+				"Slate",
+				"SlateCore",
 				"UMG",
 			});
 

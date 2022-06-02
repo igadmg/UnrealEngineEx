@@ -50,7 +50,7 @@ struct FFunctionParameterList
 	template <typename ...Ks, typename ...Vs>
 	FFunctionParameterList(TPairInitializer<Ks, Vs> ...pair)
 	{
-		(list.Add(FString(pair.Key), Variant(TInPlaceType<Vs>(), pair.Value)), ...);
+		(list.Add(FName(pair.Key), Variant(TInPlaceType<Vs>(), pair.Value)), ...);
 	}
 
 	template <typename T>
