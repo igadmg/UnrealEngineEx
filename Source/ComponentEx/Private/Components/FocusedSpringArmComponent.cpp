@@ -31,27 +31,39 @@ FFocusedSpringArmConfig UFocusedSpringArmComponent::ChangeCameraConfig(FFocusedS
 	ChangeCameraConfigInterpolationTimer = TLerpInterpolationTimer<FFocusedSpringArmConfig>(
 		OldConfig, NewCameraConfig, Time, EasingFunc);
 
+	auto UpdateFunc = [this](float DeltaTime) {
+		auto Config = ChangeCameraConfigInterpolationTimer.Advance(DeltaTime);
+
+		SetCameraConfig(Config);
+
+		return ChangeCameraConfigInterpolationTimer.IsFinished();
+	};
+
 	if (auto AsyncTaskManager = XX::GetSubsystem<UAsyncTaskManager>(this))
 	{
-		AsyncTaskManager->TaskTickFunctions.Add(FCoreExOnAsyncTaskTickFunction::CreateWeakLambda(this, [this](float DeltaTime) {
-			auto Config = ChangeCameraConfigInterpolationTimer.Advance(DeltaTime);
-
-			CameraFOV = Config.CameraFOV;
-			TargetArmLength = Config.TargetArmLength;
-			SocketOffset = Config.SocketOffset;
-			TargetOffset = Config.TargetOffset;
-			FocusOffset = Config.FocusOffset;
-
-			if (auto CameraManager = XX::GetPlayerCameraManager(this))
-			{
-				CameraManager->SetFOV(CameraFOV);
-			}
-
-			return ChangeCameraConfigInterpolationTimer.IsFinished();
-		}));
+		AsyncTaskManager->TaskTickFunctions.Add(FCoreExOnAsyncTaskTickFunction::CreateWeakLambda(this, UpdateFunc));
 	}
 
 	return OldConfig;
+}
+
+bool UFocusedSpringArmComponent::IsCameraTransitionFinished() const
+{
+	return ChangeCameraConfigInterpolationTimer.IsFinished();
+}
+
+void UFocusedSpringArmComponent::SetCameraConfig(FFocusedSpringArmConfig NewCameraConfig)
+{
+	CameraFOV = NewCameraConfig.CameraFOV;
+	TargetArmLength = NewCameraConfig.TargetArmLength;
+	SocketOffset = NewCameraConfig.SocketOffset;
+	TargetOffset = NewCameraConfig.TargetOffset;
+	FocusOffset = NewCameraConfig.FocusOffset;
+
+	if (auto CameraManager = XX::GetPlayerCameraManager(this))
+	{
+		CameraManager->SetFOV(CameraFOV);
+	}
 }
 
 FTransform UFocusedSpringArmComponent::GetSocketTransform(FName InSocketName, ERelativeTransformSpace TransformSpace) const

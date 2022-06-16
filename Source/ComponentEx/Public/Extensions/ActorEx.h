@@ -84,6 +84,7 @@ DECLARE_CONST_EXTENSION(AActor)
 };
 
 DECLARE_MUTABLE_EXTENSION(AActor)
+	COMPONENTEX_API	void SetActorEnabled(bool bIsEnabled);
 };
 
 DECLARE_EXTENSION(AActor);

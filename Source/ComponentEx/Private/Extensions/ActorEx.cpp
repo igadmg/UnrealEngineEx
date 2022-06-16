@@ -28,3 +28,35 @@ UCameraComponent* FAActorConstEx::GetCameraComponent() const
 
 	return nullptr;
 }
+
+void FAActorMutableEx::SetActorEnabled(bool bIsEnabled)
+{
+	if (!IsValid(This()))
+		return;
+
+	This()->SetActorHiddenInGame(!bIsEnabled);
+	This()->SetActorEnableCollision(bIsEnabled);
+	This()->SetActorTickEnabled(bIsEnabled);
+	for (auto Component : This()->GetComponents())
+	{
+		Component->SetActive(bIsEnabled);
+		Component->SetComponentTickEnabled(bIsEnabled);
+	}
+
+#if 0
+	UStaticMeshComponent* MeshComponent = Cast<UStaticMeshComponent>(Actor->GetComponentByClass(UStaticMeshComponent::StaticClass()));
+
+	if (MeshComponent != nullptr)
+	{
+		if (bIsEnabled)
+		{
+			FNavigationSystem::OnComponentRegistered(*MeshComponent);
+		}
+		else
+		{
+
+			FNavigationSystem::OnComponentUnregistered(*MeshComponent);
+		}
+	}
+#endif
+}

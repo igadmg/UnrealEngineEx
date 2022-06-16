@@ -2,6 +2,7 @@
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 
+#include "Components/ActorPoolComponent.h"
 #include "Components/SplineComponent.h"
 #include "AttachmentDescription.h"
 
@@ -21,8 +22,18 @@ public:
 	UFUNCTION(Category = "ComponentEx", BlueprintPure)
 	static class UCameraComponent* GetCameraComponent(const class AActor* Actor);
 
+	UFUNCTION(Category = "ComponentEx", BlueprintPure, meta = (WorldContext = "WorldContextObject"))
+	static class UActorPoolComponent* GetActorPool(const UObject* WorldContextObject);
+
 	//UFUNCTION(Category = "ComponentEx", BlueprintCallable)
 	static void Attach(const FAttachmentDescription& Where, class AActor* What, class AActor* ParentActor, const FAttachmentTransformRules& AttachmentRules);
+
+
+	UFUNCTION(Category = "ComponentEx|Level", BlueprintPure, meta = (WorldContext = "WorldContextObject"))
+	static class ALevelScriptActor* GetLevelScriptActor(const UObject* WorldContextObject, int32 LevelIndex = 0);
+
+	UFUNCTION(Category = "ComponentEx|Level", BlueprintPure, meta = (WorldContext = "WorldContextObject"))
+	static class ALevelScriptActor* GetLevelScriptActorFromStreamingLevel(const UObject* WorldContextObject, class ULevelStreaming* StreamingLevel);
 
 
 	UFUNCTION(Category = "ComponentEx|Collision", BlueprintPure)
@@ -76,3 +87,41 @@ public:
 	UFUNCTION(Category = "ComponentEx|Spline", BlueprintCallable)
 	static void SetupSplineMeshComponentEndFromSpline(class USplineMeshComponent* SplineMeshComponent, class USplineComponent* Spline, float DistanceAlongSpline, float TangetLength, float SplineMeshRoll, ESplineCoordinateSpace::Type CoordinateSpace, bool bUpdateMesh = true);
 };
+
+
+namespace XX
+{
+	static UActorPoolComponent* GetActorPool(const UObject* WorldContextObject)
+	{
+		return UComponentExStatics::GetActorPool(WorldContextObject);
+	}
+
+	static bool DestroyActor(AActor* Actor)
+	{
+		if (!IsValid(Actor))
+			return false;
+
+		if (auto ActorPool = GetActorPool(Actor))
+		{
+			return ActorPool->DestroyActor(Actor);
+		}
+		if (auto World = Actor->GetWorld())
+		{
+			return World->DestroyActor(Actor);
+		}
+
+		return false;
+	}
+
+	template <typename TActor = ALevelScriptActor>
+	TActor* GetLevelScriptActor(const UObject* Object, int32 LevelIndex = 0)
+	{
+		return TValid<TActor, ALevelScriptActor>::Valid(UComponentExStatics::GetLevelScriptActor(Object, LevelIndex));
+	}
+
+	template <typename TActor = ALevelScriptActor>
+	TActor* GetLevelScriptActorFromStreamingLevel(const UObject* Object, ULevelStreaming* StreamingLevel)
+	{
+		return TValid<TActor, ALevelScriptActor>::Valid(UComponentExStatics::GetLevelScriptActorFromStreamingLevel(Object, StreamingLevel));
+	}
+}

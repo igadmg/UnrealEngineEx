@@ -149,7 +149,8 @@ void UK2Node_IsValidEx::AllocateDefaultPins()
 
 	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, PN_IsValid);
 	AllocateValidObjectPins();
-	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, PN_IsNotValid);
+	if (!bHideNotValidPin)
+		CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, PN_IsNotValid);
 
 	Super::AllocateDefaultPins();
 }
@@ -219,7 +220,7 @@ void UK2Node_IsValidEx::ExpandNode(class FKismetCompilerContext& CompilerContext
 		}
 
 		Compiler.ConnectPins(ObjectPin, GetValidObjectPin(i));
-		Compiler.ConnectPins(NotValidPin, GetIsNotValidPin());
+		if (auto IsNotValidPin = GetIsNotValidPin()) Compiler.ConnectPins(NotValidPin, IsNotValidPin);
 	}
 }
 

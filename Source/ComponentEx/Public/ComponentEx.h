@@ -42,10 +42,3 @@ public:
 #ifdef ENGINE_World_generated_h
 #include "Extensions/WorldEx.h"
 #endif
-
-
-
-struct FComponentEx
-{
-	COMPONENTEX_API static void SetActorEnabled(class AActor* Actor, bool bIsEnabled);
-};

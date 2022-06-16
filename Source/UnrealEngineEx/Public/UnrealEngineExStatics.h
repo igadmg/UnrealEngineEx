@@ -64,12 +64,6 @@ public:
 	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintPure)
 	static FString GetLevelName(const TSoftObjectPtr<UWorld>& Level);
 
-	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
-	static AActor* GetLevelScriptActor(const UObject* WorldContextObject, int32 LevelIndex = 0);
-
-	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintPure, meta = (HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
-	static AActor* GetLevelScriptActorFromStreamingLevel(const UObject* WorldContextObject, class ULevelStreaming* StreamingLevel);
-
 	UFUNCTION(Category = "UnrealEngineEx|Level", BlueprintPure, meta = (DeterminesOutputType = "ObjectClass", HidePin = "WorldContextObject", WorldContext = "WorldContextObject"))
 	static UObject* FindLevelScriptObject(const UObject* WorldContextObject, UClass* ObjectClass);
 
@@ -208,15 +202,3 @@ public:
 	UFUNCTION(Category = "UnrealEditorEx", BlueprintPure, meta = (DevelopmentOnly))
 	static int32 GetPlayNumberOfClients();
 };
-
-
-class AActor;
-
-namespace XX
-{
-	template <typename TActor = AActor>
-	TActor* GetLevelScriptActor(const UObject* Object, int32 LevelIndex = 0)
-	{
-		return TValid<TActor, AActor>::Valid(UUnrealEngineExStatics::GetLevelScriptActor(Object, LevelIndex));
-	}
-}

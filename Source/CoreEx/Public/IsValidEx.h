@@ -80,7 +80,7 @@ static bool IsValid(const TScriptInterface<T>& ScriptInterface)
 template <typename T>
 static bool IsValid(const TSoftObjectPtr<T>& SoftObjectPtr)
 {
-	return !SoftObjectPtr.IsNull();
+	return !SoftObjectPtr.IsNull() && SoftObjectPtr.IsValid();
 }
 
 template <typename T>

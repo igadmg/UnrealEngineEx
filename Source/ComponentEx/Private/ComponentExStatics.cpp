@@ -9,9 +9,13 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ActorComponent.h"
+#include "Components/ActorPoolComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SplineComponent.h"
 #include "Components/SplineMeshComponent.h"
+#include "Engine/LevelScriptActor.h"
+#include "Engine/LevelStreaming.h"
+#include "Engine/Level.h"
 #include "Engine/PostProcessVolume.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/Texture.h"
@@ -24,12 +28,28 @@
 
 void UComponentExStatics::SetActorEnabled(AActor* Actor, bool bIsEnabled)
 {
-	FComponentEx::SetActorEnabled(Actor, bIsEnabled);
+	ex(Actor).SetActorEnabled(bIsEnabled);
 }
 
 UCameraComponent* UComponentExStatics::GetCameraComponent(const AActor* Actor)
 {
 	return ex(Actor).GetCameraComponent();
+}
+
+UActorPoolComponent* UComponentExStatics::GetActorPool(const UObject* WorldContextObject)
+{
+	if (auto LevelScriptActor = GetLevelScriptActor(WorldContextObject))
+	{
+		auto Result = LevelScriptActor->FindComponentByClass<UActorPoolComponent>();
+		if (!IsValid(Result))
+		{
+			Result = Cast<UActorPoolComponent>(LevelScriptActor->AddComponentByClass(UActorPoolComponent::StaticClass(), false, FTransform::Identity, false));
+		}
+
+		return Result;
+	}
+
+	return nullptr;
 }
 
 void UComponentExStatics::Attach(const FAttachmentDescription& Where, AActor* What, AActor* ParentActor, const FAttachmentTransformRules& AttachmentRules)
@@ -42,6 +62,38 @@ void UComponentExStatics::Attach(const FAttachmentDescription& Where, AActor* Wh
 	{
 		What->AttachToComponent(Where.Component, AttachmentRules, Where.SocketName);
 	}
+}
+
+ALevelScriptActor* UComponentExStatics::GetLevelScriptActor(const UObject* WorldContextObject, int32 LevelIndex)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	if (!IsValid(World))
+		return nullptr;
+
+	ULevel* Level = World->GetLevel(LevelIndex);
+	if (!IsValid(Level))
+		return nullptr;
+
+	ALevelScriptActor* LevelScriptActor = Level->GetLevelScriptActor();
+	if (!IsValid(LevelScriptActor))
+		return nullptr;
+
+	return LevelScriptActor;
+}
+
+ALevelScriptActor* UComponentExStatics::GetLevelScriptActorFromStreamingLevel(const UObject* WorldContextObject, ULevelStreaming* StreamingLevel)
+{
+	if (!IsValid(StreamingLevel))
+		return nullptr;
+
+	if (!StreamingLevel->IsLevelLoaded())
+		return nullptr;
+
+	ALevelScriptActor* LevelScriptActor = StreamingLevel->GetLevelScriptActor();
+	if (!IsValid(LevelScriptActor))
+		return nullptr;
+
+	return LevelScriptActor;
 }
 
 FVector UComponentExStatics::GetHitOrEndLocation(const FHitResult& HitResult)

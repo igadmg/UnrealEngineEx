@@ -31,6 +31,9 @@ public:
 	UPROPERTY(EditAnywhere, meta = (AllowAbstract))
 	TArray<UClass*> UpcastType;
 
+	UPROPERTY(EditAnywhere)
+	bool bHideNotValidPin = false;
+
 	UPROPERTY()
 	TArray<FEdGraphPinType> InputObjectType;
 

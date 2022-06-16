@@ -27,6 +27,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Serialization/JsonSerializer.h"
+#include "ComponentExStatics.h"
 #include "DebugDrawHelpersEx.h"
 #include "EngineUtils.h"
 #include "GameMapsSettings.h"
@@ -216,51 +217,19 @@ FString UUnrealEngineExStatics::GetLevelName(const TSoftObjectPtr<UWorld>& Level
 	return FUnrealEngineEx::GetLevelName(Level);
 }
 
-AActor* UUnrealEngineExStatics::GetLevelScriptActor(const UObject* WorldContextObject, int32 LevelIndex)
-{
-	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
-	if (!IsValid(World))
-		return nullptr;
-
-	ULevel* Level = World->GetLevel(LevelIndex);
-	if (!IsValid(Level))
-		return nullptr;
-
-	AActor* LevelScriptActor = Level->GetLevelScriptActor();
-	if (!IsValid(LevelScriptActor))
-		return nullptr;
-
-	return LevelScriptActor;
-}
-
-AActor* UUnrealEngineExStatics::GetLevelScriptActorFromStreamingLevel(const UObject* WorldContextObject, ULevelStreaming* StreamingLevel)
-{
-	if (!IsValid(StreamingLevel))
-		return nullptr;
-
-	if (!StreamingLevel->IsLevelLoaded())
-		return nullptr;
-
-	AActor* LevelScriptActor = StreamingLevel->GetLevelScriptActor();
-	if (!IsValid(LevelScriptActor))
-		return nullptr;
-
-	return LevelScriptActor;
-}
-
 UObject* UUnrealEngineExStatics::FindLevelScriptObject(const UObject* WorldContextObject, UClass* ObjectClass)
 {
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
 	if (!IsValid(World))
 		return nullptr;
 
-	AActor* LevelScriptActor = GetLevelScriptActor(WorldContextObject);
+	AActor* LevelScriptActor = XX::GetLevelScriptActor(WorldContextObject);
 	if (UKismetSystemLibrary::DoesImplementInterface(LevelScriptActor, ObjectClass))
 		return LevelScriptActor;
 
 	for (ULevelStreaming* Sublevel : World->GetStreamingLevels())
 	{
-		AActor* SublevelScriptActor = GetLevelScriptActorFromStreamingLevel(WorldContextObject, Sublevel);
+		AActor* SublevelScriptActor = XX::GetLevelScriptActorFromStreamingLevel(WorldContextObject, Sublevel);
 		if (UKismetSystemLibrary::DoesImplementInterface(SublevelScriptActor, ObjectClass))
 			return SublevelScriptActor;
 	}
@@ -274,13 +243,13 @@ bool UUnrealEngineExStatics::FindLevelScriptObjects(const UObject* WorldContextO
 	if (!IsValid(World))
 		return false;
 
-	AActor* LevelScriptActor = GetLevelScriptActor(WorldContextObject);
+	AActor* LevelScriptActor = XX::GetLevelScriptActor(WorldContextObject);
 	if (UKismetSystemLibrary::DoesImplementInterface(LevelScriptActor, ObjectClass))
 		Objects.Add(LevelScriptActor);
 
 	for (ULevelStreaming* Sublevel : World->GetStreamingLevels())
 	{
-		AActor* SublevelScriptActor = GetLevelScriptActorFromStreamingLevel(WorldContextObject, Sublevel);
+		AActor* SublevelScriptActor = XX::GetLevelScriptActorFromStreamingLevel(WorldContextObject, Sublevel);
 		if (UKismetSystemLibrary::DoesImplementInterface(SublevelScriptActor, ObjectClass))
 			Objects.Add(SublevelScriptActor);
 	}

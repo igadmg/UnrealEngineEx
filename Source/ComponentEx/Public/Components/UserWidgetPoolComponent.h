@@ -21,6 +21,9 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (DeterminesOutputType = "WidgetClass"))
 	UUserWidget* CreateWidget(TSubclassOf<UUserWidget> WidgetClass);
 
+	template <typename TWidget>
+	TWidget* CreateWidget(TSubclassOf<TWidget> WidgetClass) { return Cast<TWidget>(CreateWidget(TSubclassOf<UUserWidget>(WidgetClass))); }
+
 	UFUNCTION(BlueprintCallable, meta = (DeterminesOutputType = "WidgetClass"))
 	void ReleaseWidget(UUserWidget* Widget);
 

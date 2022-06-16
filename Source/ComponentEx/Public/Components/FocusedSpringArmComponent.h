@@ -90,6 +90,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FFocusedSpringArmConfig ChangeCameraConfig(FFocusedSpringArmConfig NewCameraConfig, float Time, TEnumAsByte<EEasingFunc::Type> EasingFunc);
 
+	UFUNCTION(BlueprintPure)
+	bool IsCameraTransitionFinished() const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetCameraConfig(FFocusedSpringArmConfig NewCameraConfig);
+
 
 public:
 	UFocusedSpringArmComponent(const FObjectInitializer& ObjectInitializer);

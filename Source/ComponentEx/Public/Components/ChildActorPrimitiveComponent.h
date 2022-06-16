@@ -4,7 +4,7 @@
 #include "ChildActorPrimitiveComponent.generated.h"
 
 
-UCLASS(ShowCategories = "Mobility")
+UCLASS(ClassGroup = "Utility", ShowCategories = "Mobility", meta = (BlueprintSpawnableComponent))
 class COMPONENTEX_API UChildActorPrimitiveComponent : public UPrimitiveComponent
 {
 	GENERATED_BODY()

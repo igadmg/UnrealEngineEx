@@ -5,7 +5,7 @@
 
 
 /**
- That was a /USerWidget which can prevent Focus Change. But it stopped working after UE dev's hid their internals.
+ That was a UUserWidget which can prevent Focus Change. But it stopped working after UE dev's hid their internals.
  Now I don't know how to do that.
 */
 UCLASS()

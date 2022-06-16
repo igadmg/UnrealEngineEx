@@ -35,7 +35,7 @@ void UChildActorPrimitiveComponent::OnRegister()
 				if (auto AttachedParent = ChildRoot->GetAttachParent())
 				{
 					TGuardValue<TEnumAsByte<EComponentMobility::Type>> MobilityGuard(ChildRoot->Mobility, Mobility);
-					ChildRoot->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
+					ChildRoot->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetIncludingScale);
 
 					OnChildActorCreated(ChildActor);
 				}
@@ -54,8 +54,9 @@ void UChildActorPrimitiveComponent::OnUnregister()
 	{
 		if (auto Level = Valid(GetComponentLevel()))
 		{
-			if (Level->bAreComponentsCurrentlyRegistered && !IsGarbageCollecting() &&
-				!FCoreEx::IsObjectReinst(GetOuter()))
+			if ((Level->bAreComponentsCurrentlyRegistered || IsCreatedByConstructionScript())
+				&& !IsGarbageCollecting()
+				/* && !FCoreEx::IsObjectReinst(GetOuter())*/)
 				DestroyChildActor();
 		}
 	}
@@ -251,7 +252,7 @@ void UChildActorPrimitiveComponent::DestroyChildActor()
 					if (!bIsChildActorPendingKillOrUnreachable)
 					{
 						OnChildActorDestroyed(ChildActor);
-						World->DestroyActor(ChildActor);
+						XX::DestroyActor(ChildActor);
 					}
 				}
 			}
