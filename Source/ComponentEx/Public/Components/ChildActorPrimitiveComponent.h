@@ -24,7 +24,7 @@ protected:
 
 public:
 	UFUNCTION(Category = "UnrealEngineEx: ChildActorPrimitiveComponent", BlueprintPure)
-	AActor* GetChildActor() const { return ChildActorPtr.Get(); }
+	AActor* GetChildActor() const { return Valid(ChildActorPtr); }
 
 	UFUNCTION(Category = "UnrealEngineEx: ChildActorPrimitiveComponent", BlueprintCallable)
 	void SetChildActor(AActor* ChildActor, FName SocketName = NAME_None);

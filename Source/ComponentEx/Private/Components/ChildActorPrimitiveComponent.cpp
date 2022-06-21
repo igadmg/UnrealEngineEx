@@ -22,11 +22,7 @@ void UChildActorPrimitiveComponent::OnRegister()
 {
 	Super::OnRegister();
 
-	if (!IsValid(ChildActorPtr))
-	{
-		CreateChildActor();
-	}
-	else if (auto ChildActor = GetChildActor())
+	if (auto ChildActor = GetChildActor())
 	{
 		if (GetComponentLevel() == ChildActor->GetLevel())
 		{
@@ -45,6 +41,10 @@ void UChildActorPrimitiveComponent::OnRegister()
 		{
 			CloneChildActor(ChildActor);
 		}
+	}
+	else
+	{
+		CreateChildActor();
 	}
 }
 
@@ -108,7 +108,7 @@ void UChildActorPrimitiveComponent::PostLoad()
 void UChildActorPrimitiveComponent::SetChildActor(AActor* ChildActor, FName SocketName)
 {
 	ChildAttachedActors.Empty();
-	if (IsValid(ChildActorPtr))
+	if (IsValid(GetChildActor()))
 	{
 		DestroyChildActor();
 	}
@@ -129,7 +129,7 @@ void UChildActorPrimitiveComponent::SetChildActor(AActor* ChildActor, FName Sock
 
 void UChildActorPrimitiveComponent::SetChildActorClass(TSubclassOf<AActor> InClass, AActor* NewChildActorTemplate)
 {
-	if (auto ChildActor = Valid(ChildActorPtr))
+	if (auto ChildActor = GetChildActor())
 	{
 		if (ChildActor->GetClass() != InClass)
 		{
@@ -138,11 +138,12 @@ void UChildActorPrimitiveComponent::SetChildActorClass(TSubclassOf<AActor> InCla
 		}
 	}
 
-	if (!IsValid(ChildActorPtr))
+	if (!IsValid(GetChildActor()))
 	{
 		ChildActorClass = InClass;
 		CreateChildActor();
-		if (auto ChildActor = Valid(ChildActorPtr))
+
+		if (auto ChildActor = GetChildActor())
 		{
 			for (auto ChildAttachedActor : ChildAttachedActors)
 			{
@@ -169,15 +170,15 @@ void UChildActorPrimitiveComponent::CreateChildActor(AActor* ActorTemplate)
 		FActorSpawnParameters Params;
 		Params.Owner = MyOwner;
 		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		Params.bDeferConstruction = true; // We defer construction so that we set ParentComponent prior to component registration so they appear selected
+		Params.bDeferConstruction = true;
 		Params.bAllowDuringConstructionScript = true;
 		Params.OverrideLevel = (MyOwner ? MyOwner->GetLevel() : nullptr);
 		Params.Name = /*ChildActorName*/ NAME_None;
 		Params.NameMode = FActorSpawnParameters::ESpawnActorNameMode::Requested;
 #if WITH_EDITOR
 		Params.OverridePackage = GetOwner()->GetExternalPackage();
-		/*Params.OverrideParentComponent = this;*/
-		Params.OverrideActorGuid = /*CachedInstanceData ? CachedInstanceData->ChildActorGUID :*/ FGuid();
+		//Params.OverrideParentComponent = this;
+		//Params.OverrideActorGuid = CachedInstanceData ? CachedInstanceData->ChildActorGUID : FGuid();
 #endif
 
 		if (ActorTemplate && ActorTemplate->GetClass() == ChildActorClass)
@@ -201,18 +202,10 @@ void UChildActorPrimitiveComponent::CreateChildActor(AActor* ActorTemplate)
 		FVector Location = GetChildActorLocation();
 		FRotator Rotation = GetChildActorRotation();
 
-		if (auto ChildActor = World->SpawnActor(ChildActorClass, &Location, &Rotation, Params))
+		if (auto ChildActor = XX::SpawnActor(this, ChildActorClass, Location, Rotation, Params, [this](AActor* Actor) {
+				OnChildActorSpawned(Actor);
+			}))
 		{
-			OnChildActorSpawned(ChildActor);
-
-			if (Valid(ActorTemplate))
-			{
-				FComponentInstanceDataCache InstanceDataCache(ActorTemplate);
-				ChildActor->FinishSpawning(GetChildActorTransform(), false, &InstanceDataCache);
-			}
-			else
-				ChildActor->FinishSpawning(GetChildActorTransform(), false);
-
 			if (USceneComponent* ChildRoot = ChildActor->GetRootComponent())
 			{
 				TGuardValue<TEnumAsByte<EComponentMobility::Type>> MobilityGuard(ChildRoot->Mobility, Mobility);
@@ -227,7 +220,7 @@ void UChildActorPrimitiveComponent::CreateChildActor(AActor* ActorTemplate)
 
 void UChildActorPrimitiveComponent::DestroyChildActor()
 {
-	if (auto ChildActor = GetChildActor())
+	if (auto ChildActor = ChildActorPtr.Get())
 	{
 		if (ChildActor->HasAuthority()/* && !IsLevelBeingRemoved()*/)
 		{

@@ -426,3 +426,68 @@ void UComponentExStatics::SetupSplineMeshComponentEndFromSpline(USplineMeshCompo
 		SplineMeshComponent->UpdateMesh();
 	}
 }
+
+AActor* XX::SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters)
+{
+	if (auto ActorPool = GetActorPool(WorldContextObject))
+	{
+		return ActorPool->SpawnActor(ActorClass, Transform, SpawnParameters);
+	}
+	else
+	{
+		UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+		if (!IsValid(World))
+			return nullptr;
+
+		return World->SpawnActor(ActorClass, &Transform, SpawnParameters);
+	}
+
+	return nullptr;
+}
+
+AActor* XX::SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn)
+{
+	if (auto ActorPool = GetActorPool(WorldContextObject))
+	{
+		return ActorPool->SpawnActor(ActorClass, Transform, SpawnParameters, DeferredFn);
+	}
+	else
+	{
+		auto LocalSpawnParameters = SpawnParameters;
+		LocalSpawnParameters.bDeferConstruction = true;
+
+		if (auto Actor = XX::SpawnActor(WorldContextObject, ActorClass, Transform, LocalSpawnParameters))
+		{
+			DeferredFn(Actor);
+
+			if (Valid(LocalSpawnParameters.Template))
+			{
+				FComponentInstanceDataCache InstanceDataCache(LocalSpawnParameters.Template);
+				Actor->FinishSpawning(Transform, true, &InstanceDataCache);
+			}
+			else
+				Actor->FinishSpawning(Transform, true);
+
+			return Actor;
+		}
+	}
+
+	return nullptr;
+}
+
+bool XX::DestroyActor(AActor* Actor)
+{
+	if (!IsValid(Actor))
+		return false;
+
+	if (auto ActorPool = GetActorPool(Actor))
+	{
+		return ActorPool->DestroyActor(Actor);
+	}
+	if (auto World = Actor->GetWorld())
+	{
+		return World->DestroyActor(Actor);
+	}
+
+	return false;
+}

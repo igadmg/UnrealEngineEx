@@ -91,26 +91,62 @@ public:
 
 namespace XX
 {
-	static UActorPoolComponent* GetActorPool(const UObject* WorldContextObject)
+	inline UActorPoolComponent* GetActorPool(const UObject* WorldContextObject)
 	{
 		return UComponentExStatics::GetActorPool(WorldContextObject);
 	}
 
-	static bool DestroyActor(AActor* Actor)
+	AActor* SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters);
+	AActor* SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn);
+
+	bool DestroyActor(AActor* Actor);
+
+	template <typename TActor = AActor>
+	inline TActor* SpawnActor(const UObject* WorldContextObject, const FVector& Location, const FRotator& Rotation, const FActorSpawnParameters& SpawnParameters)
 	{
-		if (!IsValid(Actor))
-			return false;
+		return Cast<TActor>(SpawnActor(WorldContextObject, TActor::StaticClass(), Location, Rotation, SpawnParameters));
+	}
 
-		if (auto ActorPool = GetActorPool(Actor))
-		{
-			return ActorPool->DestroyActor(Actor);
-		}
-		if (auto World = Actor->GetWorld())
-		{
-			return World->DestroyActor(Actor);
-		}
+	template <typename TActor = AActor>
+	inline TActor* SpawnActor(const UObject* WorldContextObject, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters)
+	{
+		return Cast<TActor>(SpawnActor(WorldContextObject, TActor::StaticClass(), Transform, SpawnParameters));
+	}
 
-		return false;
+	template <typename TActor = AActor>
+	inline TActor* SpawnActor(const UObject* WorldContextObject, const FVector& Location, const FRotator& Rotation, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn)
+	{
+		return Cast<TActor>(SpawnActor(WorldContextObject, TActor::StaticClass(), Location, Rotation, SpawnParameters, DeferredFn));
+	}
+
+	template <typename TActor = AActor>
+	inline TActor* SpawnActor(const UObject* WorldContextObject, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn)
+	{
+		return Cast<TActor>(SpawnActor(WorldContextObject, TActor::StaticClass(), Transform, SpawnParameters, DeferredFn));
+	}
+
+	template <typename TActor>
+	static AActor* SpawnActor(const UObject* WorldContextObject, TSubclassOf<TActor> ActorClass, const FVector& Location, const FRotator& Rotation, const FActorSpawnParameters& SpawnParameters)
+	{
+		return Cast<TActor>(SpawnActor(WorldContextObject, ActorClass.Get(), FTransform(Rotation, Location), SpawnParameters));
+	}
+
+	template <typename TActor>
+	static AActor* SpawnActor(const UObject* WorldContextObject, TSubclassOf<TActor> ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters)
+	{
+		return Cast<TActor>(SpawnActor(WorldContextObject, ActorClass.Get(), Transform, SpawnParameters));
+	}
+
+	template <typename TActor>
+	static AActor* SpawnActor(const UObject* WorldContextObject, TSubclassOf<TActor> ActorClass, const FVector& Location, const FRotator& Rotation, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn)
+	{
+		return Cast<TActor>(SpawnActor(WorldContextObject, ActorClass.Get(), FTransform(Rotation, Location), SpawnParameters, DeferredFn));
+	}
+
+	template <typename TActor>
+	static AActor* SpawnActor(const UObject* WorldContextObject, TSubclassOf<TActor> ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn)
+	{
+		return Cast<TActor>(SpawnActor(WorldContextObject, ActorClass.Get(), Transform, SpawnParameters, DeferredFn));
 	}
 
 	template <typename TActor = ALevelScriptActor>

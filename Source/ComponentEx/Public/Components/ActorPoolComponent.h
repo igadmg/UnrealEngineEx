@@ -12,6 +12,9 @@ class COMPONENTEX_API UActorPoolComponent : public UActorComponent
 
 
 public:
+	AActor* SpawnActor(TSubclassOf<AActor> ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters);
+	AActor* SpawnActor(TSubclassOf<AActor> ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn);
+
 	UFUNCTION(BlueprintCallable)
 	bool DestroyActor(AActor* Actor, bool bNetForce = false, bool bShouldModifyLevel = true);
 

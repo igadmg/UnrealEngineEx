@@ -7,6 +7,8 @@
 #include "Engine/Engine.h"
 #include "CoreTypesEx.h"
 
+#include <type_traits>
+
 
 #define CONCAT(a, b) CONCAT_INNER(a, b)
 #define CONCAT_INNER(a, b) a ## b
@@ -80,16 +82,6 @@ static bool IsInGame(const UObject* WorldContextObject)
 }
 
 
-namespace XX
-{
-	template <typename TSubsystemClass>
-	inline TSubsystemClass* GetSubsystem(const UObject* WorldContextObject)
-	{
-		auto World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
-		return World ? World->GetSubsystem<TSubsystemClass>() : nullptr;
-	}
-}
-
 template <typename RefType, typename AssignedType = RefType>
 TGuardValue<RefType, AssignedType> MakeGuardValue(RefType& ReferenceValue, const AssignedType& NewValue)
 {
@@ -111,6 +103,8 @@ if (PropertyChangedEvent.Property && PropertyChangedEvent.Property->GetFName() =
 if (PropertyChangedEvent.PropertyChain.GetActiveMemberNode()->GetValue()->GetFName() == GET_MEMBER_NAME_CHECKED(ClassName, MemberName))
 
 #endif
+
+#include "SubsystemEx.h"
 
 #include "LogEx.h"
 #include "EnumEx.h"
