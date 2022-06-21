@@ -73,6 +73,16 @@ AActor* UActorPoolComponent::SpawnActor(TSubclassOf<AActor> ActorClass, const FT
 	return Actor;
 }
 
+AActor* UActorPoolComponent::SpawnActor(TSubclassOf<AActor> Class, const FTransform& SpawnTransform, ESpawnActorCollisionHandlingMethod CollisionHandlingOverride, AActor* Owner, APawn* Instigator)
+{
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = CollisionHandlingOverride;
+	SpawnParameters.Owner = Owner;
+	SpawnParameters.Instigator = Instigator;
+
+	return SpawnActor(Class, SpawnTransform, SpawnParameters);
+}
+
 bool UActorPoolComponent::DestroyActor(AActor* Actor, bool bNetForce, bool bShouldModifyLevel)
 {
 	if (!IsValid(Actor))

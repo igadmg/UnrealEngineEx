@@ -27,6 +27,9 @@ protected:
 
 
 public:
+	UFUNCTION(BlueprintCallable, meta = (DeterminesOutputType = "ActorClass"))
+	AActor* SpawnActor(TSubclassOf<AActor> Class, const FTransform& SpawnTransform, ESpawnActorCollisionHandlingMethod CollisionHandlingOverride, AActor* Owner, APawn* Instigator);
+
 	UFUNCTION(BlueprintCallable)
 	bool DestroyActor(AActor* Actor, bool bNetForce = false, bool bShouldModifyLevel = true);
 
