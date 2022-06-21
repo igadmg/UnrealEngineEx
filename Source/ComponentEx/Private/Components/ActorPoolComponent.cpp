@@ -11,50 +11,79 @@ UActorPoolComponent::UActorPoolComponent(const FObjectInitializer& ObjectInitial
 {
 }
 
+FActorPoolNode& UActorPoolComponent::GetActorPoolNode(TSubclassOf<AActor> ActorClass)
+{
+	return ex(ActorPoolNodes).FindOrAdd(ActorClass, [](auto& Key) { return FActorPoolNode(); });
+}
+
 AActor* UActorPoolComponent::SpawnActor(TSubclassOf<AActor> ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters)
 {
-	UWorld* World = GEngine->GetWorldFromContextObject(this, EGetWorldErrorMode::ReturnNull);
-	if (!IsValid(World))
-		return nullptr;
+	auto& ActorPoolNode = GetActorPoolNode(ActorClass);
+	if (ActorPoolNode.PooledActors.Num() == 0)
+	{
+		UWorld* World = GEngine->GetWorldFromContextObject(this, EGetWorldErrorMode::ReturnNull);
+		if (!IsValid(World))
+			return nullptr;
 
-	return World->SpawnActor(ActorClass, &Transform, SpawnParameters);
+		return World->SpawnActor(ActorClass, &Transform, SpawnParameters);
+	}
+
+	auto Actor = ActorPoolNode.PooledActors.Pop();
+
+	ex(Actor).SetActorEnabled(true);
+
+	return Actor;
 }
 
 AActor* UActorPoolComponent::SpawnActor(TSubclassOf<AActor> ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn)
 {
-	auto LocalSpawnParameters = SpawnParameters;
-	LocalSpawnParameters.bDeferConstruction = true;
-
-	UWorld* World = GEngine->GetWorldFromContextObject(this, EGetWorldErrorMode::ReturnNull);
-	if (!IsValid(World))
-		return nullptr;
-
-	if (auto Actor = World->SpawnActor(ActorClass, &Transform, LocalSpawnParameters))
+	auto& ActorPoolNode = GetActorPoolNode(ActorClass);
+	if (ActorPoolNode.PooledActors.Num() == 0)
 	{
-		DeferredFn(Actor);
+		auto LocalSpawnParameters = SpawnParameters;
+		LocalSpawnParameters.bDeferConstruction = true;
 
-		if (Valid(LocalSpawnParameters.Template))
+		UWorld* World = GEngine->GetWorldFromContextObject(this, EGetWorldErrorMode::ReturnNull);
+		if (!IsValid(World))
+			return nullptr;
+
+		if (auto Actor = World->SpawnActor(ActorClass, &Transform, LocalSpawnParameters))
 		{
-			FComponentInstanceDataCache InstanceDataCache(LocalSpawnParameters.Template);
-			Actor->FinishSpawning(Transform, true, &InstanceDataCache);
-		}
-		else
-			Actor->FinishSpawning(Transform, true);
+			DeferredFn(Actor);
 
-		return Actor;
+			if (Valid(LocalSpawnParameters.Template))
+			{
+				FComponentInstanceDataCache InstanceDataCache(LocalSpawnParameters.Template);
+				Actor->FinishSpawning(Transform, true, &InstanceDataCache);
+			}
+			else
+				Actor->FinishSpawning(Transform, true);
+
+			return Actor;
+		}
+
+		return nullptr;
 	}
 
-	return nullptr;
+	auto Actor = ActorPoolNode.PooledActors.Pop();
+	DeferredFn(Actor);
+
+	ex(Actor).SetActorEnabled(true);
+
+	return Actor;
 }
 
 bool UActorPoolComponent::DestroyActor(AActor* Actor, bool bNetForce, bool bShouldModifyLevel)
 {
-	if (auto World = Actor->GetWorld())
-	{
-		return World->DestroyActor(Actor);
-	}
+	if (!IsValid(Actor))
+		return false;
 
-	return false;
+	auto& ActorPoolNode = GetActorPoolNode(Actor->GetClass());
+	ActorPoolNode.PooledActors.Push(Actor);
+
+	ex(Actor).SetActorEnabled(false);
+
+	return true;
 }
 
 #undef LOCTEXT_NAMESPACE
