@@ -5,6 +5,8 @@
 #include "ActorPoolComponent.generated.h"
 
 
+DECLARE_DELEGATE_OneParam(FActorPoolDeferredDelegate, AActor*);
+
 USTRUCT()
 struct COMPONENTEX_API FActorPoolNode
 {
@@ -14,6 +16,20 @@ struct COMPONENTEX_API FActorPoolNode
 	UPROPERTY()
 	TArray<AActor*> PooledActors;
 };
+
+USTRUCT(BlueprintType)
+struct COMPONENTEX_API FActorPoolDeferredCallback
+{
+	GENERATED_BODY()
+
+
+	UPROPERTY()
+	AActor *Actor;
+
+	FActorPoolDeferredDelegate Delegate;
+	void Call() { Delegate.ExecuteIfBound(Actor); };
+};
+
 
 UCLASS()
 class COMPONENTEX_API UActorPoolComponent : public UActorComponent
@@ -30,7 +46,13 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (DeterminesOutputType = "ActorClass"))
 	AActor* SpawnActor(TSubclassOf<AActor> Class, const FTransform& SpawnTransform, ESpawnActorCollisionHandlingMethod CollisionHandlingOverride, AActor* Owner, APawn* Instigator);
 
+	UFUNCTION(BlueprintCallable, meta = (DeterminesOutputType = "ActorClass"))
+	AActor* SpawnActorDeferred(TSubclassOf<AActor> Class, const FTransform& SpawnTransform, ESpawnActorCollisionHandlingMethod CollisionHandlingOverride, AActor* Owner, APawn* Instigator, FActorPoolDeferredCallback& Finish);
+
 	UFUNCTION(BlueprintCallable)
+	bool FinishSpawnActorDeferred(FActorPoolDeferredCallback Callback);
+
+	UFUNCTION(BlueprintCallable, meta = (DefaultToSelf = "Actor"))
 	bool DestroyActor(AActor* Actor, bool bNetForce = false, bool bShouldModifyLevel = true);
 
 

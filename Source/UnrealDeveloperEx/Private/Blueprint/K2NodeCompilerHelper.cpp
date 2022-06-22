@@ -9,10 +9,10 @@
 #include "Engine/Engine.h"
 #include "EdGraphSchema_K2.h"
 
-#include "CoreEx.h"
-
+#include "UnrealDeveloperEx.final.h"
 
 #define LOCTEXT_NAMESPACE "UnrealDeveloperEx"
+
 
 FK2NodeCompilerHelper::~FK2NodeCompilerHelper()
 {
@@ -52,16 +52,16 @@ UK2Node_CallFunction* FK2NodeCompilerHelper::SpawnSetVariableNode(const FEdGraph
 	return nullptr;
 }
 
-UK2Node_CallFunction* FK2NodeCompilerHelper::SpawnSetVariableNode(UEdGraphPin* SourcePin)
+UK2Node_CallFunction* FK2NodeCompilerHelper::SpawnSetVariableNode(UEdGraphPin* SourcePin, FString PropertyName)
 {
 	auto SetVariableNode = SpawnSetVariableNode(SourcePin->PinType);
 	if (SetVariableNode)
 	{
 		UEdGraphPin* PropertyNamePin = SetVariableNode->FindPinChecked(TEXT("PropertyName"));
 #if !UE_VERSION_OLDER_THAN(4, 19, 0)
-		PropertyNamePin->DefaultValue = SourcePin->PinName.ToString();
+		PropertyNamePin->DefaultValue = PropertyName;
 #else
-		PropertyNamePin->DefaultValue = SourcePin->PinName;
+		PropertyNamePin->DefaultValue = PropertyName;
 #endif
 
 		// Move connection from the variable pin on the spawn node to the 'value' pin
@@ -192,11 +192,11 @@ bool FK2NodeCompilerHelper::ConnectPins(class UEdGraphPin* SourcePin, class UEdG
 	return bIsErrorFree;
 }
 
-bool FK2NodeCompilerHelper::ConnectSetVariable(UEdGraphPin* SourcePin, UEdGraphPin* ObjectPin)
+bool FK2NodeCompilerHelper::SetObjectProperty(UEdGraphPin* ObjectPin, UEdGraphPin* SourcePin)
 {
-	if (auto SetVarNode = SpawnSetVariableNode(SourcePin))
+	if (auto SetVarNode = SpawnSetVariableNode(SourcePin, SourcePin->GetName()))
 	{
-		ConnectPins(ObjectPin, SetVarNode->FindPinChecked(TEXT("Object")));
+		bIsErrorFree &= ConnectPins(ObjectPin, SetVarNode->FindPinChecked(TEXT("Object")));
 
 		return bIsErrorFree;
 	}
@@ -300,6 +300,7 @@ void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, UClass
 	CallFunction->FunctionReference.SetExternalMember(FunctionName, FunctionClass);
 }
 
+/*
 void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params)
 {
 	SetupNode(CallFunction, FunctionClass, FunctionName);
@@ -312,6 +313,7 @@ void FK2NodeCompilerHelper::ConnectNode(UK2Node_CallFunction* CallFunction, UCla
 		ConnectPins(Pair.Value, CallFunction->FindPin(Pair.Key));
 	}
 }
+*/
 
 void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params)
 {
@@ -320,6 +322,8 @@ void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, class 
 
 void FK2NodeCompilerHelper::ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params)
 {
+	ConnectNode(CallFunction, FunctionClass, FunctionName);
+
 	for (auto Pair : Params.list)
 	{
 		auto Pin = CallFunction->FindPin(Pair.Key);
@@ -351,6 +355,26 @@ void FK2NodeCompilerHelper::ConnectNode(UK2Node_CallFunction* CallFunction, UEdG
 	ConnectPins(SelfPin, CallFunction->FindPin(UEdGraphSchema_K2::PN_Self));
 }
 
+void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params)
+{
+	SetupNode(CallFunction, SelfPin, FunctionClass, FunctionName);
+}
+
+void FK2NodeCompilerHelper::ConnectNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params)
+{
+	ConnectNode(CallFunction, SelfPin, FunctionClass, FunctionName);
+
+	for (auto Pair : Params.list)
+	{
+		auto Pin = CallFunction->FindPin(Pair.Key);
+		auto& v = Pair.Value;
+		if (v.IsType<UEdGraphPin*>()) ConnectPins(v.Get<UEdGraphPin*>(), Pin);
+		else if (v.IsType<bool>()) Pin->DefaultValue = UKismetStringLibrary::Conv_BoolToString(v.Get<bool>());
+		else if (v.IsType<int>()) Pin->DefaultValue = UKismetStringLibrary::Conv_IntToString(v.Get<int>());
+		else if (v.IsType<FString>()) Pin->DefaultValue = v.Get<FString>();
+	}
+}
+
 void FK2NodeCompilerHelper::SetupNode(UK2Node_DynamicCast* DynamicCast, UClass* CastClass, UEdGraphPin* ObjectPin)
 {
 	DynamicCast->TargetType = CastClass;
@@ -359,6 +383,17 @@ void FK2NodeCompilerHelper::SetupNode(UK2Node_DynamicCast* DynamicCast, UClass* 
 void FK2NodeCompilerHelper::ConnectNode(UK2Node_DynamicCast* DynamicCast, UClass* CastClass, UEdGraphPin* ObjectPin)
 {
 	ConnectPins(ObjectPin, DynamicCast->GetCastSourcePin());
+}
+
+void FK2NodeCompilerHelper::SetupNode(UK2Node_DynamicCast* DynamicCast, class UClass* CastClass, UEdGraphPin* ObjectPin, bool bPure)
+{
+	SetupNode(DynamicCast, CastClass, ObjectPin);
+	DynamicCast->SetPurity(bPure);
+}
+
+void FK2NodeCompilerHelper::ConnectNode(UK2Node_DynamicCast* DynamicCast, class UClass* CastClass, UEdGraphPin* ObjectPin, bool bPure)
+{
+	ConnectNode(DynamicCast, CastClass, ObjectPin);
 }
 
 void FK2NodeCompilerHelper::SetupNode(UK2Node_EnumLiteral* EnumLiteral, UEdGraphPin* ValuePin)

@@ -11,7 +11,7 @@
 #include "K2Node_AssignmentStatement.h"
 #include "Runtime/Launch/Resources/Version.h"
 
-#include "CoreEx.h"
+#include "UnrealDeveloperEx.final.h"
 
 #define LOCTEXT_NAMESPACE "UnrealDeveloperEx"
 
@@ -213,7 +213,7 @@ void UK2Node_AsyncTask::ExpandNode(FKismetCompilerContext& CompilerContext, UEdG
 		if (SpawnVarPin->LinkedTo.Num() == 0)
 			continue;
 
-		Compiler.ConnectSetVariable(SpawnVarPin, AsyncTaskPin);
+		Compiler.SetObjectProperty(AsyncTaskPin, SpawnVarPin);
 	}
 
 	for (TFieldIterator<FMulticastDelegateProperty> PropertyIt(AsyncTaskClass, EFieldIteratorFlags::IncludeSuper); PropertyIt && Compiler.bIsErrorFree; ++PropertyIt)

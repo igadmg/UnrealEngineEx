@@ -8,10 +8,10 @@
 #include "Engine/Engine.h"
 #include "EdGraphSchema_K2.h"
 
-#include "CoreEx.h"
-
+#include "UnrealDeveloperEx.final.h"
 
 #define LOCTEXT_NAMESPACE "UnrealDeveloperEx"
+
 
 bool FK2NodeHelpers::CreateInputPins(UEdGraphNode* Node, UFunction* Function)
 {

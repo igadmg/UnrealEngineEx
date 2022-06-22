@@ -8,8 +8,7 @@
 #include "ScopedTransaction.h"
 #include "ToolMenu.h"
 
-#include "ValidEx.h"
-
+#include "UnrealDeveloperEx.final.h"
 
 #define LOCTEXT_NAMESPACE "UnrealDeveloperEx"
 

@@ -11,8 +11,7 @@
 #include "K2Node_FunctionEntry.h"
 #include "K2Node_VariableGet.h"
 
-#include "ValidEx.h"
-
+#include "UnrealDeveloperEx.final.h"
 
 #define LOCTEXT_NAMESPACE "UnrealDeveloperEx"
 

@@ -1,7 +1,11 @@
 #include "Blueprint/K2Node_SpawnActorFromPool.h"
 
+#include "Blueprint/K2NodeCompilerHelper.h"
+#include "Components/ActorPoolComponent.h"
 #include "Kismet2/BlueprintEditorUtils.h"
+#include "ComponentExStatics.h"
 
+#include "UnrealDeveloperEx.final.h"
 
 #define LOCTEXT_NAMESPACE "UnrealDeveloperEx"
 
@@ -10,6 +14,7 @@
 IMPLEMENT_PIN(UK2Node_SpawnActorFromPool, SpawnTransform, "SpawnTransform");
 IMPLEMENT_PIN(UK2Node_SpawnActorFromPool, CollisionHandlingOverride, "CollisionHandlingOverride");
 IMPLEMENT_PIN(UK2Node_SpawnActorFromPool, Owner, "Owner");
+IMPLEMENT_PIN(UK2Node_SpawnActorFromPool, Instigator, "Instigator");
 
 UK2Node_SpawnActorFromPool::UK2Node_SpawnActorFromPool(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -132,6 +137,47 @@ void UK2Node_SpawnActorFromPool::AllocateDefaultPins()
 	}
 }
 
+void UK2Node_SpawnActorFromPool::ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
+{
+	Super::ExpandNode(CompilerContext, SourceGraph);
+
+	auto ResultPin = GetResultPin();
+
+	FK2NodeCompilerHelper Compiler(this, CompilerContext, SourceGraph, GetExecPin(), GetThenPin());
+
+	auto ActorPoolPin = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
+		EXPAND_FUNCTION_NAME(UComponentExStatics, GetActorPool))->GetReturnValuePin();
+
+	auto SpawnActorDeferred = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
+		ActorPoolPin
+		, EXPAND_FUNCTION_NAME(UActorPoolComponent, SpawnActorDeferred)
+		, PARAMETERS(
+			(TEXT("Class"), GetClassPin())
+			, (TEXT("SpawnTransform"), GetSpawnTransformPin())
+			, (TEXT("CollisionHandlingOverride"), GetCollisionHandlingOverridePin())
+			, (TEXT("Owner"), GetOwnerPin())
+			, (TEXT("Instigator"), GetInstigatorPin())
+		));
+
+	auto ActorPin = Compiler.SpawnIntermediateNode<UK2Node_DynamicCast>(
+		Valid<UClass>(ResultPin->PinType.PinSubCategoryObject), SpawnActorDeferred->GetReturnValuePin(), true)->GetCastResultPin();
+	for (auto Pin : Pins)
+	{
+		if (!IsSpawnVarPin(Pin))
+			continue;
+
+		Compiler.SetObjectProperty(ActorPin, Pin);
+	}
+
+	auto CreateDelegate = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
+		ActorPoolPin
+		, EXPAND_FUNCTION_NAME(UActorPoolComponent, FinishSpawnActorDeferred)
+		, PARAMETERS(
+			(TEXT("Callback"), SpawnActorDeferred->FindPin(TEXT("Finish")))
+		));
+
+	Compiler.ConnectPins(ActorPin, GetResultPin());
+}
 
 
 #undef LOCTEXT_NAMESPACE

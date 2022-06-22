@@ -191,7 +191,7 @@ TScriptInterface<IT> ValidInterface(const T* v) { return IsValid(v) && FCoreEx::
 template <typename IT, typename T>
 TScriptInterface<IT> ValidInterface(T* v) { return IsValid(v) && FCoreEx::DoesImplementInterface<IT>(v) ? TScriptInterface<IT>(v) : nullptr; }
 
-#define if_Implements(...) EXPAND(GET_N(__VA_ARGS__, _, if_Implements3, if_Implements2, _)(__VA_ARGS__))
+#define if_Implements(...) EXPAND(GET_N(__VA_ARGS__, _, _, _, _, _, _, if_Implements3, if_Implements2, _)(__VA_ARGS__))
 
 #define if_Implements2(TypeAndName, Expression) \
 if (auto TypeAndName = ValidInterface<I ## TypeAndName>(Expression); IsValid(TypeAndName))

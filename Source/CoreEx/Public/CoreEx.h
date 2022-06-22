@@ -16,13 +16,18 @@
 #define EXPAND(x) x
 #define GET_MACRO_1_2(_1,_2,NAME,...) NAME
 #define GET_MACRO_2_3(_1,_2,_3,NAME,...) NAME
-#define GET_N(_1, _2, _3, _4, NAME, ...) NAME
+#define GET_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, NAME, ...) NAME
 
 #define FOLD_1(A, X) EXPAND(A(X))
 #define FOLD_2(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_1(A, __VA_ARGS__))
 #define FOLD_3(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_2(A, __VA_ARGS__))
 #define FOLD_4(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_3(A, __VA_ARGS__))
-#define FOLD_N(A, ...) EXPAND(GET_N(__VA_ARGS__, FOLD_4, FOLD_3, FOLD_2, FOLD_1)(A, __VA_ARGS__))
+#define FOLD_5(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_4(A, __VA_ARGS__))
+#define FOLD_6(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_5(A, __VA_ARGS__))
+#define FOLD_7(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_6(A, __VA_ARGS__))
+#define FOLD_8(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_7(A, __VA_ARGS__))
+#define FOLD_9(A, X, ...) EXPAND(A(X)), EXPAND(FOLD_8(A, __VA_ARGS__))
+#define FOLD_N(A, ...) EXPAND(GET_N(__VA_ARGS__, FOLD_9, FOLD_8, FOLD_7, FOLD_6, FOLD_5, FOLD_4, FOLD_3, FOLD_2, FOLD_1)(A, __VA_ARGS__))
 
 
 #define if_CanExecuteCosmeticEvents(WorldContextObject) \

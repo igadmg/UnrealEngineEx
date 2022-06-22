@@ -1,5 +1,5 @@
 {
   "pchHeader": null,
-  "finalHeader": null,
+  "finalHeader": "UnrealDeveloperEx.final.h",
   "locTextNamespaceName": "UnrealDeveloperEx"
 }

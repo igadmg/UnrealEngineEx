@@ -5,6 +5,7 @@
 #include "K2Node_AssignmentStatement.h"
 #include "K2Node_CallArrayFunction.h"
 #include "K2Node_CallFunction.h"
+#include "K2Node_CreateDelegate.h"
 #include "K2Node_CustomEvent.h"
 #include "K2Node_DynamicCast.h"
 #include "K2Node_EnumLiteral.h"
@@ -121,7 +122,7 @@ public:
 public:
 	UK2Node_TemporaryVariable* SpawnInternalVariable(const struct FEdGraphPinType& PinType);
 	UK2Node_CallFunction* SpawnSetVariableNode(const FEdGraphPinType& PinType);
-	UK2Node_CallFunction* SpawnSetVariableNode(UEdGraphPin* SourcePin);
+	UK2Node_CallFunction* SpawnSetVariableNode(UEdGraphPin* SourcePin, FString PropertyName);
 
 	template <typename NodeType, typename... Ts>
 	NodeType* SpawnSetVariableNode(UEdGraphPin* SourcePin, Ts... args)
@@ -203,7 +204,7 @@ public:
 	UK2Node_CallFunction* SpawnIsValidNode(UEdGraphPin* ObjectPin);
 
 	bool ConnectPins(UEdGraphPin* SourcePin, UEdGraphPin* TargetPin, bool bOptional = false);
-	bool ConnectSetVariable(UEdGraphPin* SourcePin, UEdGraphPin* ObjectPin);
+	bool SetObjectProperty(UEdGraphPin* ObjectPin, UEdGraphPin* SourcePin);
 
 
 protected:
@@ -234,8 +235,8 @@ protected:
 	void ConnectNode(UK2Node_CallFunction* CallFunction, class UFunction* Function) {}
 	void SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName);
 	void ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName) {}
-	void SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params);
-	void ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params);
+	//void SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params);
+	//void ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params);
 
 	void SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params);
 	void ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params);
@@ -259,8 +260,27 @@ protected:
 	void SetupNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UClass* FunctionClass, FName FunctionName);
 	void ConnectNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UClass* FunctionClass, FName FunctionName);
 
+	void SetupNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params);
+	void ConnectNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params);
+
+	template <typename ...Ks, typename ...Vs>
+	void SetupNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UClass* FunctionClass, FName FunctionName, TPairInitializer<Ks, Vs> ...pair)
+	{
+		auto list = { FP(FName(pair.Key), FPL::Variant(TInPlaceType<Vs>(), pair.Value))... };
+		SetupNode(CallFunction, SelfPin, FunctionClass, FunctionName, FFunctionParameterList(list));
+	}
+
+	template <typename ...Ks, typename ...Vs>
+	void ConnectNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UClass* FunctionClass, FName FunctionName, TPairInitializer<Ks, Vs> ...pair)
+	{
+		auto list = { FP(FName(pair.Key), FPL::Variant(TInPlaceType<Vs>(), pair.Value))... };
+		ConnectNode(CallFunction, SelfPin, FunctionClass, FunctionName, FFunctionParameterList(list));
+	}
+
 	void SetupNode(UK2Node_DynamicCast* DynamicCast, class UClass* CastClass, UEdGraphPin* ObjectPin);
 	void ConnectNode(UK2Node_DynamicCast* DynamicCast, class UClass* CastClass, UEdGraphPin* ObjectPin);
+	void SetupNode(UK2Node_DynamicCast* DynamicCast, class UClass* CastClass, UEdGraphPin* ObjectPin, bool bPure);
+	void ConnectNode(UK2Node_DynamicCast* DynamicCast, class UClass* CastClass, UEdGraphPin* ObjectPin, bool bPure);
 
 	void SetupNode(UK2Node_EnumLiteral* EnumLiteral, UEdGraphPin* ValuePin);
 	void ConnectNode(UK2Node_EnumLiteral* EnumLiteral, UEdGraphPin* ValuePin);

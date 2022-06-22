@@ -17,6 +17,7 @@ public:
 	DECLARE_PIN(SpawnTransform);
 	DECLARE_PIN(CollisionHandlingOverride);
 	DECLARE_PIN(Owner);
+	DECLARE_PIN(Instigator);
 
 
 public:
@@ -28,10 +29,11 @@ protected:
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
 	virtual bool IsCompatibleWithGraph(const UEdGraph* TargetGraph) const override;
 	virtual void GetNodeAttributes(TArray<TKeyValuePair<FString, FString>>& OutNodeAttributes) const override;
-	virtual FNodeHandlingFunctor* CreateNodeHandler(FKismetCompilerContext& CompilerContext) const override;
+	virtual FNodeHandlingFunctor* CreateNodeHandler(class FKismetCompilerContext& CompilerContext) const override;
 
 	virtual UClass* GetClassPinBaseClass() const override;
 	virtual bool IsSpawnVarPin(UEdGraphPin* Pin) const override;
 
 	virtual void AllocateDefaultPins() override;
+	virtual void ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph) override;
 };
