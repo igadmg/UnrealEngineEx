@@ -195,10 +195,16 @@ void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerConte
 	auto LoopCondition = LoopDirection == ELoopDirection::Forward
 		? Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
 			EXPAND_FUNCTION_NAME(UKismetMathLibrary, Less_IntInt)
-			, PARAMETERS((TEXT("A"), Counter), (TEXT("B"), Length)))
+			, PARAMETERS(
+				(TEXT("A"), Counter),
+				(TEXT("B"), Length)
+			))
 		: Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
 			EXPAND_FUNCTION_NAME(UKismetMathLibrary, Greater_IntInt)
-			, PARAMETERS((TEXT("A"), Counter), (TEXT("B"), Length)));
+			, PARAMETERS(
+				(TEXT("A"), Counter),
+				(TEXT("B"), Length)
+			));
 
 	auto LoopCounter = LoopDirection == ELoopDirection::Forward
 		? Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
@@ -214,7 +220,10 @@ void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerConte
 
 		auto ArrayGet = Compiler.SpawnIntermediateNode<UK2Node_CallArrayFunction>(
 			EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Get)
-			, PARAMETERS((TEXT("TargetArray"), ArrayPin), (TEXT("Index"), Counter)));
+			, PARAMETERS(
+				(TEXT("TargetArray"), ArrayPin),
+				(TEXT("Index"), Counter)
+			));
 		auto ArrayElement = Compiler.SpawnIntermediateNode<UK2Node_Cache>(ArrayGet->FindPin(TEXT("Item")))->GetOutputObjectPin();
 
 		Compiler.ConnectPins(ArrayElement, GetArrayElementPin());
@@ -234,12 +243,18 @@ void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerConte
 		case ELoopFunction::Filter: {
 				auto FilterFlagCondition = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
 					EXPAND_FUNCTION_NAME(UKismetMathLibrary, EqualEqual_BoolBool)
-					, PARAMETERS((TEXT("A"), FilterFlag), (TEXT("B"), true)));
+					, PARAMETERS(
+						(TEXT("A"), FilterFlag),
+						(TEXT("B"), true)
+					));
 				auto FilterIfThenElse = Compiler.SpawnIntermediateNode<UK2Node_IfThenElse>(FilterFlagCondition->GetReturnValuePin());
 				{
 					Compiler.SpawnIntermediateNode<UK2Node_CallArrayFunction>(
 						EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Add)
-						, PARAMETERS((TEXT("TargetArray"), OutputArray), (TEXT("NewItem"), ArrayElement)));
+						, PARAMETERS(
+							(TEXT("TargetArray"), OutputArray),
+							(TEXT("NewItem"), ArrayElement)
+						));
 				}
 			}
 			break;
@@ -255,7 +270,10 @@ void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerConte
 		{
 			auto BreakFlagCondifiton = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
 				EXPAND_FUNCTION_NAME(UKismetMathLibrary, EqualEqual_BoolBool)
-				, PARAMETERS((TEXT("A"), BreakFlag), (TEXT("B"), true)));
+				, PARAMETERS(
+					(TEXT("A"), BreakFlag),
+					(TEXT("B"), true)
+				));
 			auto BreakFlagIfThenElse = Compiler.SpawnIntermediateNode<UK2Node_IfThenElse>(BreakFlagCondifiton->GetReturnValuePin());
 			Compiler.LastThenPin = BreakFlagIfThenElse->GetElsePin();
 		}

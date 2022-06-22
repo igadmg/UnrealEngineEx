@@ -235,9 +235,6 @@ protected:
 	void ConnectNode(UK2Node_CallFunction* CallFunction, class UFunction* Function) {}
 	void SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName);
 	void ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName) {}
-	//void SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params);
-	//void ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params);
-
 	void SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params);
 	void ConnectNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params);
 
@@ -259,7 +256,6 @@ protected:
 	void ConnectNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UFunction* Function);
 	void SetupNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UClass* FunctionClass, FName FunctionName);
 	void ConnectNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UClass* FunctionClass, FName FunctionName);
-
 	void SetupNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params);
 	void ConnectNode(UK2Node_CallFunction* CallFunction, UEdGraphPin* SelfPin, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params);
 

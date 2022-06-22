@@ -104,9 +104,13 @@ UK2Node_TemporaryVariable* FK2NodeCompilerHelper::SpawnInternalVariable(const FE
 void FK2NodeCompilerHelper::LogString(const FString& InString, bool bPrintToLog)
 {
 	auto nolog = TGuardValue<bool>(bLog, false);
-	auto PrintString = SpawnIntermediateNode<UK2Node_CallFunction>(EXPAND_FUNCTION_NAME(UKismetSystemLibrary, LogString));
-	PrintString->FindPin(TEXT("InString"))->DefaultValue = InString;
-	PrintString->FindPin(TEXT("bPrintToLog"))->DefaultValue = UKismetStringLibrary::Conv_BoolToString(bPrintToLog);
+
+	SpawnIntermediateNode<UK2Node_CallFunction>(
+		EXPAND_FUNCTION_NAME(UKismetSystemLibrary, LogString)
+		, PARAMETERS(
+			(TEXT("InString"), InString),
+			(TEXT("bPrintToLog"), bPrintToLog)
+		));
 }
 
 UEdGraphPin* FK2NodeCompilerHelper::CacheInLocalVariable(bool Value)
@@ -135,10 +139,11 @@ UEdGraphPin* FK2NodeCompilerHelper::CacheInLocalVariable(UEdGraphPin* ObjectPin)
 
 UK2Node_CallFunction* FK2NodeCompilerHelper::SpawnIsValidNode(UEdGraphPin* ObjectPin)
 {
-	auto Result = SpawnIntermediateNode<UK2Node_CallFunction>(EXPAND_FUNCTION_NAME(UKismetSystemLibrary, IsValid));
-
-	UEdGraphPin* IsValidInputPin = Result->FindPin(UEdGraphSchema_K2::PN_ObjectToCast);
-	CompilerContext.GetSchema()->TryCreateConnection(ObjectPin, IsValidInputPin);
+	auto Result = SpawnIntermediateNode<UK2Node_CallFunction>(
+		EXPAND_FUNCTION_NAME(UKismetSystemLibrary, IsValid)
+		, PARAMETERS(
+			(UEdGraphSchema_K2::PN_ObjectToCast, ObjectPin)
+		));
 
 	return Result;
 }
@@ -299,21 +304,6 @@ void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, UClass
 {
 	CallFunction->FunctionReference.SetExternalMember(FunctionName, FunctionClass);
 }
-
-/*
-void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params)
-{
-	SetupNode(CallFunction, FunctionClass, FunctionName);
-}
-
-void FK2NodeCompilerHelper::ConnectNode(UK2Node_CallFunction* CallFunction, UClass* FunctionClass, FName FunctionName, TMap<FName, UEdGraphPin*> Params)
-{
-	for (auto Pair : Params)
-	{
-		ConnectPins(Pair.Value, CallFunction->FindPin(Pair.Key));
-	}
-}
-*/
 
 void FK2NodeCompilerHelper::SetupNode(UK2Node_CallFunction* CallFunction, class UClass* FunctionClass, FName FunctionName, const FFunctionParameterList& Params)
 {

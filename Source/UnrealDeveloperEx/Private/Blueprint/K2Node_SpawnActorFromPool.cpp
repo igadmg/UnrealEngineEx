@@ -152,11 +152,11 @@ void UK2Node_SpawnActorFromPool::ExpandNode(class FKismetCompilerContext& Compil
 		ActorPoolPin
 		, EXPAND_FUNCTION_NAME(UActorPoolComponent, SpawnActorDeferred)
 		, PARAMETERS(
-			(TEXT("Class"), GetClassPin())
-			, (TEXT("SpawnTransform"), GetSpawnTransformPin())
-			, (TEXT("CollisionHandlingOverride"), GetCollisionHandlingOverridePin())
-			, (TEXT("Owner"), GetOwnerPin())
-			, (TEXT("Instigator"), GetInstigatorPin())
+			(TEXT("Class"), GetClassPin()),
+			(TEXT("SpawnTransform"), GetSpawnTransformPin()),
+			(TEXT("CollisionHandlingOverride"), GetCollisionHandlingOverridePin()),
+			(TEXT("Owner"), GetOwnerPin()),
+			(TEXT("Instigator"), GetInstigatorPin())
 		));
 
 	auto ActorPin = Compiler.SpawnIntermediateNode<UK2Node_DynamicCast>(
