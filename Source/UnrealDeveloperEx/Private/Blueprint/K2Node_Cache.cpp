@@ -124,6 +124,12 @@ void UK2Node_Cache::GetNodeContextMenuActions(UToolMenu* Menu, UGraphNodeContext
 
 bool UK2Node_Cache::ShouldCacheValue(int Index) const
 {
+	switch (CachingMode)
+	{
+	case ECachingMode::Force: return true;
+	case ECachingMode::None: return false;
+	}
+
 	if (auto LinkedObjectPinNode = FK2NodeHelpers::GetLinkedPinNode(GetInputObjectPin(Index)))
 	{
 		if (LinkedObjectPinNode->IsA<UK2Node_VariableGet>())

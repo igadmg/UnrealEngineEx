@@ -76,6 +76,12 @@ static TEnumAsByte<EWorldType::Type> GetWorldType(const UObject* WorldContextObj
 	return IsValid(World) ? (EWorldType::Type)World->WorldType : EWorldType::None;
 }
 
+static FString GetWorldName(const UObject* WorldContextObject)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	return IsValid(World) ? World->GetName() : TEXT("<null>");
+}
+
 static bool IsInGame(const UObject* WorldContextObject)
 {
 	auto WorldType = GetWorldType(WorldContextObject);

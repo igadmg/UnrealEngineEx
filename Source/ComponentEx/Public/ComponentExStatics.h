@@ -5,6 +5,7 @@
 #include "Components/ActorPoolComponent.h"
 #include "Components/SplineComponent.h"
 #include "AttachmentDescription.h"
+#include "ValidEx.h"
 
 #include "ComponentExStatics.generated.h"
 

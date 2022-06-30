@@ -8,6 +8,15 @@
 #include "K2Node_Cache.generated.h"
 
 
+UENUM()
+enum class ECachingMode : uint8
+{
+	Auto = 0x00,
+	Force,
+	None
+};
+
+
 UCLASS()
 class UNREALDEVELOPEREX_API UK2Node_Cache
 	: public UK2Node
@@ -17,6 +26,9 @@ class UNREALDEVELOPEREX_API UK2Node_Cache
 
 
 public:
+	UPROPERTY(EditAnywhere)
+	ECachingMode CachingMode = ECachingMode::Auto;
+
 	UPROPERTY()
 	TArray<FEdGraphPinType> InputObjectType;
 
@@ -38,6 +50,8 @@ public:
 
 
 public:
+	virtual bool ShouldShowNodeProperties() const override { return true; }
+
 	virtual FText GetTooltipText() const override;
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
 	virtual FSlateIcon GetIconAndTint(FLinearColor& OutColor) const override;
