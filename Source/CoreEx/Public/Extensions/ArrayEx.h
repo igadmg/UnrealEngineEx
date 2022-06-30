@@ -26,10 +26,24 @@ DECLARE_CONST_EXTENSION_TEMPLATE_REF(TArray, InElementType, InAllocatorType)
 		TArray<U> Result;
 		Result.SetNumUninitialized(This().Num());
 
-		for (auto Item : This())
+		for (auto& Item : This())
 		{
 			if (auto CastItem = ::Cast<typename std::remove_pointer<U>::type>(Item))
 				Result.Add(CastItem);
+		}
+
+		return Result;
+	}
+
+	template <typename U>
+	TArray<U> Select(const TFunction<U (const typename ThisType::ElementType&)> SelectFn)
+	{
+		TArray<U> Result;
+		Result.SetNumUninitialized(This().Num());
+
+		for (auto& Item : This())
+		{
+			Result.Add(SelectFn(Item));
 		}
 
 		return Result;

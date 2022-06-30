@@ -179,6 +179,9 @@ struct FCoreEx
 		if (!IsValid(Object))
 			return false;
 
+		if (!IsValid(SomeInterface))
+			return false;
+
 		return Object->GetClass()->ImplementsInterface(SomeInterface);
 	}
 
@@ -190,6 +193,10 @@ TScriptInterface<IT> ValidInterface(const T* v) { return IsValid(v) && FCoreEx::
 
 template <typename IT, typename T>
 TScriptInterface<IT> ValidInterface(T* v) { return IsValid(v) && FCoreEx::DoesImplementInterface<IT>(v) ? TScriptInterface<IT>(v) : nullptr; }
+
+static const UObject* ValidInterface(const UObject* v, UClass* i) { return FCoreEx::DoesImplementInterface(v, i) ? v : nullptr; }
+static UObject* ValidInterface(UObject* v, UClass* i) { return FCoreEx::DoesImplementInterface(v, i) ? v : nullptr; }
+
 
 #define if_Implements(...) EXPAND(GET_N(__VA_ARGS__, _, _, _, _, _, _, if_Implements3, if_Implements2, _)(__VA_ARGS__))
 
