@@ -71,6 +71,7 @@ public:
 };
 
 class AActor;
+class ACharacter;
 class AController;
 class AGameModeBase;
 class AHUD;
@@ -85,18 +86,6 @@ namespace XX
 	TActor* GetOwningActor(const UObject* Object)
 	{
 		return Cast<TActor>(UGuessExStatics::GetOwningActor(Object));
-	}
-
-	template <typename TActor = AActor>
-	const TActor* GetOwningActor(const AActor* Object)
-	{
-		return Cast<TActor>(Object);
-	}
-
-	template <typename TActor = AActor>
-	TActor* GetOwningActor(const UActorComponent* Object)
-	{
-		return Cast<TActor>(Object->GetOwner());
 	}
 
 	template <typename TGameInstance = UGameInstance>
@@ -133,6 +122,12 @@ namespace XX
 	TPawn* GetPlayerPawn(const UObject* Object)
 	{
 		return TValid<TPawn, APawn>::Valid(UGuessExStatics::GetPlayerPawn(Object));
+	}
+
+	template <typename TCharacter = ACharacter>
+	TCharacter* GetCharacter(const UObject* Object)
+	{
+		return TValid<TCharacter, ACharacter>::Valid(GetPlayerPawn<TCharacter>(Object));
 	}
 
 	template <typename TSpectatorPawn = ASpectatorPawn>

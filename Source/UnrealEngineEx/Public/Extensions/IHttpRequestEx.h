@@ -37,7 +37,7 @@ DECLARE_MUTABLE_EXTENSION(IHttpRequest)
 	template <typename TUStruct>
 	bool SetContentAsUStruct(const TArray<TUStruct>& InStructArray, int64 CheckFlags = 0, int64 SkipFlags = 0, int32 Indent = 0, const FJsonObjectConverter::CustomExportCallback* ExportCb = nullptr, bool bPrettyPrint = true)
 	{
-		auto SerializedStructArray = ex(InStructArray).Select<FString>([CheckFlags, SkipFlags, Indent, ExportCb, bPrettyPrint](const auto& Struct) {
+		auto SerializedStructArray = ex(InStructArray).template Select<FString>([CheckFlags, SkipFlags, Indent, ExportCb, bPrettyPrint](const auto& Struct) {
 			FString JsonString;
 			FJsonObjectConverter::UStructToJsonObjectString(Struct, JsonString, CheckFlags, SkipFlags, Indent, ExportCb, bPrettyPrint);
 			return JsonString;

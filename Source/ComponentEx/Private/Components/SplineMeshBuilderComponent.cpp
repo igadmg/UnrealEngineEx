@@ -23,8 +23,7 @@ void USplineMeshBuilderComponent::BuildSplineMesh()
 	Algo::Reverse(SpareSplineMeshComponents);
 	SplineMeshComponents.Empty();
 
-	if (IsValid(SplineComponent)
-		&& IsValid(Mesh))
+	if (IsValid(SplineComponent) && IsValid(Mesh))
 	{
 		auto SplineLength = SplineComponent->GetSplineLength();
 		auto MeshSize = UComponentExStatics::GetMeshSize(Mesh);
@@ -70,6 +69,13 @@ void USplineMeshBuilderComponent::BuildSplineMesh()
 				, IntervalStart, IntervalEnd, ESplineCoordinateSpace::Local);
 
 			SplineMeshComponents.Add(SplineMeshComponent);
+#if WITH_EDITOR
+			if (bDebugKeepComponentInstances)
+			{
+				GetOwner()->AddInstanceComponent(SplineMeshComponent);
+			}
+#endif
+
 			IntervalStart = IntervalEnd;
 		}
 	}

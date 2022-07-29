@@ -1,5 +1,11 @@
 #include "MathExStatics.h"
 
+#include "GameFramework/PlayerController.h"
+#include "Engine/Engine.h"
+#include "Engine/LocalPlayer.h"
+#include "SceneView.h"
+#include "StereoRendering.h"
+
 #include "MathEx.h"
 
 
@@ -59,4 +65,64 @@ FVector UMathExStatics::SphereCenterByTwoPointsAndRadiusVector(FVector A, FVecto
 	Rn = FVector::CrossProduct(Nn, CAn).GetSafeNormal();
 
 	return C + Rn * b;
+}
+
+bool UMathExStatics::ProjectWorldToScreenBidirectional(APlayerController* PlayerController, FVector WorldLocation, FVector& ScreenLocation, bool& OutTargetBehindCamera)
+{
+	if (!IsValid(PlayerController))
+		return false;
+
+	FVector Projected;
+	OutTargetBehindCamera = false;
+
+	ULocalPlayer const* const LP = PlayerController->GetLocalPlayer();
+	if (LP && LP->ViewportClient)
+	{
+		FSceneViewProjectionData ProjectionData;
+		if (LP->GetProjectionData(LP->ViewportClient->Viewport, /*out*/ ProjectionData))
+		{
+			const FMatrix ViewProjectionMatrix = ProjectionData.ComputeViewProjectionMatrix();
+			const FIntRect ViewRectangle = ProjectionData.GetConstrainedViewRect();
+
+			FPlane Result = ViewProjectionMatrix.TransformFVector4(FVector4(WorldLocation, 1.f));
+			if (Result.W < 0.f) { OutTargetBehindCamera = true; }
+			if (Result.W == 0.f) { Result.W = 1.f; } // Prevent Divide By Zero
+
+			const float RHW = 1.f / FMath::Abs(Result.W);
+			Projected = FVector(Result.X, Result.Y, Result.Z) * RHW;
+
+			// Normalize to 0..1 UI Space
+			const float NormX = (Projected.X / 2.f) + 0.5f;
+			const float NormY = 1.f - (Projected.Y / 2.f) - 0.5f;
+
+			Projected.X = (float)ViewRectangle.Min.X + (NormX * (float)ViewRectangle.Width());
+			Projected.Y = (float)ViewRectangle.Min.Y + (NormY * (float)ViewRectangle.Height());
+
+			ScreenLocation = Projected;
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool UMathExStatics::SuggestProjectileVelocityForTime(const UObject* WorldContextObject, FVector& OutVelocity, FVector Start, FVector End, float Time, float OverrideGravityZ)
+{
+	// https://www.forrestthewoods.com/blog/solving_ballistic_trajectories/
+
+	const UWorld* const World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+	if (World == nullptr)
+		return false;
+
+	const float GravityZ = FMath::IsNearlyEqual(OverrideGravityZ, 0.0f) ? -World->GetGravityZ() : -OverrideGravityZ;
+
+	// g = -4*(Start.Z - 2*Zpeak + End.Z)/Time^2
+	float Zpeak = (Start.Z + End.Z) / 2 + GravityZ * FMath::Square(Time) / 8;
+	float Vz = -(3 * Start.Z - 4 * Zpeak + End.Z) / Time;
+	FVector2d Vxy = FVector2d(End - Start) / Time;
+
+	OutVelocity = FVector(Vxy, Vz);
+
+	return true;
 }

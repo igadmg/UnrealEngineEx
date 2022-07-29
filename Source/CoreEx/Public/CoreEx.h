@@ -99,6 +99,13 @@ TGuardValue<RefType, AssignedType> MakeGuardValue(RefType& ReferenceValue, const
 	return TGuardValue<RefType, AssignedType>(ReferenceValue, NewValue);
 }
 
+inline FScriptDelegate MakeScriptDelegate(UObject* Object, FName Function)
+{
+	FScriptDelegate Delegate;
+	Delegate.BindUFunction(Object, Function);
+	return Delegate;
+}
+
 
 #if WITH_EDITOR
 
@@ -115,8 +122,6 @@ if (PropertyChangedEvent.PropertyChain.GetActiveMemberNode()->GetValue()->GetFNa
 
 #endif
 
-#include "SubsystemEx.h"
-
 #include "LogEx.h"
 #include "EnumEx.h"
 #include "Throttle.h"
@@ -125,7 +130,8 @@ if (PropertyChangedEvent.PropertyChain.GetActiveMemberNode()->GetValue()->GetFNa
 #include "Extensions/MapEx.h"
 #include "Extensions/ClassEx.h"
 
-#endif
+#endif // COREEX_CoreEx_h
 
 #include "IsValidEx.h"
+#include "SubsystemEx.h"
 #include "ValidEx.h"

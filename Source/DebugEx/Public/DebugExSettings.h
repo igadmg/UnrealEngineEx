@@ -11,7 +11,7 @@ class DEBUGEX_API UDebugExSettings : public UDeveloperSettings
 
 
 public:
-	UPROPERTY(Category = "DebugEx", EditAnywhere, BlueprintReadOnly, Config, meta = (RowType = DebugMenuRenameConfig))
+	UPROPERTY(Category = "DebugEx", EditAnywhere, BlueprintReadOnly, Config, meta = (RowType = "DebugMenuRenameConfig"))
 	TSoftObjectPtr<class UDataTable> PropertyRenameTable;
 
 

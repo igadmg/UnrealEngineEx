@@ -169,7 +169,7 @@ void UK2Node_SpawnActorFromPool::ExpandNode(class FKismetCompilerContext& Compil
 		Compiler.SetObjectProperty(ActorPin, Pin);
 	}
 
-	auto CreateDelegate = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
+	auto FinishSpawnActorDeferred = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
 		ActorPoolPin
 		, EXPAND_FUNCTION_NAME(UActorPoolComponent, FinishSpawnActorDeferred)
 		, PARAMETERS(

@@ -36,6 +36,11 @@ public:
 	UPROPERTY(Category = "Internal", BlueprintReadOnly)
 	TArray<class USplineMeshComponent*> SplineMeshComponents;
 
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(Category = "Debug", EditAnywhere, BlueprintReadOnly)
+	bool bDebugKeepComponentInstances = false;
+#endif
+
 
 public:
 	UFUNCTION(Category = "UnrealEngineEx: SplineMeshBuilderComponent", BlueprintCallable)

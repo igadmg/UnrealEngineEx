@@ -27,6 +27,7 @@ public class CoreEx : ModuleRules
 				"Core",
 				"CoreUObject",
 				"Engine",
+				"NetCore",
 			});
 
 		PublicDependencyModuleNames.AddRange(new string[] {

@@ -202,24 +202,25 @@ void UK2Node_IsValidEx::ExpandNode(class FKismetCompilerContext& CompilerContext
 
 	FK2NodeCompilerHelper Compiler(this, CompilerContext, SourceGraph, GetExecPin(), GetIsValidPin());
 
+	auto IsNotValidPin = GetIsNotValidPin();
+
 	for (int i = 0; i < GetInputObjectNum(); i++)
 	{
 		auto ObjectPin = Compiler.SpawnIntermediateNode<UK2Node_Cache>(GetInputObjectPin(i))->GetOutputObjectPin();
 
 		auto ValidateObjectIfThenElse = Compiler.SpawnIntermediateNode<UK2Node_IfThenElse>(
 			Compiler.SpawnIsValidNode(ObjectPin)->GetReturnValuePin());
-		auto NotValidPin = ValidateObjectIfThenElse->GetElsePin();
+		if (IsNotValidPin) Compiler.ConnectPins(ValidateObjectIfThenElse->GetElsePin(), IsNotValidPin);
 
 		auto UpcastType_ = UpcastType[i];
 		if (UpcastType_ && UpcastType_ != InputObjectType[i].PinSubCategoryObject)
 		{
 			auto CastNode = Compiler.SpawnIntermediateNode<UK2Node_DynamicCast>(UpcastType_, ObjectPin);
 			ObjectPin = CastNode->GetCastResultPin();
-			NotValidPin = CastNode->GetInvalidCastPin();
+			if (IsNotValidPin) Compiler.ConnectPins(CastNode->GetInvalidCastPin(), IsNotValidPin);
 		}
 
 		Compiler.ConnectPins(ObjectPin, GetValidObjectPin(i));
-		if (auto IsNotValidPin = GetIsNotValidPin()) Compiler.ConnectPins(NotValidPin, IsNotValidPin);
 	}
 }
 

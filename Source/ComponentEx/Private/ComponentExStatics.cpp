@@ -52,6 +52,11 @@ UActorPoolComponent* UComponentExStatics::GetActorPool(const UObject* WorldConte
 	return nullptr;
 }
 
+bool UComponentExStatics::DestroyPooledActor(AActor* Actor)
+{
+	return XX::DestroyActor(Actor);
+}
+
 void UComponentExStatics::Attach(const FAttachmentDescription& Where, AActor* What, AActor* ParentActor, const FAttachmentTransformRules& AttachmentRules)
 {
 	if (Where.Component == nullptr)
@@ -480,7 +485,7 @@ bool XX::DestroyActor(AActor* Actor)
 	if (!IsValid(Actor))
 		return false;
 
-	if (auto ActorPool = GetActorPool(Actor))
+	if (auto ActorPool = GetActorPool(Actor); Actor->ActorHasTag(UActorPoolComponent::TagPooled) && ActorPool)
 	{
 		return ActorPool->DestroyActor(Actor);
 	}

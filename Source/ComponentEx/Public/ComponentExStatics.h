@@ -26,6 +26,9 @@ public:
 	UFUNCTION(Category = "ComponentEx", BlueprintPure, meta = (WorldContext = "WorldContextObject"))
 	static class UActorPoolComponent* GetActorPool(const UObject* WorldContextObject);
 
+	UFUNCTION(BlueprintCallable, meta = (DefaultToSelf = "Actor"))
+	static bool DestroyPooledActor(AActor* Actor);
+
 	//UFUNCTION(Category = "ComponentEx", BlueprintCallable)
 	static void Attach(const FAttachmentDescription& Where, class AActor* What, class AActor* ParentActor, const FAttachmentTransformRules& AttachmentRules);
 
@@ -94,13 +97,15 @@ namespace XX
 {
 	inline UActorPoolComponent* GetActorPool(const UObject* WorldContextObject)
 	{
-		return UComponentExStatics::GetActorPool(WorldContextObject);
+		return !IsRunningCommandlet()
+			? UComponentExStatics::GetActorPool(WorldContextObject)
+			: nullptr;
 	}
 
-	AActor* SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters);
-	AActor* SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn);
+	COMPONENTEX_API AActor* SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters);
+	COMPONENTEX_API AActor* SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn);
 
-	bool DestroyActor(AActor* Actor);
+	COMPONENTEX_API bool DestroyActor(AActor* Actor);
 
 	template <typename TActor = AActor>
 	inline TActor* SpawnActor(const UObject* WorldContextObject, const FVector& Location, const FRotator& Rotation, const FActorSpawnParameters& SpawnParameters)

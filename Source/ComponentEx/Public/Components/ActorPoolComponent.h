@@ -37,6 +37,10 @@ class COMPONENTEX_API UActorPoolComponent : public UActorComponent
 	GENERATED_BODY()
 
 
+public:
+	static FName TagPooled;
+
+
 protected:
 	UPROPERTY(Transient)
 	TMap<TSubclassOf<AActor>, FActorPoolNode> ActorPoolNodes;

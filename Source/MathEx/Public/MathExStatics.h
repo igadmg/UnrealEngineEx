@@ -34,4 +34,10 @@ public:
 
 	UFUNCTION(Category = "MathEx", BlueprintPure)
 	static FVector SphereCenterByTwoPointsAndRadiusVector(FVector A, FVector B, FVector R);
+
+	UFUNCTION(Category = "MathEx", BlueprintCallable)
+	static bool ProjectWorldToScreenBidirectional(class APlayerController* PlayerController, FVector WorldLocation, FVector& ScreenLocation, bool& OutTargetBehindCamera);
+
+	UFUNCTION(Category = "MathEx", BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	static bool SuggestProjectileVelocityForTime(const UObject* WorldContextObject, FVector& OutVelocity, FVector Start, FVector End, float Time, float OverrideGravityZ = 0);
 };

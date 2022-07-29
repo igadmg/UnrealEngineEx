@@ -5,6 +5,7 @@
 #define LOCTEXT_NAMESPACE "ComponentEx"
 
 
+FName UActorPoolComponent::TagPooled(TEXT("++Pooled"));
 
 UActorPoolComponent::UActorPoolComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -25,13 +26,28 @@ AActor* UActorPoolComponent::SpawnActor(TSubclassOf<AActor> ActorClass, const FT
 		if (!IsValid(World))
 			return nullptr;
 
-		return World->SpawnActor(ActorClass, &Transform, SpawnParameters);
+		if (auto Actor = World->SpawnActor(ActorClass, &Transform, SpawnParameters))
+		{
+			Actor->Tags.AddUnique(TagPooled);
+
+			return Actor;
+		}
+
+		return nullptr;
 	}
 
 	auto Actor = ActorPoolNode.PooledActors.Pop();
 	Actor->SetActorTransform(Transform, false, nullptr, ETeleportType::ResetPhysics);
 
 	ex(Actor).SetActorEnabled(true);
+
+	if (Valid(SpawnParameters.Template))
+	{
+		FComponentInstanceDataCache InstanceDataCache(SpawnParameters.Template);
+		Actor->FinishSpawning(Transform, true, &InstanceDataCache);
+	}
+	else
+		Actor->FinishSpawning(Transform, true);
 
 	return Actor;
 }
@@ -50,6 +66,7 @@ AActor* UActorPoolComponent::SpawnActor(TSubclassOf<AActor> ActorClass, const FT
 
 		if (auto Actor = World->SpawnActor(ActorClass, &Transform, LocalSpawnParameters))
 		{
+			Actor->Tags.AddUnique(TagPooled);
 			DeferredFn(Actor);
 
 			if (Valid(LocalSpawnParameters.Template))
@@ -72,6 +89,14 @@ AActor* UActorPoolComponent::SpawnActor(TSubclassOf<AActor> ActorClass, const FT
 	DeferredFn(Actor);
 
 	ex(Actor).SetActorEnabled(true);
+
+	if (Valid(SpawnParameters.Template))
+	{
+		FComponentInstanceDataCache InstanceDataCache(SpawnParameters.Template);
+		Actor->FinishSpawning(Transform, true, &InstanceDataCache);
+	}
+	else
+		Actor->FinishSpawning(Transform, true);
 
 	return Actor;
 }
@@ -119,6 +144,9 @@ AActor* UActorPoolComponent::SpawnActorDeferred(TSubclassOf<AActor> ActorClass, 
 			return Actor;
 		}
 
+		Finish.Actor = nullptr;
+		Finish.Delegate.Unbind();
+
 		return nullptr;
 	}
 
@@ -153,6 +181,8 @@ bool UActorPoolComponent::DestroyActor(AActor* Actor, bool bNetForce, bool bShou
 	if (!IsValid(Actor))
 		return false;
 
+	if (!ensureMsgf(Actor->ActorHasTag(TagPooled), TEXT("Actor %s does not belong to a pool.")))
+		return false;
 
 	auto& ActorPoolNode = GetActorPoolNode(Actor->GetClass());
 	ensure(!ActorPoolNode.PooledActors.Contains(Actor));

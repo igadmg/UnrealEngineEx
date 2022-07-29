@@ -96,6 +96,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetCameraConfig(FFocusedSpringArmConfig NewCameraConfig);
 
+	UFUNCTION(BlueprintPure)
+	FFocusedSpringArmConfig GetCameraConfig() { return FFocusedSpringArmConfig::Make(this); }
+
 
 public:
 	UFocusedSpringArmComponent(const FObjectInitializer& ObjectInitializer);
