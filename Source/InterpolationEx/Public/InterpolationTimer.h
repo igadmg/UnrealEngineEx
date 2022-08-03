@@ -14,6 +14,7 @@ struct FInterpolationTimer
 	FInterpolationTimer()
 		: Duration(-1)
 		, CurrentTime(0.f)
+		, bIsCyclic(false)
 	{
 	}
 
@@ -35,6 +36,13 @@ struct FInterpolationTimer
 			if (Duration > 0) while (CurrentTime > Duration) CurrentTime -= Duration;
 		}
 		return bIsFinished;
+	}
+
+	void Reset(float NewDuration, float NewCurrentTime = 0.0f, bool bNewIsCyclic = false)
+	{
+		Duration = NewDuration;
+		CurrentTime = NewCurrentTime;
+		bIsCyclic = bNewIsCyclic;
 	}
 };
 

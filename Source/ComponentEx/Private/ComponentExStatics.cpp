@@ -225,7 +225,7 @@ float UComponentExStatics::FindDistanceClosestToLocation(USplineComponent* Splin
 {
 	const int DistanceSolverIterations = 16;
 
-	const float ClosestInputKey = Spline->FindInputKeyClosestToWorldLocation(Location);
+	const float ClosestInputKey = Spline->FindInputKeyClosestToLocation(Location, CoordinateSpace);
 	const int32 PreviousPoint = FMath::TruncToInt(ClosestInputKey);
 
 	// Lerp between the previous and the next spline points
@@ -237,7 +237,7 @@ float UComponentExStatics::FindDistanceClosestToLocation(USplineComponent* Splin
 	{
 		const float InputKeyAtDistance = Spline->SplineCurves.ReparamTable.Eval(Distance, 0.0f);
 		// The euclidean distance between the current calculated distance and the real closest point
-		const float Delta = (Spline->GetLocationAtSplineInputKey(InputKeyAtDistance, CoordinateSpace) - Spline->GetLocationAtSplineInputKey(ClosestInputKey, CoordinateSpace)).Size();
+		const float Delta = (Spline->GetLocationAtSplineInputKey(InputKeyAtDistance) - Spline->GetLocationAtSplineInputKey(ClosestInputKey)).Size();
 		if (InputKeyAtDistance < ClosestInputKey)
 		{
 			Distance += Delta;

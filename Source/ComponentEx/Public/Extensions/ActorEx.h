@@ -144,6 +144,44 @@ DECLARE_MUTABLE_EXTENSION(AActor)
 
 		return nullptr;
 	}
+
+	template <typename T>
+	T* AddComponent(T* Component, bool bManualAttachment = false, const FTransform& RelativeTransform = FTransform::Identity)
+	{
+		This()->AddOwnedComponent(Component);
+		This()->FinishAddComponent(Component, bManualAttachment, RelativeTransform);
+
+		return Component;
+	}
+
+	void RemoveComponent(UActorComponent* Component)
+	{
+		if (Component->IsBeingDestroyed()) return;
+
+		if (Component->HasBegunPlay())
+		{
+			Component->EndPlay(EEndPlayReason::Destroyed);
+		}
+
+		// Ensure that we call UninitializeComponent before we destroy this component
+		if (Component->HasBeenInitialized())
+		{
+			Component->UninitializeComponent();
+		}
+
+		// Unregister if registered
+		if (Component->IsRegistered())
+		{
+			Component->UnregisterComponent();
+		}
+
+		// Then remove from Components array, if we have an Actor
+		This()->RemoveOwnedComponent(Component);
+		if (This()->GetRootComponent() == Component)
+		{
+			This()->SetRootComponent(nullptr);
+		}
+	}
 };
 
 DECLARE_EXTENSION(AActor);

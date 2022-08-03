@@ -58,6 +58,14 @@ namespace XX
 		}
 	};
 
+	template <> struct TLerp<FTransform>
+	{
+		static FTransform Lerp(const FTransform& A, const FTransform& B, float V)
+		{
+			return UKismetMathLibrary::TLerp(A, B, V);;
+		}
+	};
+
 	template <typename T>
 	T Lerp(const T& A, const T& B, float V)
 	{

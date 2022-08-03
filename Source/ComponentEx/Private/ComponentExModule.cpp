@@ -1,4 +1,4 @@
-#include "ComponentEx.h"
+#include "ComponentExModule.h"
 
 #include "Components/ActorComponent.h"
 #include "GameFramework/Actor.h"

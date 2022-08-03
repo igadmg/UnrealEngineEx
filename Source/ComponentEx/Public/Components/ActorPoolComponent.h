@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
+#include "Engine/World.h"
 
 #include "ActorPoolComponent.generated.h"
 
