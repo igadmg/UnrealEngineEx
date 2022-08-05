@@ -181,6 +181,8 @@ DECLARE_MUTABLE_EXTENSION(AActor)
 		{
 			This()->SetRootComponent(nullptr);
 		}
+
+		Component->OnComponentDestroyed(false);
 	}
 };
 

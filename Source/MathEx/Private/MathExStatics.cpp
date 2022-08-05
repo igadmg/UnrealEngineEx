@@ -107,6 +107,78 @@ bool UMathExStatics::ProjectWorldToScreenBidirectional(APlayerController* Player
 	return false;
 }
 
+bool UMathExStatics::ProjectWorldToScreen(APlayerController* PlayerController, FVector WorldLocation, FVector& ScreenLocation, bool& OutTargetBehindCamera)
+{
+	if (!IsValid(PlayerController) || !IsValid(PlayerController->GetPawn()))
+		return false;
+
+	FVector2D ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
+	FVector2D ViewportCenter = FVector2D(ViewportSize.X / 2, ViewportSize.Y / 2);
+	FVector2D ScreenLocation2D;
+
+	auto PlayerPawn = PlayerController->GetPawn();
+	FVector Forward = PlayerPawn->GetViewRotation().Vector();
+	FVector ObjectDirection = (WorldLocation - PlayerPawn->GetActorLocation()).GetSafeNormal();
+
+	float DotProduct = FVector::DotProduct(Forward, ObjectDirection);
+	OutTargetBehindCamera = (DotProduct < 0);
+
+	// object is behind the camera
+	if (OutTargetBehindCamera)
+	{
+		FVector SideDirection = FVector::CrossProduct(Forward, FVector(0.0f, 0.0f, 1.0f));
+		float SideProduct = FVector::DotProduct(ObjectDirection, SideDirection);
+
+		ScreenLocation2D.X = (SideProduct > 0.0f) ? 0.0f : ViewportSize.X;
+		ScreenLocation2D.Y = ViewportCenter.Y + FMath::Lerp(ViewportSize.Y / 2.0f, 0.0f, FMath::Abs(SideProduct));
+		ScreenLocation = FVector(ScreenLocation2D.X, ScreenLocation2D.Y, 0.0f);
+		return true;
+	}
+
+	PlayerController->ProjectWorldLocationToScreen(WorldLocation, ScreenLocation2D);
+
+	// object is inside the screen
+	if (ScreenLocation2D.X >= 0.0f && ScreenLocation2D.X <= ViewportSize.X &&
+		ScreenLocation2D.Y >= 0.0f && ScreenLocation2D.Y <= ViewportSize.Y)
+	{
+		ScreenLocation = FVector(ScreenLocation2D.X, ScreenLocation2D.Y, 0.0f);
+		return true;
+	}
+
+	ScreenLocation2D -= ViewportCenter;
+
+	float AngleRadians = FMath::Atan2(ScreenLocation2D.Y, ScreenLocation2D.X);
+	AngleRadians -= FMath::DegreesToRadians(90.0f);
+
+	float Cos = FMath::Cos(AngleRadians);
+	float Sin = -FMath::Sin(AngleRadians);
+	float Cot = Cos / Sin;
+	ScreenLocation2D = FVector2D(ViewportCenter.X + Sin * 150.f, ViewportCenter.Y + Cos * 150.f);
+
+	if (Cos > 0)
+	{
+		ScreenLocation2D = FVector2D(ViewportCenter.Y / Cot, ViewportCenter.Y);
+	}
+	else
+	{
+		ScreenLocation2D = FVector2D(-ViewportCenter.Y / Cot, -ViewportCenter.Y);
+	}
+
+	if (ScreenLocation2D.X > ViewportCenter.X)
+	{
+		ScreenLocation2D = FVector2D(ViewportCenter.X, ViewportCenter.X * Cot);
+	}
+	else if (ScreenLocation2D.X < -ViewportCenter.X)
+	{
+		ScreenLocation2D = FVector2D(-ViewportCenter.X, -ViewportCenter.X * Cot);
+	}
+
+	ScreenLocation2D += ViewportCenter;
+	ScreenLocation = FVector(ScreenLocation2D.X, ScreenLocation2D.Y, 0.0f);
+
+	return true;
+}
+
 bool UMathExStatics::SuggestProjectileVelocityForTime(const UObject* WorldContextObject, FVector& OutVelocity, FVector Start, FVector End, float Time, float OverrideGravityZ)
 {
 	// https://www.forrestthewoods.com/blog/solving_ballistic_trajectories/
