@@ -105,7 +105,7 @@ DECLARE_MUTABLE_EXTENSION(AActor)
 	template <typename T>
 	T* AddComponentByClass(bool bManualAttachment = false, const FTransform& RelativeTransform = FTransform::Identity, bool bDeferredFinish = false)
 	{
-		return AddComponentByClass(T::StaticClass(), bManualAttachment, RelativeTransform, bDeferredFinish);
+		return AddComponentByClass<T>(T::StaticClass(), bManualAttachment, RelativeTransform, bDeferredFinish);
 	}
 
 	template <typename T>
@@ -119,7 +119,7 @@ DECLARE_MUTABLE_EXTENSION(AActor)
 	template <typename T>
 	T* AddComponentByClass(bool bManualAttachment, const FTransform& RelativeTransform, TFunction<void (T*)> InitizlieFn)
 	{
-		return AddComponentByClass(T::StaticClass(), bManualAttachment, RelativeTransform, InitizlieFn);
+		return AddComponentByClass<T>(T::StaticClass(), bManualAttachment, RelativeTransform, InitizlieFn);
 	}
 
 	template <typename T>
