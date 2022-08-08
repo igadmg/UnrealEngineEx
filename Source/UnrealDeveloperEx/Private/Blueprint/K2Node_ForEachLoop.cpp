@@ -24,6 +24,7 @@ IMPLEMENT_PIN(UK2Node_ForEachLoop, FilterFlag, "Keep?");
 IMPLEMENT_PIN(UK2Node_ForEachLoop, Completed, "Completed");
 IMPLEMENT_PIN(UK2Node_ForEachLoop, ResultArray, "Result Array");
 IMPLEMENT_PIN(UK2Node_ForEachLoop, ResultItem, "Result Item");
+IMPLEMENT_PIN(UK2Node_ForEachLoop, FoundFlag, "Found?");
 
 
 UK2Node_ForEachLoop::UK2Node_ForEachLoop(const FObjectInitializer& ObjectInitializer)
@@ -145,6 +146,7 @@ void UK2Node_ForEachLoop::AllocateDefaultPins()
 		break;
 	case ELoopFunction::Find:
 		CreatePin(EGPD_Output, ArrayElementType, PN_ResultItem);
+		CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Boolean, PN_FoundFlag);
 		break;
 	}
 
@@ -239,6 +241,8 @@ void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerConte
 					EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Add)
 					, PARAMETERS((TEXT("TargetArray"), OutputArray), (TEXT("NewItem"), OutputElement)));
 			}
+			Sequence->AddInputPin();
+			Compiler.LastThenPin = Sequence->GetThenPinGivenIndex(2);
 			break;
 		case ELoopFunction::Filter: {
 				auto FilterFlagCondition = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
@@ -257,14 +261,27 @@ void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerConte
 						));
 				}
 			}
+			Sequence->AddInputPin();
+			Compiler.LastThenPin = Sequence->GetThenPinGivenIndex(2);
 			break;
 		case ELoopFunction::Accumulate:
-
+			Sequence->AddInputPin();
+			Compiler.LastThenPin = Sequence->GetThenPinGivenIndex(2);
+			break;
+		case ELoopFunction::Find: {
+				auto FilterFlagCondition = Compiler.SpawnIntermediateNode<UK2Node_CallFunction>(
+					EXPAND_FUNCTION_NAME(UKismetMathLibrary, EqualEqual_BoolBool)
+					, PARAMETERS(
+						(TEXT("A"), FilterFlag),
+						(TEXT("B"), true)
+					));
+				Compiler.ConnectPins(FilterFlag, GetFoundFlagPin());
+				auto FilterIfThenElse = Compiler.SpawnIntermediateNode<UK2Node_IfThenElse>(FilterFlagCondition->GetReturnValuePin());
+				Compiler.ConnectPins(FilterIfThenElse->GetThenPin(), GetCompletedPin());
+				Compiler.LastThenPin = FilterIfThenElse->GetElsePin();
+			}
 			break;
 		}
-
-		Sequence->AddInputPin();
-		Compiler.LastThenPin = Sequence->GetThenPinGivenIndex(2);
 
 		if (BreakFlag)
 		{

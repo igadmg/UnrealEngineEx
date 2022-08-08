@@ -69,6 +69,7 @@ public:
 	DECLARE_PIN(Completed);
 	DECLARE_PIN(ResultArray);
 	DECLARE_PIN(ResultItem);
+	DECLARE_PIN(FoundFlag);
 
 
 public:
