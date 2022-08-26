@@ -179,9 +179,12 @@ APawn* UGuessExStatics::GetPawnOrSpectator(const UObject* Object)
 	return GetSpectatorPawn(Object);
 }
 
-APawn* UGuessExStatics::GetPlayerPawn(const UObject* Object)
+APawn* UGuessExStatics::GetPlayerPawn(const UObject* Object, TSubclassOf<class APawn> PawnClass)
 {
-	if (auto AsPawn = Cast<APawn>(GetOwningActorByClass(Object, APawn::StaticClass())))
+	if (!IsValid(Object)) return nullptr;
+	if (!IsValid(PawnClass)) PawnClass = APawn::StaticClass();
+
+	if (auto AsPawn = Cast<APawn>(GetOwningActorByClass(Object, PawnClass)))
 	{
 		return AsPawn;
 	}
@@ -214,9 +217,12 @@ ASpectatorPawn* UGuessExStatics::GetSpectatorPawn(const UObject* Object)
 	return nullptr;
 }
 
-AController* UGuessExStatics::GetController(const UObject* Object)
+AController* UGuessExStatics::GetController(const UObject* Object, TSubclassOf<class AController> ControllerClass)
 {
 	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("UGuessExStatics::GetController"), STAT_GuessExStaticsGetController, STATGROUP_GuessEx);
+
+	if (!IsValid(Object)) return nullptr;
+	if (!IsValid(ControllerClass)) ControllerClass = AController::StaticClass();
 
 	if (auto AsGameInstance = Cast<UGameInstance>(Object))
 	{
@@ -271,16 +277,33 @@ UCharacterMovementComponent* UGuessExStatics::GetCharacterMovementComponent(cons
 	if (!IsValid(Object))
 		return nullptr;
 
-	auto AsCharacter = Cast<ACharacter>(Object);
-	if (AsCharacter)
+	if (auto AsCharacter = Cast<ACharacter>(Object))
 	{
 		return AsCharacter->GetCharacterMovement();
 	}
 
-	auto AsActorComponent = Cast<UActorComponent>(Object);
-	if (AsActorComponent)
+	if (auto AsActorComponent = Cast<UActorComponent>(Object))
 	{
 		return GetCharacterMovementComponent(AsActorComponent->GetOwner());
+	}
+
+	return nullptr;
+}
+
+UCharacterMovementComponent* UGuessExStatics::GetCharacterMovementMode(const UObject* Object, TEnumAsByte<enum EMovementMode>& MovementMode, uint8& CustomMovementMode)
+{
+	MovementMode = MOVE_None;
+	CustomMovementMode = 0;
+
+	if (!IsValid(Object))
+		return nullptr;
+
+	if (auto CharacterMovementComponent = XX::GetCharacterMovementComponent(Object))
+	{
+		MovementMode = CharacterMovementComponent->MovementMode;
+		CustomMovementMode = CharacterMovementComponent->CustomMovementMode;
+
+		return CharacterMovementComponent;
 	}
 
 	return nullptr;

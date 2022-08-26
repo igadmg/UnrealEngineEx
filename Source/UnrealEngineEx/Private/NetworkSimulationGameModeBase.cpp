@@ -40,7 +40,7 @@ void ANetworkSimulationGameModeBase::Logout(AController* Exiting)
 		{
 			if (auto PlayerState = Valid(PlayerController->PlayerState))
 			{
-				UNetworkSimulationGameInstance::SavePlayerState(PlayerController);
+				//UNetworkSimulationGameInstance::SavePlayerState(PlayerController); Commented out because it caused server to crash when client leaves session with ReplicationGraph enabled
 			}
 		}
 	}

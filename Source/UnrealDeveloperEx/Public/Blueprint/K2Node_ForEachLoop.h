@@ -38,6 +38,9 @@ public:
 	ELoopFunction LoopFunction = ELoopFunction::Loop;
 
 	UPROPERTY(EditAnywhere)
+	bool bHaveStartIndex = false;
+
+	UPROPERTY(EditAnywhere)
 	bool bHaveBreak = false;
 
 	UPROPERTY(EditAnywhere)
@@ -60,6 +63,7 @@ protected:
 
 public:
 	DECLARE_PIN(Array);
+	DECLARE_PIN(StartIndex);
 	DECLARE_PIN(LoopBody);
 	DECLARE_PIN(ArrayElement);
 	DECLARE_PIN(ArrayIndex);

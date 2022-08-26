@@ -10,7 +10,7 @@ class UNREALENGINEEX_API USplineBuilder : public UObject
 
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ExposeOnSpawn = true))
 	float DistanceThreshold = 0.1f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

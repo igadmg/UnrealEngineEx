@@ -88,7 +88,7 @@ public:
 	FRotator GetFocusRotation() const;
 
 	UFUNCTION(BlueprintCallable)
-	FFocusedSpringArmConfig ChangeCameraConfig(FFocusedSpringArmConfig NewCameraConfig, float Time, TEnumAsByte<EEasingFunc::Type> EasingFunc);
+	FFocusedSpringArmConfig ChangeCameraConfig(FFocusedSpringArmConfig NewCameraConfig, float Time, TEnumAsByte<EEasingFunc::Type> EasingFunc = EEasingFunc::Linear);
 
 	UFUNCTION(BlueprintPure)
 	bool IsCameraTransitionFinished() const;

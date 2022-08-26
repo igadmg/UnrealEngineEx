@@ -130,6 +130,7 @@ AActor* UActorPoolComponent::SpawnActorDeferred(TSubclassOf<AActor> ActorClass, 
 
 		if (auto Actor = World->SpawnActor(ActorClass, &Transform, LocalSpawnParameters))
 		{
+			Actor->Tags.AddUnique(TagPooled);
 			Finish.Actor = Actor;
 			Finish.Delegate.BindWeakLambda(this, [this, Transform, SpawnParameters](AActor* Actor) {
 					if (Valid(SpawnParameters.Template))

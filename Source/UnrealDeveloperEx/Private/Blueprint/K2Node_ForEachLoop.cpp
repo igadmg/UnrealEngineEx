@@ -15,6 +15,7 @@
 
 
 IMPLEMENT_PIN(UK2Node_ForEachLoop, Array, "Array");
+IMPLEMENT_PIN(UK2Node_ForEachLoop, StartIndex, "Start Index");
 IMPLEMENT_PIN(UK2Node_ForEachLoop, LoopBody, "Loop Body");
 IMPLEMENT_PIN(UK2Node_ForEachLoop, ArrayElement, "Array Element");
 IMPLEMENT_PIN(UK2Node_ForEachLoop, ArrayIndex, "Array Index");
@@ -109,6 +110,8 @@ void UK2Node_ForEachLoop::AllocateDefaultPins()
 {
 	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Execute);
 	CreatePin(EGPD_Input, ArrayType, PN_Array);
+	if (bHaveStartIndex)
+		CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Int, PN_StartIndex);
 
 	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, PN_LoopBody);
 	CreatePin(EGPD_Output, ArrayElementType, PN_ArrayElement);
@@ -166,9 +169,14 @@ void UK2Node_ForEachLoop::ExpandNode(class FKismetCompilerContext& CompilerConte
 		EXPAND_FUNCTION_NAME(UKismetArrayLibrary, Array_Length)
 		, PARAMETERS((TEXT("TargetArray"), ArrayPin)));
 
+	auto StartIndexPin = GetStartIndexPin();
 	auto Counter = LoopDirection == ELoopDirection::Forward
-		? Compiler.CacheInLocalVariable(0)
-		: Compiler.CacheInLocalVariable(ArrayLength->GetReturnValuePin());
+		? (StartIndexPin
+			? Compiler.CacheInLocalVariable(StartIndexPin)
+			: Compiler.CacheInLocalVariable(0))
+		: (StartIndexPin
+			? Compiler.CacheInLocalVariable(StartIndexPin)
+			: Compiler.CacheInLocalVariable(ArrayLength->GetReturnValuePin()));
 	auto Length = LoopDirection == ELoopDirection::Forward
 		? Compiler.CacheInLocalVariable(ArrayLength->GetReturnValuePin())
 		: Compiler.CacheInLocalVariable(0);

@@ -1,4 +1,5 @@
 #include "Misc/EngineVersionComparison.h"
+#include "Misc/Guid.h"
 #include "UObject/Object.h"
 #include "UObject/ScriptInterface.h"
 #include "HitProxies.h"
@@ -97,6 +98,11 @@ static bool IsValid(const FDelegateHandle& DelegateHandle)
 static bool IsValid(const FTimerHandle& TimerHandle)
 {
 	return TimerHandle.IsValid();
+}
+
+static bool IsValid(const FGuid& Guid)
+{
+	return Guid.IsValid();
 }
 #endif
 
