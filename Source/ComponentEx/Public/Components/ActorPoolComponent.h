@@ -25,7 +25,7 @@ struct COMPONENTEX_API FActorPoolDeferredCallback
 
 
 	UPROPERTY()
-	AActor *Actor;
+	AActor *Actor = nullptr;
 
 	FActorPoolDeferredDelegate Delegate/* = FActorPoolDeferredDelegate()*/;
 	void Call() { Delegate.ExecuteIfBound(Actor); };
