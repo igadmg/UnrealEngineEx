@@ -135,6 +135,9 @@ template <typename T>
 T* Valid(const FSoftObjectPath& v) { return Cast<T>(v.TryLoad()); }
 
 template <typename T>
+UClass* Valid(const FSoftClassPath& v) { return v.TryLoadClass<T>(); }
+
+template <typename T>
 typename TSubclassOf<T>::TClassType* Valid(const TSubclassOf<T>& v) { return IsValid(v) ? v.Get() : nullptr; }
 
 

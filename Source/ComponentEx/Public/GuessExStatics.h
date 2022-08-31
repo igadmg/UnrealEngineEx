@@ -2,6 +2,7 @@
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameMapsSettings.h"
 #include "ValidEx.h"
 #include "GuessExStatics.generated.h"
 
@@ -95,6 +96,21 @@ namespace XX
 	TGameInstance* GetGameInstance(const UObject* Object)
 	{
 		return TValid<TGameInstance, UGameInstance>::Valid(UGameplayStatics::GetGameInstance(Object));
+	}
+
+	template <typename TGameInstance = UGameInstance>
+	const TGameInstance* GetGameInstance(const UObject* Object, bool bReturnDefuautlIfNone)
+	{
+		const auto* Result = TValid<TGameInstance, UGameInstance>::Valid(UGameplayStatics::GetGameInstance(Object));
+		if (bReturnDefuautlIfNone && !Result)
+		{
+			auto GameInstanceClass = Valid<TGameInstance>(GetDefault<UGameMapsSettings>()->GameInstanceClass);
+			if (!IsValid(GameInstanceClass)) GameInstanceClass = TGameInstance::StaticClass();
+
+			Result = GetDefault<TGameInstance>(GameInstanceClass);
+		}
+
+		return Result;
 	}
 
 	template <typename TGameMode = AGameModeBase>

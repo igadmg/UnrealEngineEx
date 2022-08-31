@@ -148,6 +148,7 @@ DECLARE_MUTABLE_EXTENSION(AActor)
 	template <typename T>
 	T* AddComponent(T* Component, bool bManualAttachment = false, const FTransform& RelativeTransform = FTransform::Identity)
 	{
+		Component->Rename(nullptr, This());
 		This()->AddOwnedComponent(Component);
 		This()->FinishAddComponent(Component, bManualAttachment, RelativeTransform);
 
@@ -183,6 +184,9 @@ DECLARE_MUTABLE_EXTENSION(AActor)
 		}
 
 		Component->OnComponentDestroyed(false);
+
+		Component->Rename(nullptr, GetTransientPackage());
+		Component->ResetOwner();
 	}
 };
 

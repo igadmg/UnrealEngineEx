@@ -28,6 +28,7 @@ public class ComponentEx : ModuleRules
 				"Core",
 				"CoreUObject",
 				"Engine",
+				"EngineSettings",
 				"Slate",
 				"SlateCore",
 				"UMG",
