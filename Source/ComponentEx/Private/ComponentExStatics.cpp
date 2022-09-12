@@ -450,7 +450,7 @@ AActor* XX::SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, co
 	return nullptr;
 }
 
-AActor* XX::SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn)
+AActor* XX::SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const FActorSpawnDeferredInitializer& DeferredFn)
 {
 	if (auto ActorPool = GetActorPool(WorldContextObject))
 	{

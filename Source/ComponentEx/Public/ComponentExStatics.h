@@ -102,67 +102,93 @@ namespace XX
 			: nullptr;
 	}
 
-	COMPONENTEX_API AActor* SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters);
-	COMPONENTEX_API AActor* SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn);
+	using FActorSpawnDeferredInitializer = TFunction<void(AActor*)>;
+	template <class TActor>
+	using TActorSpawnDeferredInitializer = TFunction<void(TActor*)>;
+
+	namespace Detail
+	{
+		template <typename TActor, typename TInitializer, std::enable_if_t<std::is_same_v<TActor, AActor>, bool> = true>
+		inline auto WrapActorSpawnDeferredInitializer(const TInitializer& Initializer)
+		{
+			return Initializer;
+		}
+
+		template <typename TActor, typename TInitializer, std::enable_if_t<!std::is_same_v<TActor, AActor>, bool> = true>
+		inline auto WrapActorSpawnDeferredInitializer(const TInitializer& Initializer)
+		{
+			return [&Initializer](AActor* Actor)
+			{
+				Initializer(static_cast<TActor*>(Actor));
+			};
+		}
+	}
+
+	COMPONENTEX_API AActor* SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters = FActorSpawnParameters());
+	COMPONENTEX_API AActor* SpawnActor(const UObject* WorldContextObject, UClass* ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const FActorSpawnDeferredInitializer& DeferredFn);
 
 	COMPONENTEX_API bool DestroyActor(AActor* Actor);
 
+#define SPAWN_ACTOR_INITIALIZER_DEDUCTION_GUIDE(ActorType, InitializerType) std::enable_if_t<std::is_convertible_v<InitializerType, ::XX::TActorSpawnDeferredInitializer<ActorType>>, ActorType*>
+
 	template <typename TActor = AActor>
-	inline TActor* SpawnActor(const UObject* WorldContextObject, const FVector& Location, const FRotator& Rotation, const FActorSpawnParameters& SpawnParameters)
+	inline TActor* SpawnActor(const UObject* WorldContextObject, const FVector& Location, const FRotator& Rotation, const FActorSpawnParameters& SpawnParameters = FActorSpawnParameters())
 	{
-		return Cast<TActor>(SpawnActor(WorldContextObject, TActor::StaticClass(), Location, Rotation, SpawnParameters));
+		return Cast<TActor>(SpawnActor(WorldContextObject, TActor::StaticClass(), FTransform(Rotation, Location), SpawnParameters));
 	}
 
 	template <typename TActor = AActor>
-	inline TActor* SpawnActor(const UObject* WorldContextObject, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters)
+	inline TActor* SpawnActor(const UObject* WorldContextObject, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters = FActorSpawnParameters())
 	{
 		return Cast<TActor>(SpawnActor(WorldContextObject, TActor::StaticClass(), Transform, SpawnParameters));
 	}
 
-	template <typename TActor = AActor>
-	inline TActor* SpawnActor(const UObject* WorldContextObject, const FVector& Location, const FRotator& Rotation, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn)
+	template <typename TActor = AActor, typename TInitializer>
+	inline auto SpawnActor(const UObject* WorldContextObject, const FVector& Location, const FRotator& Rotation, const FActorSpawnParameters& SpawnParameters, const TInitializer& DeferredFn) -> SPAWN_ACTOR_INITIALIZER_DEDUCTION_GUIDE(TActor, TInitializer)
 	{
-		return Cast<TActor>(SpawnActor(WorldContextObject, TActor::StaticClass(), Location, Rotation, SpawnParameters, DeferredFn));
+		return Cast<TActor>(SpawnActor(WorldContextObject, TActor::StaticClass(), FTransform(Rotation, Location), SpawnParameters, Detail::WrapActorSpawnDeferredInitializer<TActor>(DeferredFn)));
 	}
 
-	template <typename TActor = AActor>
-	inline TActor* SpawnActor(const UObject* WorldContextObject, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn)
+	template <typename TActor = AActor, typename TInitializer>
+	inline auto SpawnActor(const UObject* WorldContextObject, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const TInitializer& DeferredFn) -> SPAWN_ACTOR_INITIALIZER_DEDUCTION_GUIDE(TActor, TInitializer)
 	{
-		return Cast<TActor>(SpawnActor(WorldContextObject, TActor::StaticClass(), Transform, SpawnParameters, DeferredFn));
+		return Cast<TActor>(SpawnActor(WorldContextObject, TActor::StaticClass(), Transform, SpawnParameters, Detail::WrapActorSpawnDeferredInitializer<TActor>(DeferredFn)));
 	}
 
 	template <typename TActor>
-	static AActor* SpawnActor(const UObject* WorldContextObject, TSubclassOf<TActor> ActorClass, const FVector& Location, const FRotator& Rotation, const FActorSpawnParameters& SpawnParameters)
+	inline TActor* SpawnActor(const UObject* WorldContextObject, TSubclassOf<TActor> ActorClass, const FVector& Location, const FRotator& Rotation, const FActorSpawnParameters& SpawnParameters = FActorSpawnParameters())
 	{
 		return Cast<TActor>(SpawnActor(WorldContextObject, ActorClass.Get(), FTransform(Rotation, Location), SpawnParameters));
 	}
 
 	template <typename TActor>
-	static AActor* SpawnActor(const UObject* WorldContextObject, TSubclassOf<TActor> ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters)
+	inline TActor* SpawnActor(const UObject* WorldContextObject, TSubclassOf<TActor> ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters = FActorSpawnParameters())
 	{
 		return Cast<TActor>(SpawnActor(WorldContextObject, ActorClass.Get(), Transform, SpawnParameters));
 	}
 
-	template <typename TActor>
-	static AActor* SpawnActor(const UObject* WorldContextObject, TSubclassOf<TActor> ActorClass, const FVector& Location, const FRotator& Rotation, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn)
+	template <typename TActor, typename TInitializer>
+	inline auto SpawnActor(const UObject* WorldContextObject, TSubclassOf<TActor> ActorClass, const FVector& Location, const FRotator& Rotation, const FActorSpawnParameters& SpawnParameters, const TInitializer& DeferredFn) -> SPAWN_ACTOR_INITIALIZER_DEDUCTION_GUIDE(TActor, TInitializer)
 	{
-		return Cast<TActor>(SpawnActor(WorldContextObject, ActorClass.Get(), FTransform(Rotation, Location), SpawnParameters, DeferredFn));
+		return Cast<TActor>(SpawnActor(WorldContextObject, ActorClass.Get(), FTransform(Rotation, Location), SpawnParameters, Detail::WrapActorSpawnDeferredInitializer<TActor>(DeferredFn)));
 	}
 
-	template <typename TActor>
-	static AActor* SpawnActor(const UObject* WorldContextObject, TSubclassOf<TActor> ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const TFunction<void(AActor*)> DeferredFn)
+	template <typename TActor, typename TInitializer>
+	inline auto SpawnActor(const UObject* WorldContextObject, TSubclassOf<TActor> ActorClass, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters, const TInitializer& DeferredFn) -> SPAWN_ACTOR_INITIALIZER_DEDUCTION_GUIDE(TActor, TInitializer)
 	{
-		return Cast<TActor>(SpawnActor(WorldContextObject, ActorClass.Get(), Transform, SpawnParameters, DeferredFn));
+		return Cast<TActor>(SpawnActor(WorldContextObject, ActorClass.Get(), Transform, SpawnParameters, Detail::WrapActorSpawnDeferredInitializer<TActor>(DeferredFn)));
 	}
+
+#undef SPAWN_ACTOR_INITIALIZER_DEDUCTION_GUIDE
 
 	template <typename TActor = ALevelScriptActor>
-	TActor* GetLevelScriptActor(const UObject* Object, int32 LevelIndex = 0)
+	inline TActor* GetLevelScriptActor(const UObject* Object, int32 LevelIndex = 0)
 	{
 		return TValid<TActor, ALevelScriptActor>::Valid(UComponentExStatics::GetLevelScriptActor(Object, LevelIndex));
 	}
 
 	template <typename TActor = ALevelScriptActor>
-	TActor* GetLevelScriptActorFromStreamingLevel(const UObject* Object, ULevelStreaming* StreamingLevel)
+	inline TActor* GetLevelScriptActorFromStreamingLevel(const UObject* Object, ULevelStreaming* StreamingLevel)
 	{
 		return TValid<TActor, ALevelScriptActor>::Valid(UComponentExStatics::GetLevelScriptActorFromStreamingLevel(Object, StreamingLevel));
 	}
