@@ -4,18 +4,18 @@
 #include "UnrealEngineEx.final.h"
 
 
-UInputTrigger::UInputTrigger(const FObjectInitializer& ObjectInitializer)
+UInputTriggerObject::UInputTriggerObject(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	Reset();
 }
 
-UWorld* UInputTrigger::GetWorld() const
+UWorld* UInputTriggerObject::GetWorld() const
 {
 	return (!HasAnyFlags(RF_ClassDefaultObject) && GetOuter()) ? GetOuter()->GetWorld() : nullptr;
 }
 
-bool UInputTrigger::Trigger(float Value, float& OutputValue)
+bool UInputTriggerObject::Trigger(float Value, float& OutputValue)
 {
 	bool bThresholdPassed = FMath::Abs(Value) > Threshold;
 
@@ -59,7 +59,7 @@ bool UInputTrigger::Trigger(float Value, float& OutputValue)
 	return false;
 }
 
-void UInputTrigger::Reset()
+void UInputTriggerObject::Reset()
 {
 	LastPressedState = false;
 	LastPressedCount = 0;

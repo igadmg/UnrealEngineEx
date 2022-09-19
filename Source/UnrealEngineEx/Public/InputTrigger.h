@@ -5,7 +5,7 @@
 
 
 UCLASS(BlueprintType)
-class UNREALENGINEEX_API UInputTrigger : public UObject
+class UNREALENGINEEX_API UInputTriggerObject : public UObject
 {
 	GENERATED_BODY()
 
@@ -38,7 +38,7 @@ public:
 
 
 public:
-	UInputTrigger(const FObjectInitializer& ObjectInitializer);
+	UInputTriggerObject(const FObjectInitializer& ObjectInitializer);
 
 
 
