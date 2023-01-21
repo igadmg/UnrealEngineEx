@@ -16,7 +16,7 @@ struct FKShapeElemEx
 			EAggCollisionShape::Type ShapeType;
 			uint8 bContributeToMass : 1;
 
-#if WITH_PHYSX
+#if defined(WITH_PHYSX)
 			FPhysxUserData UserData;
 #endif // WITH_PHYSX
 		};

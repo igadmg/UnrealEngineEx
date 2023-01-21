@@ -99,6 +99,9 @@ DO_VALID_PTR_CAST(HHitProxy)
 #if !UE_VERSION_OLDER_THAN(5, 0, 0)
 template <typename T>
 T* Valid(const TObjectPtr<T>& v) { return IsValid(v) ? v.Get() : nullptr; }
+
+template <typename T, typename U>
+T* Valid(const TObjectPtr<U>& v) { return IsValid(v) ? Cast<T>(v.Get()) : nullptr; }
 #endif
 
 template <class T, ESPMode InMode>
