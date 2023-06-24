@@ -21,7 +21,7 @@ struct UNREALENGINEEX_API FInputModeConfiguration
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EInputMode InputMode;
+	EInputMode InputMode = EInputMode::None;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "InputMode != EInputMode::GameOnly", EditConditionHides))
 	class UWidget* WidgetToFocus = nullptr;

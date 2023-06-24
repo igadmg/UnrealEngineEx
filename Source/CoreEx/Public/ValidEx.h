@@ -41,34 +41,26 @@ struct DoValidPtr<T, typename std::enable_if<\
 template <typename T, typename U, typename Enable = void>
 struct DoValidPtrCast
 {
-	static const T* Valid(const U* Ptr)
-	{
-		return IsValid(Ptr) ? Cast<T>(Ptr) : nullptr;
-	}
-
-	static T* Valid(U* Ptr)
-	{
-		return IsValid(Ptr) ? Cast<T>(Ptr) : nullptr;
-	}
 };
 
 #define DO_VALID_PTR_CAST(Type)\
 template <typename T, typename U>\
 struct DoValidPtrCast<T, U, typename std::enable_if<\
-		std::is_base_of<Type, T>::value\
+		std::is_base_of<Type, U>::value\
 	>::type>
 
-template <typename T>
-T* Valid(T* v) { return DoValidPtr<T>::Valid(v); }
+DO_VALID_PTR_CAST(UObject)
+{
+	static const T* Valid(const U * Ptr)
+	{
+		return IsValid(Ptr) ? Cast<T>(Ptr) : nullptr;
+	}
 
-template <typename T>
-const T* Valid(const T* v) { return DoValidPtr<T>::Valid(v); }
-
-template <typename T, typename U>
-T* Valid(U* v) { return DoValidPtrCast<T, U>::Valid(v); }
-
-template <typename T, typename U>
-const T* Valid(const U* v) { return DoValidPtrCast<T, U>::Valid(v); }
+	static T* Valid(U * Ptr)
+	{
+		return IsValid(Ptr) ? Cast<T>(Ptr) : nullptr;
+	}
+};
 
 DO_VALID_PTR_CAST(FField)
 {
@@ -96,11 +88,23 @@ DO_VALID_PTR_CAST(HHitProxy)
 	}
 };
 
-#if !UE_VERSION_OLDER_THAN(5, 0, 0)
 template <typename T>
-T* Valid(const TObjectPtr<T>& v) { return IsValid(v) ? v.Get() : nullptr; }
+T* Valid(T* v) { return DoValidPtr<T>::Valid(v); }
+
+template <typename T>
+const T* Valid(const T* v) { return DoValidPtr<T>::Valid(v); }
 
 template <typename T, typename U>
+T* Valid(U* v) { return DoValidPtrCast<T, U>::Valid(v); }
+
+template <typename T, typename U>
+const T* Valid(const U* v) { return DoValidPtrCast<T, U>::Valid(v); }
+
+#if !UE_VERSION_OLDER_THAN(5, 0, 0)
+template <typename T, typename = std::enable_if<std::is_base_of<UObject, T>::value>::type>
+T* Valid(const TObjectPtr<T>& v) { return IsValid(v) ? v.Get() : nullptr; }
+
+template <typename T, typename U, typename = std::enable_if<std::is_base_of<UObject, T>::value>::type>
 T* Valid(const TObjectPtr<U>& v) { return IsValid(v) ? Cast<T>(v.Get()) : nullptr; }
 #endif
 

@@ -8,7 +8,6 @@ public class CoreEx : ModuleRules
 	public CoreEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
-		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		PrivatePCHHeaderFile = "Private/CoreExPrivatePCH.h";
 

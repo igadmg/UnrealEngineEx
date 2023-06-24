@@ -3,6 +3,7 @@
 #include "Animation/AnimationAsset.h"
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimSequence.h"
+#include "Animation/Skeleton.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
@@ -20,6 +21,7 @@
 #include "Engine/StaticMesh.h"
 #include "Engine/Texture.h"
 #include "GameFramework/Controller.h"
+#include "GameFramework/Pawn.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "TimerManager.h"
 

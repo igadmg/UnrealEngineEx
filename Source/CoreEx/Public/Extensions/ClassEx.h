@@ -17,10 +17,11 @@ DECLARE_CONST_EXTENSION(UClass)
 	{
 		for (TFieldIterator<FProperty> PropertyIt(This_); PropertyIt; ++PropertyIt)
 		{
-			if (auto AsMulticastDelegateProperty = Valid<FMulticastDelegateProperty>(*PropertyIt))
+			auto a = DoValidPtrCast<FMulticastDelegateProperty, FProperty>::Valid(*PropertyIt);
+			/*if (auto AsMulticastDelegateProperty = Valid<FMulticastDelegateProperty>(*PropertyIt))
 			{
 				Predicate(AsMulticastDelegateProperty);
-			}
+			}*/
 		}
 	}
 };

@@ -8,7 +8,6 @@ public class CoordinateSystemEx : ModuleRules
 	public CoordinateSystemEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
-		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		PrivatePCHHeaderFile = "Private/CoordinateSystemExPrivatePCH.h";
 

@@ -2,6 +2,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Components/ActorComponent.h"
+#include "Engine/GameInstance.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/HUD.h"
@@ -217,7 +218,7 @@ ASpectatorPawn* UGuessExStatics::GetSpectatorPawn(const UObject* Object)
 	return nullptr;
 }
 
-AController* UGuessExStatics::GetController(const UObject* Object, TSubclassOf<class AController> ControllerClass)
+AController* UGuessExStatics::GetController(const UObject* Object, TSubclassOf<AController> ControllerClass)
 {
 	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("UGuessExStatics::GetController"), STAT_GuessExStaticsGetController, STATGROUP_GuessEx);
 

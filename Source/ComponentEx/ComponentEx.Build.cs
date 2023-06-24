@@ -8,7 +8,6 @@ public class ComponentEx : ModuleRules
 	public ComponentEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
-		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		PrivatePCHHeaderFile = "Private/ComponentExPrivatePCH.h";
 

@@ -2,6 +2,7 @@
 
 #include "ExPrologue.h"
 #include "GameFramework/Actor.h"
+#include "UObject/Package.h"
 #include "ValidEx.h"
 
 
