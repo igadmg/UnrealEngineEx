@@ -29,7 +29,7 @@ public:
 
 
 public:
-	UUserWidgetPoolComponent(const FObjectInitializer& ObjectInitializer);
+	UUserWidgetPoolComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 protected:

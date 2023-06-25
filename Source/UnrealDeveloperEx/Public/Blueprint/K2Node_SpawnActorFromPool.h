@@ -21,7 +21,7 @@ public:
 
 
 public:
-	UK2Node_SpawnActorFromPool(const FObjectInitializer& ObjectInitializer);
+	UK2Node_SpawnActorFromPool(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 protected:

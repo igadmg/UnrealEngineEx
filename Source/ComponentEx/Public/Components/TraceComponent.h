@@ -64,7 +64,7 @@ public:
 
 
 public:
-	UTraceComponent(const FObjectInitializer& ObjectInitializer);
+	UTraceComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 protected:

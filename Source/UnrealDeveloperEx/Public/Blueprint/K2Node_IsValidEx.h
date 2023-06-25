@@ -51,7 +51,7 @@ public:
 
 
 public:
-	UK2Node_IsValidEx(const FObjectInitializer& ObjectInitializer);
+	UK2Node_IsValidEx(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:

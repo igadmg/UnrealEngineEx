@@ -18,5 +18,5 @@ public:
 
 
 public:
-	UTickableObject(const FObjectInitializer& ObjectInitializer);
+	UTickableObject(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 };

@@ -31,7 +31,7 @@ public:
 
 
 public:
-	UInputObject(const FObjectInitializer& ObjectInitializer);
+	UInputObject(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 protected:

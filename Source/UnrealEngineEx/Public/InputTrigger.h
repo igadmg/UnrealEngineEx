@@ -38,7 +38,7 @@ public:
 
 
 public:
-	UInputTriggerObject(const FObjectInitializer& ObjectInitializer);
+	UInputTriggerObject(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 

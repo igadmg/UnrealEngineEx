@@ -17,7 +17,7 @@ protected:
 
 
 public:
-	UNetworkSimulationGameInstance(const FObjectInitializer& ObjectInitializer);
+	UNetworkSimulationGameInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:

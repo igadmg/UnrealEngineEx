@@ -101,7 +101,7 @@ public:
 
 
 public:
-	UFocusedSpringArmComponent(const FObjectInitializer& ObjectInitializer);
+	UFocusedSpringArmComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:

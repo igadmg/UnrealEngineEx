@@ -16,5 +16,5 @@ public:
 
 
 public:
-	UDebugExSettings(const FObjectInitializer& ObjectInitializer);
+	UDebugExSettings(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 };

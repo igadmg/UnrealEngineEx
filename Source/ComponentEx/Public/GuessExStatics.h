@@ -7,6 +7,17 @@
 #include "GuessExStatics.generated.h"
 
 
+class AActor;
+class ACharacter;
+class AController;
+class AGameModeBase;
+class AHUD;
+class APawn;
+class APlayerState;
+class ASpectatorPawn;
+class UGameInstance;
+class UPlayer;
+
 UCLASS()
 class COMPONENTEX_API UGuessExStatics : public UBlueprintFunctionLibrary
 {
@@ -62,6 +73,9 @@ public:
 	static class APlayerController* GetPlayerController(const UObject* Object);
 
 	UFUNCTION(Category = "GuessEx", BlueprintPure, meta = (DefaultToSelf = "Object"))
+	static class UPlayer* GetPlayer(const UObject* Object);
+
+	UFUNCTION(Category = "GuessEx", BlueprintPure, meta = (DefaultToSelf = "Object"))
 	static class APlayerCameraManager* GetPlayerCameraManager(const UObject* Object);
 
 	UFUNCTION(Category = "GuessEx", BlueprintPure, meta = (DefaultToSelf = "Object"))
@@ -73,16 +87,6 @@ public:
 	UFUNCTION(Category = "GuessEx", BlueprintCallable, meta = (DefaultToSelf = "Object"))
 	static class UCharacterMovementComponent* GetCharacterMovementMode(const UObject* Object, TEnumAsByte<enum EMovementMode>& MovementMode, uint8& CustomMovementMode);
 };
-
-class AActor;
-class ACharacter;
-class AController;
-class AGameModeBase;
-class AHUD;
-class APawn;
-class APlayerState;
-class ASpectatorPawn;
-class UGameInstance;
 
 namespace XX
 {
@@ -171,6 +175,12 @@ namespace XX
 	TPlayerCameraManager* GetPlayerCameraManager(const UObject* Object)
 	{
 		return TValid<TPlayerCameraManager, APlayerCameraManager>::Valid(UGuessExStatics::GetPlayerCameraManager(Object));
+	}
+
+	template <typename TPlayer = UPlayer>
+	TPlayer* GetPlayer(const UObject* Object)
+	{
+		return TValid<TPlayer, UPlayer>::Valid(UGuessExStatics::GetPlayer(Object));
 	}
 
 	template <typename TCameraComponent = UCameraComponent>

@@ -40,7 +40,7 @@ public:
 
 
 public:
-	UK2Node_DispatchEvents(const FObjectInitializer& ObjectInitializer);
+	UK2Node_DispatchEvents(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:

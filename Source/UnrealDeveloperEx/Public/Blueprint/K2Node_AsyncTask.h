@@ -36,7 +36,7 @@ protected:
 
 
 public:
-	UK2Node_AsyncTask(const FObjectInitializer& ObjectInitializer);
+	UK2Node_AsyncTask(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:

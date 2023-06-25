@@ -251,6 +251,14 @@ APlayerController* UGuessExStatics::GetPlayerController(const UObject* Object)
 	return Valid<APlayerController>(GetController(Object));
 }
 
+UPlayer* UGuessExStatics::GetPlayer(const UObject* Object)
+{
+	if (auto PlayerController = GetPlayerController(Object))
+		return PlayerController->Player;
+
+	return nullptr;
+}
+
 APlayerCameraManager* UGuessExStatics::GetPlayerCameraManager(const UObject* Object)
 {
 	const APlayerController* Controller = Cast<APlayerController>(GetController(Object));

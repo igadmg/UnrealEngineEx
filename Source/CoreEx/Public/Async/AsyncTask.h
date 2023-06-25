@@ -45,6 +45,6 @@ public:
 
 
 public:
-	UAsyncTask(const FObjectInitializer& ObjectInitializer);
+	UAsyncTask(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	~UAsyncTask();
 };

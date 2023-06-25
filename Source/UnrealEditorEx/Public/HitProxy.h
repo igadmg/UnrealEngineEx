@@ -44,7 +44,7 @@ public:
 
 
 public:
-	UHitProxy(const FObjectInitializer& ObjectInitializer);
+	UHitProxy(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:

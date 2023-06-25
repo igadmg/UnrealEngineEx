@@ -25,6 +25,6 @@ public:
 
 
 public:
-	ASpatialPlayerStart(const FObjectInitializer& ObjectInitializer);
+	ASpatialPlayerStart(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 };
 

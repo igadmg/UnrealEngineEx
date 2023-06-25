@@ -62,7 +62,7 @@ public:
 
 
 public:
-	UActorPoolComponent(const FObjectInitializer& ObjectInitializer);
+	UActorPoolComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:
