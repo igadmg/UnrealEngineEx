@@ -26,6 +26,7 @@ public class UnrealEngineEx : ModuleRules
 				"Core",
 				"CoreUObject",
 				"Engine",
+				"EnhancedInput",
 			});
 
 		PublicDependencyModuleNames.AddRange(new string[] {
