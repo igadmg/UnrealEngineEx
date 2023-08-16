@@ -5,6 +5,7 @@
 #include "Engine/StaticMesh.h"
 #include "Materials/Material.h"
 #include "ComponentExStatics.h"
+#include "ComponentPool.h"
 
 #include "ComponentEx.final.h"
 
@@ -19,8 +20,10 @@ void USplineMeshBuilderComponent::BuildSplineMesh()
 {
 	DECLARE_SCOPE_CYCLE_COUNTER(TEXT("USplineMeshBuilderComponent::BuildSplineMesh"), STAT_SplineMeshBuilderComponentBuildSplineMesh, STATGROUP_ComponentEx);
 
-	auto SpareSplineMeshComponents = SplineMeshComponents;
-	Algo::Reverse(SpareSplineMeshComponents);
+	auto SplineMeshComponentsPool = TComponentPool<USplineMeshComponent>(SplineMeshComponents, [this](auto Component) {
+			GetOwner()->RemoveInstanceComponent(Component);
+			Component->DestroyBodySetup();
+		});
 	SplineMeshComponents.Empty();
 
 	if (IsValid(SplineComponent) && IsValid(Mesh))
@@ -34,17 +37,7 @@ void USplineMeshBuilderComponent::BuildSplineMesh()
 		{
 			float IntervalEnd = FMath::Clamp(IntervalStart + MeshLength, 0.f, SplineLength);
 
-			USplineMeshComponent* SplineMeshComponent = nullptr;
-			if (SpareSplineMeshComponents.Num() > 0)
-			{
-				SplineMeshComponent = SpareSplineMeshComponents.Last();
-				SpareSplineMeshComponents.SetNum(SpareSplineMeshComponents.Num() - 1);
-
-				if (IsValid(SplineMeshComponent))
-				{
-					SplineMeshComponent->SetMobility(Mobility);
-				}
-			}
+			auto SplineMeshComponent = SplineMeshComponentsPool.Take();
 			if (!IsValid(SplineMeshComponent))
 			{
 				SplineMeshComponent = NewObject<USplineMeshComponent>(GetOuter(), NAME_None, RF_Transactional);
@@ -52,6 +45,10 @@ void USplineMeshBuilderComponent::BuildSplineMesh()
 				SplineMeshComponent->SetMobility(Mobility);
 				SplineMeshComponent->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 				SplineMeshComponent->RegisterComponent();
+			}
+			else
+			{
+				SplineMeshComponent->SetMobility(Mobility);
 			}
 
 			SplineMeshComponent->SetStaticMesh(Mesh);
@@ -78,17 +75,6 @@ void USplineMeshBuilderComponent::BuildSplineMesh()
 
 			IntervalStart = IntervalEnd;
 		}
-	}
-
-	for (auto SplineMeshComponent : SpareSplineMeshComponents)
-	{
-		if (!IsValid(SplineMeshComponent))
-			continue;
-
-		GetOwner()->RemoveInstanceComponent(SplineMeshComponent);
-		SplineMeshComponent->DestroyBodySetup();
-		SplineMeshComponent->UnregisterComponent();
-		SplineMeshComponent->DestroyComponent();
 	}
 }
 

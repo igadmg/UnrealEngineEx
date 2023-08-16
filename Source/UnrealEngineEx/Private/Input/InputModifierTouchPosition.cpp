@@ -11,7 +11,7 @@ FInputActionValue UInputModifierTouchPosition::ModifyRaw_Implementation(const UE
 	{
 		FVector2D TouchPosition;
 		bool bIsPressed = false;
-		PlayerController->GetInputTouchState(ETouchIndex::Touch1, TouchPosition.X, TouchPosition.Y, bIsPressed);
+		PlayerController->GetInputTouchState(Touch, TouchPosition.X, TouchPosition.Y, bIsPressed);
 		return bIsPressed ? FInputActionValue(TouchPosition) : FInputActionValue(FVector2D::ZeroVector);
 	}
 
