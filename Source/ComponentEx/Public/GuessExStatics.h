@@ -165,6 +165,12 @@ namespace XX
 		return TValid<TController, AController>::Valid(UGuessExStatics::GetController(Object));
 	}
 
+	template <typename TController = AController>
+	TController* GetController(const APawn* Pawn)
+	{
+		return Valid(Pawn->GetController<TController>());
+	}
+
 	template <typename TController = APlayerController>
 	TController* GetLocalPlayerController(const UObject* Object)
 	{

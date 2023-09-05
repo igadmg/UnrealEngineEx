@@ -1,8 +1,8 @@
 #include "UnrealEngineExStatics.h"
 
 #include "Blueprint/SlateBlueprintLibrary.h"
-#include "Blueprint/WidgetTree.h"
 #include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetTree.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/MultiLineEditableTextBox.h"
@@ -10,6 +10,7 @@
 #include "Components/PanelWidget.h"
 #include "Components/Widget.h"
 #include "Engine/CoreSettings.h"
+#include "Engine/InputDelegateBinding.h"
 #include "Engine/LevelScriptActor.h"
 #include "Engine/LevelStreaming.h"
 #include "Engine/LevelStreamingDynamic.h"
@@ -1294,4 +1295,46 @@ DEFINE_FUNCTION(UUnrealEngineExStatics::execToJsonString)
 	P_NATIVE_BEGIN
 	*(FString*)RESULT_PARAM = ToJsonStringImpl(ValueProperty, ValuePropertyPtr);
 	P_NATIVE_END
+}
+
+UInputComponent* UUnrealEngineExStatics::EnableInput(UObject* Object, APlayerController* PlayerController, UInputComponent* InputComponent)
+{
+	if (!IsValid(Object))
+		return InputComponent;
+
+	if (!IsValid(PlayerController) || !PlayerController->IsLocalController())
+		return InputComponent;
+
+	// If it doesn't exist create it and bind delegates
+	if (!IsValid(InputComponent))
+	{
+		InputComponent = NewObject<UInputComponent>(PlayerController, UInputSettings::GetDefaultInputComponentClass());
+		InputComponent->RegisterComponent();
+		//InputComponent->bBlockInput = bBlockInput;
+		//InputComponent->Priority = InputPriority;
+	}
+	else
+	{
+		// Make sure we only have one instance of the InputComponent on the stack
+		PlayerController->PopInputComponent(InputComponent);
+	}
+
+	UInputDelegateBinding::BindInputDelegates(Object->GetClass(), InputComponent, Object);
+
+	PlayerController->PushInputComponent(InputComponent);
+
+	return InputComponent;
+}
+
+bool UUnrealEngineExStatics::DisableInput(UObject* Object, APlayerController* PlayerController, UInputComponent* InputComponent)
+{
+	if (!IsValid(PlayerController) || !PlayerController->IsLocalController())
+		return false;
+
+	if (!IsValid(InputComponent))
+		return false;
+
+	PlayerController->PopInputComponent(InputComponent);
+
+	return true;
 }

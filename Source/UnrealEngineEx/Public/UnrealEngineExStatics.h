@@ -187,6 +187,14 @@ public:
 
 
 public:
+	UFUNCTION(Category = "UnrealEngineEx|Input", BlueprintCallable, meta = (DefaultToSelf = "Object"))
+	static class UInputComponent* EnableInput(UObject* Object, APlayerController* PlayerController, UInputComponent* InputComponent = nullptr);
+
+	UFUNCTION(Category = "UnrealEngineEx|Input", BlueprintCallable, meta = (DefaultToSelf = "Object"))
+	static bool DisableInput(UObject* Object, APlayerController* PlayerController, UInputComponent* InputComponent);
+
+
+public:
 	UFUNCTION(Category = "UnrealEngineEx|Json", BlueprintPure, CustomThunk, meta = (AutoCreateRefTerm = "Value", CustomStructureParam = "Value"))
 	static FString ToJsonString(const int32& Value);
 	DECLARE_FUNCTION(execToJsonString);
