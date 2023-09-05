@@ -63,6 +63,6 @@ public:
 
 
 public:
-	UEditorViewportClientProxy(const FObjectInitializer& ObjectInitializer);
+	UEditorViewportClientProxy(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 };
 

@@ -18,7 +18,7 @@ public:
 
 
 public:
-	UK2Node_SwitchCast(const FObjectInitializer& ObjectInitializer);
+	UK2Node_SwitchCast(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:

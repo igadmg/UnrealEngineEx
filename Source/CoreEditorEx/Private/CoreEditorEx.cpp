@@ -2,6 +2,7 @@
 
 #include "Interfaces/CookInterface.h"
 #include "UObject/ObjectSaveContext.h"
+#include "UObject/UObjectIterator.h"
 #include "Core.h"
 #include "Editor.h"
 

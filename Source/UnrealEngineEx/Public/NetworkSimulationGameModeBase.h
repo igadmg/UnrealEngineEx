@@ -12,7 +12,7 @@ class UNREALENGINEEX_API ANetworkSimulationGameModeBase : public AGameModeBase
 
 
 public:
-	ANetworkSimulationGameModeBase(const FObjectInitializer& ObjectInitializer);
+	ANetworkSimulationGameModeBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 protected:

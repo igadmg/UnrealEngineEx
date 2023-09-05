@@ -70,3 +70,27 @@ namespace XX
 	}
 }
 #endif
+
+#if defined(ENGINE_LocalPlayerSubsystem_generated_h) && !defined(GetSubsystem_ENGINE_LocalPlayerSubsystem_generated_h)
+#define GetSubsystem_ENGINE_LocalPlayerSubsystem_generated_h
+
+#include "Engine/LocalPlayer.h"
+
+namespace XX
+{
+	template <typename TSubsystemClass = ULocalPlayerSubsystem>
+	inline TSubsystemClass* GetSubsystem(const UObject* WorldContextObject, typename std::enable_if_t<std::is_base_of_v<ULocalPlayerSubsystem, TSubsystemClass>>* = nullptr)
+	{
+		auto LocalPlayer = XX::GetPlayer<ULocalPlayer>(WorldContextObject);
+		return LocalPlayer ? LocalPlayer->GetSubsystem<TSubsystemClass>() : nullptr;
+	}
+
+	template <typename TSubsystemClass = ULocalPlayerSubsystem>
+	inline const TArray<TSubsystemClass*>& GetSubsystemArray(const UObject* WorldContextObject, typename std::enable_if_t<std::is_base_of_v<ULocalPlayerSubsystem, TSubsystemClass>>* = nullptr)
+	{
+		static TArray<TSubsystemClass*> EmptyArray;
+		auto LocalPlayer = XX::GetPlayer<ULocalPlayer>(WorldContextObject);
+		return LocalPlayer ? LocalPlayer->GetSubsystemArray<TSubsystemClass>() : EmptyArray;
+	}
+}
+#endif

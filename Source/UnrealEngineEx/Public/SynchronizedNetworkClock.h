@@ -48,7 +48,7 @@ protected:
 
 
 public:
-	USynchronizedNetworkClock(const FObjectInitializer& ObjectInitializer);
+	USynchronizedNetworkClock(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:

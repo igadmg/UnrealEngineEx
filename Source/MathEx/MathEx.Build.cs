@@ -8,7 +8,6 @@ public class MathEx : ModuleRules
 	public MathEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
-		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		PrivatePCHHeaderFile = "Private/MathExPrivatePCH.h";
 

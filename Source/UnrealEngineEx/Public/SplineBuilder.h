@@ -26,6 +26,6 @@ public:
 
 
 public:
-	USplineBuilder(const FObjectInitializer& ObjectInitializer);
+	USplineBuilder(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 };
 

@@ -8,7 +8,6 @@ public class UnrealDeveloperEx : ModuleRules
 	public UnrealDeveloperEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
-		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		PrivatePCHHeaderFile = "Private/UnrealDeveloperExPrivatePCH.h";
 

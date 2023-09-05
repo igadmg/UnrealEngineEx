@@ -1,10 +1,13 @@
 #include "MathExStatics.h"
 
+#include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/Engine.h"
+#include "Engine/GameViewportClient.h"
 #include "Engine/LocalPlayer.h"
 #include "SceneView.h"
 #include "StereoRendering.h"
+#include "UnrealClient.h"
 
 #include "MathEx.h"
 

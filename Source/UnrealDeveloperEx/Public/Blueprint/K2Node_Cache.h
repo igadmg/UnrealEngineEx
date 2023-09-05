@@ -46,7 +46,7 @@ public:
 
 
 public:
-	UK2Node_Cache(const FObjectInitializer& ObjectInitializer);
+	UK2Node_Cache(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:

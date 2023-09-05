@@ -33,7 +33,7 @@ public: // ICookInterface
 
 
 public:
-	USplineInstanceMeshPlacerComponent(const FObjectInitializer& ObjectInitializer);
+	USplineInstanceMeshPlacerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 protected:

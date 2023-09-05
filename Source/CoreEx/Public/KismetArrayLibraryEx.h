@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Kismet/BlueprintFunctionLibrary.h"
+#include "Kismet/KismetArrayLibrary.h"
 #include "KismetArrayLibraryEx.generated.h"
 
 

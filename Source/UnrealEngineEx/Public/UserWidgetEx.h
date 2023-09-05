@@ -35,7 +35,7 @@ protected:
 
 
 public:
-	UUserWidgetEx(const FObjectInitializer& ObjectInitializer);
+	UUserWidgetEx(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 protected:

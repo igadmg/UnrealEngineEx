@@ -37,7 +37,7 @@ public:
 
 
 public:
-	UComponentContainer(const FObjectInitializer& ObjectInitializer);
+	UComponentContainer(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:
@@ -154,7 +154,7 @@ protected:
 
 
 public:
-	UComponentContainerManager(const FObjectInitializer& ObjectInitializer);
+	UComponentContainerManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	virtual ~UComponentContainerManager();
 };
 
@@ -171,7 +171,7 @@ public:
 
 
 public:
-	UContainedComponent(const FObjectInitializer& ObjectInitializer);
+	UContainedComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:

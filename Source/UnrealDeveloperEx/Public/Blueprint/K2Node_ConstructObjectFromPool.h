@@ -14,6 +14,6 @@ class UNREALDEVELOPEREX_API UK2Node_ConstructObjectFromPool : public UK2Node_Con
 
 
 public:
-	UK2Node_ConstructObjectFromPool(const FObjectInitializer& ObjectInitializer);
+	UK2Node_ConstructObjectFromPool(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 };
 

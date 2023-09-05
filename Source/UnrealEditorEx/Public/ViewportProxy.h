@@ -12,7 +12,7 @@ class UNREALEDITOREX_API UViewportProxy : public UObject
 
 
 public:
-	UViewportProxy(const FObjectInitializer& ObjectInitializer);
+	UViewportProxy(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 };
 
 UCLASS(BlueprintType)
@@ -41,5 +41,5 @@ public:
 
 
 public:
-	UViewportClick(const FObjectInitializer& ObjectInitializer);
+	UViewportClick(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 };

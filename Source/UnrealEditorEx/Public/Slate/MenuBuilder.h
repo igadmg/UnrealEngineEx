@@ -114,6 +114,6 @@ public:
 
 
 public:
-	UMenuBuilder(const FObjectInitializer& ObjectInitializer);
+	UMenuBuilder(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 };
 

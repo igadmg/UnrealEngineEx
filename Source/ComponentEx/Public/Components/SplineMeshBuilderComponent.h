@@ -56,7 +56,7 @@ public: // ICookInterface
 
 
 public:
-	USplineMeshBuilderComponent(const FObjectInitializer& ObjectInitializer);
+	USplineMeshBuilderComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 protected:

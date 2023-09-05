@@ -12,7 +12,7 @@ class UNREALENGINEEX_API ANetworkSimulationPlayerController : public APlayerCont
 
 
 public:
-	ANetworkSimulationPlayerController(const FObjectInitializer& ObjectInitializer);
+	ANetworkSimulationPlayerController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 protected:

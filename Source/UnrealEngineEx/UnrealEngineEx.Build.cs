@@ -8,7 +8,6 @@ public class UnrealEngineEx : ModuleRules
 	public UnrealEngineEx(ReadOnlyTargetRules Target)
 		: base(Target)
 	{
-		bEnforceIWYU = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		PrivatePCHHeaderFile = "Private/UnrealEngineExPrivatePCH.h";
 
@@ -27,6 +26,7 @@ public class UnrealEngineEx : ModuleRules
 				"Core",
 				"CoreUObject",
 				"Engine",
+				"EnhancedInput",
 			});
 
 		PublicDependencyModuleNames.AddRange(new string[] {

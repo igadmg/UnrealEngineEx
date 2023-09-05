@@ -63,7 +63,7 @@ public:
 
 
 public:
-	UPendingContainer(const FObjectInitializer& ObjectInitializer);
+	UPendingContainer(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 protected:

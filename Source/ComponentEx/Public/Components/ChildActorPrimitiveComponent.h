@@ -52,7 +52,7 @@ public:
 
 
 public:
-	UChildActorPrimitiveComponent(const FObjectInitializer& ObjectInitializer);
+	UChildActorPrimitiveComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:

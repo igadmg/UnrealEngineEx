@@ -21,7 +21,7 @@ public:
 
 
 public:
-	UComponentVisProxy(const FObjectInitializer& ObjectInitializer);
+	UComponentVisProxy(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:
