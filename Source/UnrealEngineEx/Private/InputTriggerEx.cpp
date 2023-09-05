@@ -1,4 +1,4 @@
-#include "InputTrigger.h"
+#include "InputTriggerEx.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "UnrealEngineEx.final.h"

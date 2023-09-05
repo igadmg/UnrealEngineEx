@@ -1,6 +1,6 @@
 #pragma once
 
-#include "InputTrigger.generated.h"
+#include "InputTriggerEx.generated.h"
 
 
 
