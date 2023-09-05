@@ -1,11 +1,11 @@
 #pragma once
 
-#include "InputTrigger.generated.h"
+#include "InputTriggerEx.generated.h"
 
 
 
 UCLASS(BlueprintType)
-class UNREALENGINEEX_API UInputTrigger : public UObject
+class UNREALENGINEEX_API UInputTriggerEx : public UObject
 {
 	GENERATED_BODY()
 
@@ -38,7 +38,7 @@ public:
 
 
 public:
-	UInputTrigger(const FObjectInitializer& ObjectInitializer);
+	UInputTriggerEx(const FObjectInitializer& ObjectInitializer);
 
 
 

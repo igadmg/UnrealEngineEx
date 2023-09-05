@@ -1,21 +1,21 @@
-#include "InputTrigger.h"
+#include "InputTriggerEx.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "UnrealEngineEx.final.h"
 
 
-UInputTrigger::UInputTrigger(const FObjectInitializer& ObjectInitializer)
+UInputTriggerEx::UInputTriggerEx(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	Reset();
 }
 
-UWorld* UInputTrigger::GetWorld() const
+UWorld* UInputTriggerEx::GetWorld() const
 {
 	return (!HasAnyFlags(RF_ClassDefaultObject) && GetOuter()) ? GetOuter()->GetWorld() : nullptr;
 }
 
-bool UInputTrigger::Trigger(float Value, float& OutputValue)
+bool UInputTriggerEx::Trigger(float Value, float& OutputValue)
 {
 	bool bThresholdPassed = FMath::Abs(Value) > Threshold;
 
@@ -59,7 +59,7 @@ bool UInputTrigger::Trigger(float Value, float& OutputValue)
 	return false;
 }
 
-void UInputTrigger::Reset()
+void UInputTriggerEx::Reset()
 {
 	LastPressedState = false;
 	LastPressedCount = 0;
