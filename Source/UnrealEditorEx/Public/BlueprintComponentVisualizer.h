@@ -278,10 +278,12 @@ protected:
 
 struct FBlueprintComponentVisualizer
 {
+	/*
 	static TSharedPtr<TBlueprintComponentVisualizer<TAddGCObject<FComponentVisualizer>>> Make(TSubclassOf<UBlueprintComponentVisualizer> ComponentVisualizerClass)
 	{
 		return MakeShareable(new TBlueprintComponentVisualizer<TAddGCObject<FComponentVisualizer>>(ComponentVisualizerClass));
 	}
+	*/
 
 	template <typename TBaseClass>
 	static TSharedPtr<TBlueprintComponentVisualizer<TBaseClass>> Make(TSubclassOf<UBlueprintComponentVisualizer> ComponentVisualizerClass)

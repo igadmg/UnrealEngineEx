@@ -12,6 +12,15 @@ namespace XX
 	}
 #endif
 
+#if defined(ENGINE_Pawn_generated_h) && !defined(GuessEx_ENGINE_Pawn_generated_h)
+#define GuessEx_ENGINE_Pawn_generated_h
+	template <typename TController = AController>
+	TController* GetController(const APawn* Pawn)
+	{
+		return Valid(Pawn->GetController<TController>());
+	}
+#endif
+
 #if defined(ENGINE_ActorComponent_generated_h) && !defined(GuessEx_ENGINE_ActorComponent_generated_h)
 #define GuessEx_ENGINE_ActorComponent_generated_h
 	template <typename TActor = AActor>

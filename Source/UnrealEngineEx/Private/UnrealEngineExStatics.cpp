@@ -27,6 +27,7 @@
 #include "GameFramework/SpectatorPawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Misc/EngineVersionComparison.h"
 #include "Serialization/JsonSerializer.h"
 #include "ComponentExStatics.h"
 #include "DebugDrawHelpersEx.h"
@@ -268,7 +269,7 @@ ULevelStreaming* UUnrealEngineExStatics::AddStreamingLevel(UObject* WorldContext
 	if (LevelStreamingPtr != nullptr)
 		return *LevelStreamingPtr;
 
-#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 21
+#if !UE_VERSION_OLDER_THAN(4, 21, 0)
 	ULevelStreaming* AsyncLevel = NewObject<ULevelStreaming>(World, ULevelStreamingDynamic::StaticClass(), NAME_None, RF_Transient, NULL);
 #else
 	ULevelStreaming* AsyncLevel = NewObject<ULevelStreaming>(World, ULevelStreamingKismet::StaticClass(), NAME_None, RF_Transient, NULL);
