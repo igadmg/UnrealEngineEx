@@ -180,7 +180,7 @@ APawn* UGuessExStatics::GetPawnOrSpectator(const UObject* Object)
 	return GetSpectatorPawn(Object);
 }
 
-APawn* UGuessExStatics::GetPlayerPawn(const UObject* Object, TSubclassOf<class APawn> PawnClass)
+APawn* UGuessExStatics::GetPlayerPawn(const UObject* Object, TSubclassOf<APawn> PawnClass)
 {
 	if (!IsValid(Object)) return nullptr;
 	if (!IsValid(PawnClass)) PawnClass = APawn::StaticClass();
@@ -246,9 +246,11 @@ AController* UGuessExStatics::GetController(const UObject* Object, TSubclassOf<A
 		});
 }
 
-APlayerController* UGuessExStatics::GetPlayerController(const UObject* Object)
+APlayerController* UGuessExStatics::GetPlayerController(const UObject* Object, TSubclassOf<APlayerController> PlayerControllerClass)
 {
-	return Valid<APlayerController>(GetController(Object));
+	if (!IsValid(PlayerControllerClass)) PlayerControllerClass = APlayerController::StaticClass();
+
+	return Valid<APlayerController>(GetController(Object, PlayerControllerClass));
 }
 
 UPlayer* UGuessExStatics::GetPlayer(const UObject* Object)

@@ -60,17 +60,17 @@ public:
 	UFUNCTION(Category = "GuessEx", BlueprintPure, meta = (DefaultToSelf = "Object"))
 	static class APawn* GetPawnOrSpectator(const UObject* Object);
 
-	UFUNCTION(Category = "GuessEx", BlueprintPure, meta = (DefaultToSelf = "Object", DeterminesOutputType = "PawnClass"))
+	UFUNCTION(Category = "GuessEx", BlueprintPure, meta = (AdvancedDisplay = "PawnClass", DefaultToSelf = "Object", DeterminesOutputType = "PawnClass"))
 	static class APawn* GetPlayerPawn(const UObject* Object, TSubclassOf<class APawn> PawnClass = nullptr);
 
 	UFUNCTION(Category = "GuessEx", BlueprintPure, BlueprintCosmetic, meta = (DefaultToSelf = "Object"))
 	static class ASpectatorPawn* GetSpectatorPawn(const UObject* Object);
 
-	UFUNCTION(Category = "GuessEx", BlueprintPure, meta = (DefaultToSelf = "Object", DeterminesOutputType = "ControllerClass"))
+	UFUNCTION(Category = "GuessEx", BlueprintPure, meta = (AdvancedDisplay = "ControllerClass", DefaultToSelf = "Object", DeterminesOutputType = "ControllerClass"))
 	static class AController* GetController(const UObject* Object, TSubclassOf<class AController> ControllerClass = nullptr);
 
-	UFUNCTION(Category = "GuessEx", BlueprintPure, meta = (DefaultToSelf = "Object"))
-	static class APlayerController* GetPlayerController(const UObject* Object);
+	UFUNCTION(Category = "GuessEx", BlueprintPure, meta = (AdvancedDisplay = "PlayerControllerClass", DefaultToSelf = "Object", DeterminesOutputType = "PlayerControllerClass"))
+	static class APlayerController* GetPlayerController(const UObject* Object, TSubclassOf<class APlayerController> PlayerControllerClass = nullptr);
 
 	UFUNCTION(Category = "GuessEx", BlueprintPure, meta = (DefaultToSelf = "Object"))
 	static class UPlayer* GetPlayer(const UObject* Object);

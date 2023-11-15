@@ -71,4 +71,9 @@ struct FMathEx
 	{
 		return B * A.Inverse();
 	}
+
+	static FORCEINLINE FVector2D Round(const FVector2D &V)
+	{
+		return FVector2D(FMath::RoundToFloat(V.X), FMath::RoundToFloat(V.Y));
+	}
 };
