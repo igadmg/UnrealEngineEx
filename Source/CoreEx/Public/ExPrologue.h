@@ -33,6 +33,12 @@ inline typename TEx<T>::MutableExType ex(const TSharedPtr<T, InMode>& O)
 }
 
 template <typename T>
+inline typename TEx<T>::ConstExRefType const_ex(const T& O)
+{
+	return typename TEx<T>::ConstExRefType(O);
+}
+
+template <typename T>
 inline typename TEx<T>::ConstExRefType ex(const T& O)
 {
 	return typename TEx<T>::ConstExRefType(O);

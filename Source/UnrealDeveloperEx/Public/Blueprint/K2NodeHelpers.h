@@ -33,6 +33,7 @@ public:
 	static UEdGraphNode* GetLinkedPinNode(UEdGraphPin* Pin);
 
 
+#if 0
 	template <typename T>
 	static void ForEachProperty(UClass* ObjectClass, TFunction<void (T*)> Predicate)
 	{
@@ -41,7 +42,6 @@ public:
 			Predicate(*PropertyIt);
 		}
 	}
-#if 0
 	void ForEachOutputDelegate(class UClass* ObjectClass, TFunction<void(FMulticastDelegateProperty*)> Predicate);
 #endif
 };
