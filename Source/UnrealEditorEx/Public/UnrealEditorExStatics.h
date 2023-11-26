@@ -30,4 +30,7 @@ public:
 	{
 		return FSlateUIAction { ExecuteAction, CanExecuteAction };
 	}
+
+	UFUNCTION(Category = "UnrealEditorEx", BlueprintCallable)
+	static void FixDefaultObject(UClass* Class);
 };

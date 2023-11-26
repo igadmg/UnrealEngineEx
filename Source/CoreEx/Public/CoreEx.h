@@ -106,6 +106,22 @@ inline FScriptDelegate MakeScriptDelegate(UObject* Object, FName Function)
 	return Delegate;
 }
 
+template <typename T = UObject>
+T* DuplicateObject(UClass* DestClass, const TObjectPtr<T>& SourceObject, UObject* Outer = nullptr, const FName Name = NAME_None)
+{
+	if (SourceObject != nullptr)
+	{
+		if (Outer == nullptr || Outer == INVALID_OBJECT)
+		{
+			Outer = (UObject*)GetTransientOuterForRename(DestClass);
+		}
+
+		return Cast<T>(StaticDuplicateObject(SourceObject, Outer, Name, RF_AllFlags, DestClass));
+	}
+
+	return nullptr;
+}
+
 
 #if WITH_EDITOR
 
