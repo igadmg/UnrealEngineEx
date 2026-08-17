@@ -6,6 +6,15 @@
 
 /**
  Functions to check validity of objects of different UE types.
+
+	IsValid(obj) - checks validity for UObjects and may builtin types
+	IsValid(FName)
+	IsValid(String)
+	IsValid(ptr)
+	IsValid(TFunction)
+	IsValid(TSharedPtr)
+	... etc
+	Neraly every object can be chancked for validity with IsValid
 */
 
 

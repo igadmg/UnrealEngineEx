@@ -10,6 +10,44 @@
 #include "ComponentExStatics.generated.h"
 
 
+/***
+ * 
+ *
+void SetActorEnabled(class AActor* Actor, bool bIsEnabled);
+
+// Get camer component for 
+class UCameraComponent* GetCameraComponent(const class AActor* Actor);
+
+class UActorPoolComponent* GetActorPool(const UObject* WorldContextObject);
+bool DestroyPooledActor(AActor* Actor);
+
+void Attach(const FAttachmentDescription& Where, class AActor* What, class AActor* ParentActor, const FAttachmentTransformRules& AttachmentRules);
+
+// Access to level script objects from C++
+// Can be pared with ValidInterface<ISomething>() to send messages
+class ALevelScriptActor* GetLevelScriptActor(const UObject* WorldContextObject, int32 LevelIndex = 0);
+class ALevelScriptActor* GetLevelScriptActorFromStreamingLevel(const UObject* WorldContextObject, class ULevelStreaming* StreamingLevel);
+
+FVector GetHitOrEndLocation(const FHitResult& HitResult);
+FVector GetTraceDirection(const FHitResult& HitResult);
+bool RunBehaviorTree(class AController* Controller, class UBehaviorTree* BehaviorTreeAsset, class UBehaviorTreeComponent* BehaviourTreeComponent = nullptr, class UBlackboardComponent* BlackboardComponent = nullptr);
+bool InitializeBlackboard(class AController* Controller, class UBlackboardComponent& BlackboardComp, class UBlackboardData& BlackboardAsset);
+bool UseBlackboard(class AController* Controller, class UBlackboardData* BlackboardAsset, class UBlackboardComponent*& BlackboardComponent);
+class UObject* GetBlendable(class APostProcessVolume* Volume, int Index);
+bool UpdateBlendableWeight(class APostProcessVolume* Volume, int Index, float Weight);
+float FindDistanceClosestToLocation(class USplineComponent* Spline, FVector Location, ESplineCoordinateSpace::Type CoordinateSpace = ESplineCoordinateSpace::World);
+FVector2D GetTextureSize(class UTexture* Texture);
+FVector GetMeshSize(class UStaticMesh* Mesh);
+void PlayAnimationWithCallback(class USkeletalMeshComponent* SkeletalMeshComponent, class UAnimationAsset* NewAnimToPlay, bool bLooping, const FTimerDynamicDelegate& OnFinished);
+bool GetWorldBoneTransformAtTime(class USkeletalMeshComponent* SkeletalMeshComponent, class UAnimSequence* AnimSequence, FName BoneName, float Time, FTransform& OutTransform);
+bool GetWorldSocketTransformAtTime(class USkeletalMeshComponent* SkeletalMeshComponent, class UAnimSequence* AnimSequence, FName SocketName, float Time, FTransform& OutTransform);
+void SetupSplineMeshComponentFromSpline(class USplineMeshComponent* SplineMeshComponent, class USplineComponent* Spline, float StartDistance, float EndDistance, ESplineCoordinateSpace::Type CoordinateSpace, bool bUpdateMesh = true);
+void SetupSplineMeshComponentStartFromSpline(class USplineMeshComponent* SplineMeshComponent, class USplineComponent* Spline, float DistanceAlongSpline, float TangetLength, float SplineMeshRoll, ESplineCoordinateSpace::Type CoordinateSpace, bool bUpdateMesh = true);
+void SetupSplineMeshComponentEndFromSpline(class USplineMeshComponent* SplineMeshComponent, class USplineComponent* Spline, float DistanceAlongSpline, float TangetLength, float SplineMeshRoll, ESplineCoordinateSpace::Type CoordinateSpace, bool bUpdateMesh = true);
+ * 
+ */
+
+
 UCLASS()
 class COMPONENTEX_API UComponentExStatics : public UBlueprintFunctionLibrary
 {

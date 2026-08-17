@@ -1,7 +1,21 @@
 #include "IsValidEx.h"
 
 /**
- Functions to do Casts with Valid checks of different objects of different UE types.
+ Functions to cast and get valid object from ptr or nil
+ Works for Valid Inteface casts
+
+	valid_obj = Valid<Type>(obj) - returns valid object of Type
+	valid_iface_obj = ValidInterface<InterfaceType>(obj) // casts to TScriptInterface
+
+  In C++ it casts to TScriptInterface
+
+  These macros where very useful in C++ to check if object implements interface and get valid interface pointer.
+	if_Implements
+	if_Implements2
+	if_Implements3
+ 
+ 
+Functions to do Casts with Valid checks of different objects of different UE types.
 
  Smart pointers vill be cast to types of their objects.
  TSmartPtr<AActor> ptrA;

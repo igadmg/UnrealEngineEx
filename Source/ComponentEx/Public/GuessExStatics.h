@@ -7,6 +7,50 @@
 #include "GuessExStatics.generated.h"
 
 
+/***
+ * Guess functions - used to bestfind something
+ * 
+ 
+APlayerController*
+GetLocalPlayerController(const UObject* WorldContextObject);
+
+AHUD*
+GetLocalPlayerHUD(const UObject* WorldContextObject);
+
+bool IsOwnedBy(const UObject* Object, const UObject* Owner);
+AActor* GetOwningActor(const UObject* Object);
+AActor* GetOwningActorByClass(const UObject* Object, TSubclassOf<AActor> ActorClass);
+
+AActor* GetControlledActor(const UObject* Object);
+
+AHUD* GetPlayerHUD(const UObject* Object);
+
+APlayerState* GetPlayerState(const UObject* Object);
+
+float GetPlayerScore(const UObject* Object);
+
+APawn* GetPawnOrSpectator(const UObject* Object);
+APawn* GetPlayerPawn(const UObject* Object, TSubclassOf<APawn> Pawn= nullptr);
+ASpectatorPawn* GetSpectatorPawn(const UObject* Object);
+
+AController* GetController(const UObject* Object, TSubclassOf<AController> Controller= nullptr);
+
+APlayerController* GetPlayerController(const UObject* Object, TSubclassOf<APlayerController> PlayerController= nullptr);
+
+UPlayer* GetPlayer(const UObject* Object);
+
+APlayerCameraManager* GetPlayerCameraManager(const UObject* Object);
+
+UCameraComponent* GetPlayerActiveCamera(const UObject* Object);
+
+UCharacterMovementComponent* GetCharacterMovementComponent(const UObject* Object);
+
+UCharacterMovementComponent* GetCharacterMovementMode(const UObject* Object, TEnumAsByte<enum EMovementMode>& MovementMode, uint8& CustomMovementMode);
+
+ 
+ */
+
+
 class AActor;
 class ACharacter;
 class AController;

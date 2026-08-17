@@ -4,7 +4,8 @@
 
 
 /**
- Throttle execution of function. Don't run it more often as needed.
+ Throttle execution of function. 
+ Don't runs the function more often then needed.
 */
 struct FThrottle
 {

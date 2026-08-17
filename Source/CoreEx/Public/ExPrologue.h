@@ -3,6 +3,20 @@
 #define TYPENAME(X) typename X
 #define TYPENAME_N(...) FOLD_N(TYPENAME, __VA_ARGS__)
 
+/**
+ * ex - C++ extension for Unreal Engine objects.
+ * 
+ * usage kinda strange, but you can wrap any object with ex() or ex_const()
+ * and you will get access to library of functions defined as extensions for them.
+ * 
+ *  Ex.
+ *  AActor* Actor = ...;
+ *  ex(Actor).SetActorEnabled(false); // runs function from ActorEx.h extension library
+ *  // do a lot of common stuff
+ *  ex(smth).Fn() can call functions defined in a specific way.
+ *  const_ex(Actor).GetCameraComponent(); // calls for const references.
+ */
+
 template <typename T>
 struct TEx
 {

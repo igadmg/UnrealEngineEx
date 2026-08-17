@@ -29,6 +29,25 @@ AHUD* UGuessExStatics::GetLocalPlayerHUD(const UObject* WorldContextObject)
 	return GetPlayerHUD(GetLocalPlayerController(WorldContextObject));
 }
 
+
+/**
+ * That is Uber Function to iterate full Owner tree of UObjects
+ * it goues all owner tree of ony UObject up until find and Actor
+ * of specific type and run function on it and if it returns null it
+ * gets Actors Parent and try there but if fails it gets
+ * Actors Owner and serach there
+ * and if everything fails it tries to GetOuter() and do search again.
+ * 
+ * it also does best guesses for player owned UObjects like 
+ * UActorComponent and UUserWidget to best guess owning Actor
+ * 
+ * it is easily used to find first owning Actor and tht just make everything simplier.
+ * 
+ * 
+ * it is used everywhere in Guess library for numerous checks and guesses
+ * It can find
+ * 
+ */
 template <typename TResult>
 TResult* ForEachOwningActor(UObject* Object, TFunction<TResult* (AActor*)> Function)
 {

@@ -6,7 +6,55 @@
 #include "CoreExStatics.h"
 #include "UnrealEngineExStatics.generated.h"
 
+/**
+ * Not much usefull here. Mostly outdated maybe
+ * 
 
+// All access these functions give is from WorldContextObject reference
+// That is some magical object binding any UObject to execution world.
+// It is passed from script when some magic tag is declared.
+// but also it can be obtained from any object
+// it is valid object itself.
+ 
+// Some Networking stuff
+
+TEnumAsByte<EWorldType::Type> GetWorldType(const UObject* WorldContextObject);
+void WorldType(const UObject* WorldContextObject, TEnumAsByte<EWorldType::Type>& OutWorldType);
+void NetMode(const UObject* WorldContextObject, TEnumAsByte<ENetMode>& OutNetMode);
+float GetServerWorldTimeSeconds(const UObject* WorldContextObject);
+bool IsListenServer(const UObject* WorldContextObject);
+UObject* GetDefaultObject(TSubclassOf<UObject> ObjectClass);
+
+float GetTimerPercentTimeHandle(const UObject* WorldContextObject, FTimerHandle Handle);
+FNetworkStatus GetNetworkStatus(const UObject* WorldContextObject);
+bool IsSingleplayer(const UObject* WorldContextObject);
+void NetRole(const UObject* WorldContextObject, TEnumAsByte<ENetRole>& OutNetRole);
+bool IsServer(const UObject* WorldContextObject);
+bool ListenServer(UObject* WorldContextObject);
+bool StopServer(UObject* WorldContextObject);
+bool ServerTravel(const UObject* WorldContextObject, const TSoftObjectPtr<UWorld> Level, bool bAbsolute = true, FString Options = FString(TEXT("")));
+
+void ShutdownGame();
+
+
+// Some strange UMG ui stuff
+
+bool ReplaceWidget(class UWidget* OldWidget, class UWidget* NewWidget);
+
+// these are obscure metaprogramming functions
+UUserWidget* GetFirstChildWidgetsOfClass(class UWidget* ParentWidget, TSubclassOf<UUserWidget> WidgetClass, bool TopLevelOnly = true);
+void GetAllChildWidgetsOfClass(class UWidget* ParentWidget, TArray<UUserWidget*>& FoundWidgets, TSubclassOf<UUserWidget> WidgetClass, bool TopLevelOnly = true);
+void GetAllChildWidgetsOfInterface(class UWidget* ParentWidget, TArray<UUserWidget*>& FoundWidgets, TSubclassOf<UInterface> WidgetInterface, bool TopLevelOnly = true);
+
+class UWidget* GetParentEx(class UWidget* Widget);
+
+// that one
+FVector2D GetWidgetPositionOnViewport(class UWidget* Widget);
+void Write(class UMultiLineEditableTextBox* Widget, FText Text);
+void WriteLine(class UMultiLineEditableTextBox* Widget, FText Text);
+void ClearText(class UMultiLineEditableTextBox* Widget, FText Text);
+
+ */
 
 UCLASS()
 class UNREALENGINEEX_API UUnrealEngineExStatics : public UBlueprintFunctionLibrary
