@@ -187,7 +187,7 @@ DECLARE_MUTABLE_EXTENSION(AActor)
 		Component->OnComponentDestroyed(false);
 
 		Component->Rename(nullptr, GetTransientPackage());
-		Component->ResetOwner();
+		//Component->ResetOwner();
 	}
 };
 

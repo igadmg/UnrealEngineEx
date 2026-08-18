@@ -45,7 +45,7 @@ public:
 
 public:
 	UFUNCTION(Category = "BlueprintComponentVisualizer", BlueprintNativeEvent)
-	bool DrawVisualization(const UActorComponent* Component, UPrimitiveDrawInterface* PDI);
+	bool DrawVisualization(const UActorComponent* Component, UPrimitiveDrawInterfaceObject* PDI);
 
 	UFUNCTION(Category = "BlueprintComponentVisualizer", BlueprintNativeEvent)
 	bool DrawVisualizationHUD(const UActorComponent* Component, /*const class FViewport* Viewport, */class UCanvas* Canvas);
@@ -92,7 +92,7 @@ class TBlueprintComponentVisualizer : public TBaseClass
 {
 	TSubclassOf<UBlueprintComponentVisualizer> ComponentVisualizerClass;
 	UBlueprintComponentVisualizer* ComponentVisualizer = nullptr;
-	UPrimitiveDrawInterface* uPDI = nullptr;
+	UPrimitiveDrawInterfaceObject* uPDI = nullptr;
 	UCanvas* uCanvas = nullptr;
 	UViewportProxy* uViewport = nullptr;
 	UViewportClick* uViewportClick = nullptr;
@@ -154,7 +154,7 @@ public:
 		if (IsValid(ComponentVisualizerClass))
 		{
 			ComponentVisualizer = Valid(NewObject<UBlueprintComponentVisualizer>(GetTransientPackage(), ComponentVisualizerClass, NAME_None, RF_Transient));
-			uPDI = NewObject<UPrimitiveDrawInterface>(GetTransientPackage(), NAME_None, RF_Transient);
+			uPDI = NewObject<UPrimitiveDrawInterfaceObject>(GetTransientPackage(), NAME_None, RF_Transient);
 			uCanvas = NewObject<UCanvas>(GetTransientPackage(), NAME_None, RF_Transient);
 			uViewport = NewObject<UViewportProxy>(GetTransientPackage(), NAME_None, RF_Transient);
 			uViewportClick = NewObject<UViewportClick>(GetTransientPackage(), NAME_None, RF_Transient);

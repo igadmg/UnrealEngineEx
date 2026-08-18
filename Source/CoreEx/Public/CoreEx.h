@@ -67,6 +67,22 @@ static ENetMode GetNetMode(const UObject* WorldContextObject)
 	return World ? World->GetNetMode() : NM_Standalone;
 }
 
+static FString GetNetModeString(const UObject* WorldContextObject)
+{
+	switch (::GetNetMode(WorldContextObject)) {
+	case NM_Standalone:
+		return "Standalone";
+	case NM_DedicatedServer:
+		return "DedicatedServer";
+	case NM_ListenServer:
+		return "ListenServer";
+	case NM_Client:
+		return "Client";
+	}
+
+	return "";
+}
+
 #define if_NotClassDefaultObject(WorldContextObject) \
 if ((WorldContextObject->GetFlags() & RF_ClassDefaultObject) == 0)
 

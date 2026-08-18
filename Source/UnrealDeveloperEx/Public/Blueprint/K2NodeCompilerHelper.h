@@ -135,7 +135,8 @@ public:
 	template <typename NodeType, typename... Ts>
 	NodeType* SpawnIntermediateEventNode(UEdGraphPin* SourcePin, Ts... args)
 	{
-		auto Result = CompilerContext.SpawnIntermediateEventNode<NodeType>(Node, SourcePin, SourceGraph);
+		auto Result = CompilerContext.SpawnIntermediateNode<NodeType>(Node, SourceGraph);
+		//TODO(iga): use SourcePin here
 		SetupNode(Result, args...);
 		Result->AllocateDefaultPins();
 

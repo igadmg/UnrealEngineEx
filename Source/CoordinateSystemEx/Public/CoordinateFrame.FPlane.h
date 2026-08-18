@@ -16,12 +16,7 @@ static FORCEINLINE FTransform GetPlaneTransform(const FPlane& Plane)
 	};
 	int indices[] = { 0, 1, 2 };
 
-	struct FAxisSortBySize {
-		double* PlaneAxisSizes;
-		FAxisSortBySize(double* PlaneAxisSizes) : PlaneAxisSizes(PlaneAxisSizes) {}
-		bool operator()(int a, int b) const { return PlaneAxisSizes[a] > PlaneAxisSizes[b]; }
-	};
-	Sort(indices, 3, FAxisSortBySize(PlaneAxisSizes));
+	Algo::Sort(indices, [PlaneAxisSizes](int a, int b) { return PlaneAxisSizes[a] > PlaneAxisSizes[b]; });
 
 	if (indices[0] != 0 && indices[1] != 0)
 		PlaneAxis[indices[2]] = FVector::CrossProduct(PlaneAxis[2], PlaneAxis[1]);

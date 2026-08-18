@@ -3,19 +3,19 @@
 #include "Engine/EngineTypes.h"
 #include "Materials/MaterialInterface.h"
 
-#include "PrimitiveDrawInterface.generated.h"
+#include "PrimitiveDrawInterfaceObject.generated.h"
 
 
 
 UCLASS(BlueprintType)
-class UNREALEDITOREX_API UPrimitiveDrawInterface : public UObject
+class UNREALEDITOREX_API UPrimitiveDrawInterfaceObject : public UObject
 {
 	GENERATED_BODY()
 
 
 public:
 	class FPrimitiveDrawInterface* PDI;
-	UPrimitiveDrawInterface* Init(FPrimitiveDrawInterface* InPDI) { PDI = InPDI; return this; }
+	UPrimitiveDrawInterfaceObject* Init(FPrimitiveDrawInterface* InPDI) { PDI = InPDI; return this; }
 
 
 public:

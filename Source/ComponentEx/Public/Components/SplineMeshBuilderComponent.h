@@ -2,6 +2,7 @@
 
 #include "Components/SceneComponent.h"
 #include "Interfaces/CookInterface.h"
+#include "PhysicsEngine/BodyInstance.h"
 
 #include "SplineMeshBuilderComponent.generated.h"
 

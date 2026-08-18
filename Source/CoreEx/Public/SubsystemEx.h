@@ -25,28 +25,28 @@ namespace XX
 		return GameInstance ? GameInstance->GetSubsystem<TSubsystemClass>() : nullptr;
 	}
 
-	template <typename TSubsystemClass = UGameInstanceSubsystem>
-	inline const TArray<TSubsystemClass*>& GetSubsystemArray(const UObject* WorldContextObject, typename std::enable_if_t<std::is_base_of_v<UGameInstanceSubsystem, TSubsystemClass>>* = nullptr)
-	{
-		static TArray<TSubsystemClass*> EmptyArray;
-		auto GameInstance = UGameplayStatics::GetGameInstance(WorldContextObject);
-		return GameInstance ? GameInstance->GetSubsystemArray<TSubsystemClass>() : EmptyArray;
-	}
+	//template <typename TSubsystemClass = UGameInstanceSubsystem>
+	//inline const TArray<TSubsystemClass*>& GetSubsystemArray(const UObject* WorldContextObject, typename std::enable_if_t<std::is_base_of_v<UGameInstanceSubsystem, TSubsystemClass>>* = nullptr)
+	//{
+	//	static TArray<TSubsystemClass*> EmptyArray;
+	//	auto GameInstance = UGameplayStatics::GetGameInstance(WorldContextObject);
+	//	return GameInstance ? GameInstance->GetSubsystemArray<TSubsystemClass>() : EmptyArray;
+	//}
 
-	template <typename TSubsystemClass = UGameInstanceSubsystem>
-	inline const TArray<TSubsystemClass*>& GetSubsystemArray(const UGameInstance* GameInstance, typename std::enable_if_t<std::is_base_of_v<UGameInstanceSubsystem, TSubsystemClass>>* = nullptr)
-	{
-		static TArray<TSubsystemClass*> EmptyArray;
-		return GameInstance ? GameInstance->GetSubsystemArray<TSubsystemClass>() : EmptyArray;
-	}
-
-	template <typename TSubsystemClass = UGameInstanceSubsystem>
-	inline const TArray<TSubsystemClass*>& GetSubsystemArray(const UGameInstanceSubsystem* WorldContextObject, typename std::enable_if_t<std::is_base_of_v<UGameInstanceSubsystem, TSubsystemClass>>* = nullptr)
-	{
-		static TArray<TSubsystemClass*> EmptyArray;
-		auto GameInstance = WorldContextObject ? WorldContextObject->GetGameInstance() : nullptr;
-		return GameInstance ? GameInstance->GetSubsystemArray<TSubsystemClass>() : EmptyArray;
-	}
+	//template <typename TSubsystemClass = UGameInstanceSubsystem>
+	//inline const TArray<TSubsystemClass*>& GetSubsystemArray(const UGameInstance* GameInstance, typename std::enable_if_t<std::is_base_of_v<UGameInstanceSubsystem, TSubsystemClass>>* = nullptr)
+	//{
+	//	static TArray<TSubsystemClass*> EmptyArray;
+	//	return GameInstance ? GameInstance->GetSubsystemArray<TSubsystemClass>() : EmptyArray;
+	//}
+	
+	//template <typename TSubsystemClass = UGameInstanceSubsystem>
+	//inline const TArray<TSubsystemClass*>& GetSubsystemArray(const UGameInstanceSubsystem* WorldContextObject, typename std::enable_if_t<std::is_base_of_v<UGameInstanceSubsystem, TSubsystemClass>>* = nullptr)
+	//{
+	//	static TArray<TSubsystemClass*> EmptyArray;
+	//	auto GameInstance = WorldContextObject ? WorldContextObject->GetGameInstance() : nullptr;
+	//	return GameInstance ? GameInstance->GetSubsystemArray<TSubsystemClass>() : EmptyArray;
+	//}
 }
 #endif
 
@@ -61,13 +61,13 @@ namespace XX
 		return World ? World->GetSubsystem<TSubsystemClass>() : nullptr;
 	}
 
-	template <typename TSubsystemClass = UWorldSubsystem>
-	inline const TArray<TSubsystemClass*>& GetSubsystemArray(const UObject* WorldContextObject, typename std::enable_if_t<std::is_base_of_v<UWorldSubsystem, TSubsystemClass>>* = nullptr)
-	{
-		static TArray<TSubsystemClass*> EmptyArray;
-		auto World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
-		return World ? World->GetSubsystemArray<TSubsystemClass>() : nullptr;
-	}
+	//template <typename TSubsystemClass = UWorldSubsystem>
+	//inline const TArray<TSubsystemClass*>& GetSubsystemArray(const UObject* WorldContextObject, typename std::enable_if_t<std::is_base_of_v<UWorldSubsystem, TSubsystemClass>>* = nullptr)
+	//{
+	//	static TArray<TSubsystemClass*> EmptyArray;
+	//	auto World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	//	return World ? World->GetSubsystemArray<TSubsystemClass>() : nullptr;
+	//}
 }
 #endif
 
@@ -85,12 +85,12 @@ namespace XX
 		return LocalPlayer ? LocalPlayer->GetSubsystem<TSubsystemClass>() : nullptr;
 	}
 
-	template <typename TSubsystemClass = ULocalPlayerSubsystem>
-	inline const TArray<TSubsystemClass*>& GetSubsystemArray(const UObject* WorldContextObject, typename std::enable_if_t<std::is_base_of_v<ULocalPlayerSubsystem, TSubsystemClass>>* = nullptr)
-	{
-		static TArray<TSubsystemClass*> EmptyArray;
-		auto LocalPlayer = XX::GetPlayer<ULocalPlayer>(WorldContextObject);
-		return LocalPlayer ? LocalPlayer->GetSubsystemArray<TSubsystemClass>() : EmptyArray;
-	}
+	//template <typename TSubsystemClass = ULocalPlayerSubsystem>
+	//inline const TArray<TSubsystemClass*>& GetSubsystemArray(const UObject* WorldContextObject, typename std::enable_if_t<std::is_base_of_v<ULocalPlayerSubsystem, TSubsystemClass>>* = nullptr)
+	//{
+	//	static TArray<TSubsystemClass*> EmptyArray;
+	//	auto LocalPlayer = XX::GetPlayer<ULocalPlayer>(WorldContextObject);
+	//	return LocalPlayer ? LocalPlayer->GetSubsystemArray<TSubsystemClass>() : EmptyArray;
+	//}
 }
 #endif

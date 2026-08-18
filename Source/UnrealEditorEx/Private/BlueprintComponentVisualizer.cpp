@@ -13,7 +13,7 @@ UWorld* UBlueprintComponentVisualizer::GetWorld() const
 }
 
 
-bool UBlueprintComponentVisualizer::DrawVisualization_Implementation(const UActorComponent* Component, UPrimitiveDrawInterface* PDI)
+bool UBlueprintComponentVisualizer::DrawVisualization_Implementation(const UActorComponent* Component, UPrimitiveDrawInterfaceObject* PDI)
 {
 	return false;
 }

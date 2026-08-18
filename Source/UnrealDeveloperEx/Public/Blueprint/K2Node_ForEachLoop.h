@@ -5,7 +5,7 @@
 
 #include "K2Node_ForEachLoop.generated.h"
 
-#define WITH_NOTIFY_GRAPH_PATCH true
+#define WITH_NOTIFY_GRAPH_PATCH false
 
 UENUM(BlueprintType)
 enum class ELoopDirection : uint8

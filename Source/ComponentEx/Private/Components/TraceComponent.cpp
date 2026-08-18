@@ -1,6 +1,7 @@
 #include "Components/TraceComponent.h"
 
 #include "Camera/CameraComponent.h"
+#include "GameFramework/Pawn.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 #include "ComponentEx.final.h"

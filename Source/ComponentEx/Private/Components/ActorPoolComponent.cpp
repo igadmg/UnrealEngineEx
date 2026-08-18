@@ -182,7 +182,7 @@ bool UActorPoolComponent::DestroyActor(AActor* Actor, bool bNetForce, bool bShou
 	if (!IsValid(Actor))
 		return false;
 
-	if (!ensureMsgf(Actor->ActorHasTag(TagPooled), TEXT("Actor %s does not belong to a pool.")))
+	if (!ensureMsgf(Actor->ActorHasTag(TagPooled), TEXT("Actor %s does not belong to a pool."), *Actor->GetName()))
 		return false;
 
 	auto& ActorPoolNode = GetActorPoolNode(Actor->GetClass());

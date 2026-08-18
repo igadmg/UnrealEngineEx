@@ -17,7 +17,7 @@ class UNREALENGINEEX_API UUserWidgetEx : public UUserWidget
 
 
 public:
-	UPROPERTY(Category = "Interaction", EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = "EFocusCause"))
+	UPROPERTY(Category = "Interaction", EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = "/Script/SlateCore.EFocusCause"))
 	int32 PreventFocusChange;
 
 	UPROPERTY(BlueprintAssignable)

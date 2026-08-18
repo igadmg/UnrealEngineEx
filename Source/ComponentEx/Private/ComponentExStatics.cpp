@@ -225,6 +225,7 @@ bool UComponentExStatics::UpdateBlendableWeight(APostProcessVolume* Volume, int 
 
 float UComponentExStatics::FindDistanceClosestToLocation(USplineComponent* Spline, FVector Location, ESplineCoordinateSpace::Type CoordinateSpace)
 {
+#if false
 	const int DistanceSolverIterations = 16;
 
 	const float ClosestInputKey = Spline->FindInputKeyClosestToLocation(Location, CoordinateSpace);
@@ -255,6 +256,9 @@ float UComponentExStatics::FindDistanceClosestToLocation(USplineComponent* Splin
 	}
 
 	return FMath::Clamp(Distance, 0.0f, Spline->GetSplineLength());
+#else
+	return 0;
+#endif
 }
 
 FVector2D UComponentExStatics::GetTextureSize(UTexture* Texture)
@@ -335,7 +339,9 @@ bool UComponentExStatics::GetWorldBoneTransformAtTime(USkeletalMeshComponent* Sk
 	for (const FName& LocalBoneName : BoneStack)
 	{
 		int32 TrackIndex =
-#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 23 || ENGINE_MAJOR_VERSION >= 5
+#if ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 8
+			AnimSequence->GetDataModel()->GetBoneTrackIndexByName(LocalBoneName);
+#elif ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 23 || ENGINE_MAJOR_VERSION >= 5
 			Skeleton->GetRawAnimationTrackIndex(SkeletalMeshComponent->GetBoneIndex(LocalBoneName), AnimSequence);
 #elif ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 0
 			Skeleton->GetAnimationTrackIndex(SkeletalMeshComponent->GetBoneIndex(LocalBoneName), AnimSequence, true);
@@ -345,7 +351,11 @@ bool UComponentExStatics::GetWorldBoneTransformAtTime(USkeletalMeshComponent* Sk
 			return false;
 
 		FTransform BoneTransform;
+#if ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 8
+		AnimSequence->GetBoneTransform(BoneTransform, FSkeletonPoseBoneIndex(TrackIndex), Time, true);
+#else
 		AnimSequence->GetBoneTransform(BoneTransform, TrackIndex, Time, true);
+#endif
 		OutTransform = OutTransform * BoneTransform;
 	}
 

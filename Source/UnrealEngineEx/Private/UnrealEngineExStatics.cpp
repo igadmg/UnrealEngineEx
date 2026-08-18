@@ -980,8 +980,9 @@ int32 UUnrealEngineExStatics::GetPlayNumberOfClients()
 	int32 PlayNumberOfClients(0);
 	PlayInSettings->GetPlayNumberOfClients(PlayNumberOfClients);	// Ignore 'state' of option (handled externally)
 	return PlayNumberOfClients;
-#endif
+#else
 	return 0;
+#endif
 }
 
 
@@ -1050,8 +1051,7 @@ void ForeachChildWidget(UWidget* ParentWidget, TFunction<bool(UWidget*)> Predica
 
 	while (WidgetsToCheck.Num() > 0)
 	{
-		const bool bAllowShrinking = false;
-		UWidget* PossibleParent = WidgetsToCheck.Pop(bAllowShrinking);
+		UWidget* PossibleParent = WidgetsToCheck.Pop(EAllowShrinking::No);
 
 		if (CheckedWidgets.Contains(PossibleParent))
 			continue;
@@ -1198,7 +1198,8 @@ FString UUnrealEngineExStatics::GetInstanceStringID(UObject* WorldContextObject)
 	switch (World->GetNetMode())
 	{
 	case NM_Client:
-		return FString::Printf(TEXT("Client %d"), GPlayInEditorID - 1);
+		//return FString::Printf(TEXT("Client %d"), GPlayInEditorID - 1);
+		return FString::Printf(TEXT("Client"));
 	case NM_DedicatedServer:
 		return FString::Printf(TEXT("Dedicated Server"));
 	case NM_ListenServer:
@@ -1279,7 +1280,7 @@ FString ToJsonStringImpl(FProperty* Property, void* Value)
 
 	auto JsonWriter = TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&Result, 0);
 	auto JsonValue = FJsonObjectConverter::UPropertyToJsonValue(Property, Value);
-	FJsonSerializer::Serialize(JsonValue, JsonWriter);
+	FJsonSerializer::Serialize(JsonValue, Property->GetName(), JsonWriter);
 	JsonWriter->Close();
 
 	return Result;

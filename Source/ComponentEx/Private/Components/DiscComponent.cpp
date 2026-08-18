@@ -2,6 +2,8 @@
 
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
+#include "SceneView.h"
+#include "SceneManagement.h"
 #include "PrimitiveSceneProxy.h"
 
 #include "ComponentEx.final.h"

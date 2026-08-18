@@ -1,5 +1,7 @@
 #include "Components/ChildActorPrimitiveComponent.h"
 #include "Misc/EngineVersionComparison.h"
+#include "Engine/Level.h"
+#include "ComponentExStatics.h"
 
 #include "ComponentEx.final.h"
 
